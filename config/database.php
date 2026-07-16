@@ -1,8 +1,8 @@
 
 <?php
-define('SUPABASE_URL', 'YOUR_SUPABASE_URL');
-define('SUPABASE_KEY', 'YOUR_SUPABASE_ANON_KEY');
-define('SUPABASE_SERVICE_KEY', 'YOUR_SUPABASE_SERVICE_ROLE_KEY');
+define('SUPABASE_URL', 'https://fenezpgytgeriefzbtal.supabase.co');
+define('SUPABASE_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlbmV6cGd5dGdlcmllZnpidGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxOTI1MDUsImV4cCI6MjA5OTc2ODUwNX0.rEycTxSxtWbIRSx3yhMqUwPfdxvB9Ei1aQcLYaLEmh4');
+define('SUPABASE_SERVICE_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlbmV6cGd5dGdlcmllZnpidGFsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDE5MjUwNSwiZXhwIjoyMDk5NzY4NTA1fQ.HDrF1m6fcyt3mAIbq2tXFow8W7IUb-_VXmLHBqSlcoI');
 
 class SupabaseDB {
     private $url;

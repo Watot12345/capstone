@@ -8,6 +8,7 @@
               <i id="toggleArrow" class="fa-solid fa-chevron-left text-xs"></i>
             </button>
           </div>
+           <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2">Modules</span>
 
           <span class="sidebar-text text-[9px] font-bold tracking-widest text-slate-400 uppercase block px-3 mb-2">Main Controls</span>
           
