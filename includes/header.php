@@ -50,8 +50,8 @@
           JS
         </div>
         <div class="hidden sm:flex flex-col">
-          <span class="text-xs font-bold text-slate-700 leading-none">Joshua Suruiz</span>
-          <span class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-wider">Superadmin</span>
+          <span class="text-xs font-bold text-slate-700 leading-none">Joshua Sierra</span>
+          <span class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-wider">admin</span>
         </div>
       </div>
     </div>

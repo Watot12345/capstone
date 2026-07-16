@@ -13,7 +13,7 @@
           
           <a href="dashboard.php" class="flex items-center space-x-3 px-3 py-2.5 bg-white text-brand-dark border border-brand-border rounded-xl text-xs font-bold tracking-wide transition shadow-xs relative">
             <i class="fa-solid fa-table-columns text-sm text-brand-medium"></i>
-            <span class="sidebar-text truncate">Dashboard Overview</span>
+            <span class="sidebar-text truncate">System Overview</span>
           </a>
 
           <div class="space-y-1">
@@ -40,7 +40,7 @@
                 class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-user-shield text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-                    <span class="sidebar-text truncate">Role & Permissions</span>
+                    <span class="sidebar-text truncate">System Logs</span>
                 </div>
                 <div class="dropdown-right">
                     <i id="roleChevron"
@@ -59,7 +59,7 @@
               class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-sitemap text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-                    <span class="sidebar-text truncate">Department Management</span>
+                    <span class="sidebar-text truncate">Analytics</span>
               </div>
                 <div class="dropdown-right">
                     <i id="deptChevron"
@@ -80,7 +80,7 @@
                   class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
                   <div class="flex items-center space-x-3">
                       <i class="fa-solid fa-address-book text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-                      <span class="sidebar-text truncate">Citizen Management</span>
+                      <span class="sidebar-text truncate">Reports</span>
                   </div>
                   <div class="dropdown-right">
                       <i id="citizenChevron"
@@ -101,7 +101,7 @@
 
                   <div class="flex items-center space-x-3">
                       <i class="fa-solid fa-clock-rotate-left text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-                      <span class="sidebar-text truncate">Audit Logs System</span>
+                      <span class="sidebar-text truncate">Compliance & Violations</span>
               </div>
 
               <div class="dropdown-right">
@@ -114,6 +114,26 @@
               <a href="log_activities.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition"><i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> <span>User Activities</span></a>
               <a href="log_history.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition"><i class="fa-solid fa-history text-[10px] opacity-50"></i> <span>Login History</span></a>
               <a href="log_changes.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition"><i class="fa-solid fa-pen-to-square text-[10px] opacity-50"></i> <span>Data Changes</span></a>
+            </div>
+          </div>
+
+           <div class="space-y-1">
+               <button
+                  onclick="toggleDropdown('citizenDropdown', 'citizenChevron')"
+                  class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+                  <div class="flex items-center space-x-3">
+                      <i class="fa-solid fa-address-book text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+                      <span class="sidebar-text truncate">Settings</span>
+                  </div>
+                  <div class="dropdown-right">
+                      <i id="citizenChevron"
+                        class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
+                  </div>
+              </button>
+
+            <div id="citizenDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+              <a href="citizen_records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition"><i class="fa-solid fa-id-card text-[10px] opacity-50"></i> <span>View Citizen Records</span></a>
+              <a href="citizen_master.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition"><i class="fa-solid fa-database text-[10px] opacity-50"></i> <span>Manage Master Data</span></a>
             </div>
           </div>
         </nav>
