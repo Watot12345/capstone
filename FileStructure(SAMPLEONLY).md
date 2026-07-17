@@ -269,7 +269,42 @@ hsms/
 ├── webpack.config.js                  # Webpack configuration
 └── README.md                          # Project documentation
 
+.htaccess (URL Rewriting)
+apache
+RewriteEngine On
 
+# Force HTTPS
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Remove .php extension
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [NC,L]
+
+# Admin routes
+RewriteRule ^admin/?$ admin/index.php [NC,L]
+RewriteRule ^admin/([a-zA-Z0-9_-]+)/?$ admin/modules/$1/index.php [NC,L]
+
+# API routes
+RewriteRule ^api/([a-zA-Z0-9_-]+)/?$ mobile/api/$1.php [NC,L]
+
+# 404 Error
+ErrorDocument 404 /404.php
+
+# admin/.htaccess
+RewriteEngine On
+
+# Remove .php extension
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*?)/?$ $1.php [L]
+
+# Clean URL routing
+RewriteRule ^module/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/?$ modules/$1/$2.php [L]
+RewriteRule ^module/([a-zA-Z0-9_-]+)/?$ modules/$1/index.php [L]
+
+# Example:
+# /module/health-center/patients → /admin/modules/health-center/patients.php
+# /module/health-center → /admin/modules/health-center/index.php
 
 
 SAMPLE FILES
@@ -317,27 +352,7 @@ function getDB() {
 }
 ?>
 
-.htaccess (URL Rewriting)
-apache
-RewriteEngine On
 
-# Force HTTPS
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
-
-# Remove .php extension
-RewriteCond %{REQUEST_FILENAME}.php -f
-RewriteRule ^(.*)$ $1.php [NC,L]
-
-# Admin routes
-RewriteRule ^admin/?$ admin/index.php [NC,L]
-RewriteRule ^admin/([a-zA-Z0-9_-]+)/?$ admin/modules/$1/index.php [NC,L]
-
-# API routes
-RewriteRule ^api/([a-zA-Z0-9_-]+)/?$ mobile/api/$1.php [NC,L]
-
-# 404 Error
-ErrorDocument 404 /404.php
 
 
 4. admin/includes/sidebar.php
