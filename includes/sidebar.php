@@ -183,28 +183,28 @@
             <span>Medical Records</span>
           </a>
 
-          <!-- Appointments ⭐ -->
+          <!-- Appointments   -->
           <a href="appointments.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-calendar-check text-[10px] opacity-50"></i> 
-            <span>Appointments ⭐</span>
+            <span>Appointments </span>
           </a>
 
-          <!-- Triage ⭐ -->
+          <!-- Triage   -->
           <a href="triage.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-heart-pulse text-[10px] opacity-50"></i> 
-            <span>Triage ⭐</span>
+            <span>Triage  </span>
           </a>
 
-          <!-- Prescriptions ⭐ -->
+          <!-- Prescriptions   -->
           <a href="prescriptions.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-prescription-bottle text-[10px] opacity-50"></i> 
-            <span>Prescriptions ⭐</span>
+            <span>Prescriptions  </span>
           </a>
 
-          <!-- Referrals ⭐ -->
+          <!-- Referrals   -->
           <a href="referrals.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-arrow-right-arrow-left text-[10px] opacity-50"></i> 
-            <span>Referrals ⭐</span>
+            <span>Referrals  </span>
           </a>
 
         </div>
@@ -241,17 +241,17 @@
           
           <a href="payments.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-money-bill-wave text-[10px] opacity-50"></i> 
-            <span>Payments ⭐</span>
+            <span>Payments  </span>
           </a>
           
           <a href="documents.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file text-[10px] opacity-50"></i> 
-            <span>Documents ⭐</span>
+            <span>Documents  </span>
           </a>
           
           <a href="renewals.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-rotate text-[10px] opacity-50"></i> 
-            <span>Renewals ⭐</span>
+            <span>Renewals  </span>
           </a>
 
         </div>
@@ -288,12 +288,12 @@
           
           <a href="vaccine_inventory.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-boxes text-[10px] opacity-50"></i> 
-            <span>Vaccine Inventory ⭐</span>
+            <span>Vaccine Inventory  </span>
           </a>
           
           <a href="nutrition_assessment.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-apple-alt text-[10px] opacity-50"></i> 
-            <span>Nutrition Assessment ⭐</span>
+            <span>Nutrition Assessment  </span>
           </a>
 
         </div>
@@ -330,12 +330,12 @@
           
           <a href="providers.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-user-cog text-[10px] opacity-50"></i> 
-            <span>Service Providers ⭐</span>
+            <span>Service Providers  </span>
           </a>
           
           <a href="wastewater_billing.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-invoice text-[10px] opacity-50"></i> 
-            <span>Billing ⭐</span>
+            <span>Billing  </span>
           </a>
 
         </div>
@@ -372,17 +372,17 @@
           
           <a href="alerts.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-bell text-[10px] opacity-50"></i> 
-            <span>Real-time Alerts ⭐</span>
+            <span>Real-time Alerts  </span>
           </a>
           
           <a href="contact_tracing.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-people-arrows text-[10px] opacity-50"></i> 
-            <span>Contact Tracing ⭐</span>
+            <span>Contact Tracing  </span>
           </a>
           
           <a href="response_management.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-phone-alt text-[10px] opacity-50"></i> 
-            <span>Response Management ⭐</span>
+            <span>Response Management </span>
           </a>
 
         </div>
