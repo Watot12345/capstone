@@ -1,44 +1,115 @@
-// CALENDAR/CLOCK FUNCTION
-    function updateClock() {
-      const now = new Date();
-      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      document.getElementById('headerClock').innerText = now.toLocaleDateString('en-US', options);
+// ============================================================
+// 1. CALENDAR/CLOCK FUNCTION
+// ============================================================
+function updateClock() {
+    const now = new Date();
+    const options = { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+    };
+    const clockElement = document.getElementById('headerClock');
+    if (clockElement) {
+        clockElement.innerText = now.toLocaleDateString('en-US', options);
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-    // DROPDOWN
-    function toggleDropdown(id, chevronId) {
-      if (isCollapsed) return; 
+// ============================================================
+// 2. GLOBAL VARIABLE
+// ============================================================
+let isCollapsed = false;
 
-      const dropdown = document.getElementById(id);
-      const chevron = document.getElementById(chevronId);
-      
-      const dropdowns = ['userDropdown', 'roleDropdown', 'deptDropdown', 'citizenDropdown', 'auditDropdown'];
-      const chevrons = ['userChevron', 'roleChevron', 'deptChevron', 'citizenChevron', 'auditChevron'];
-      
-      dropdowns.forEach((d, i) => {
+// ============================================================
+// 3. ALL DROPDOWN IDs (Updated for Simplified Sidebar)
+// ============================================================
+const ALL_DROPDOWN_IDS = [
+    // Main Controls
+    'systemOverviewDropdown',
+    'analyticsDropdown',
+    'reportsDropdown',
+    'complianceDropdown',
+    // Operational Modules (Parent)
+    'healthCenterDropdown',
+    'sanitationDropdown',
+    'immunizationDropdown',
+    'wastewaterDropdown',
+    'surveillanceDropdown',
+    // System Management
+    'userMgmtDropdown',
+    'sysLogsDropdown',
+    'settingsDropdown'
+];
+
+const ALL_CHEVRON_IDS = [
+    // Main Controls
+    'systemOverviewChevron',
+    'analyticsChevron',
+    'reportsChevron',
+    'complianceChevron',
+    // Operational Modules (Parent)
+    'healthCenterChevron',
+    'sanitationChevron',
+    'immunizationChevron',
+    'wastewaterChevron',
+    'surveillanceChevron',
+    // System Management
+    'userMgmtChevron',
+    'sysLogsChevron',
+    'settingsChevron'
+];
+
+// ============================================================
+// 4. DROPDOWN TOGGLE
+// ============================================================
+function toggleDropdown(id, chevronId) {
+    if (isCollapsed) return;
+
+    const dropdown = document.getElementById(id);
+    const chevron = document.getElementById(chevronId);
+
+    // Close all other dropdowns
+    ALL_DROPDOWN_IDS.forEach((d, i) => {
         if (d !== id) {
-          document.getElementById(d).classList.add('hidden');
-          const otherChevron = document.getElementById(chevrons[i]);
-          if (otherChevron) otherChevron.classList.remove('rotate-180');
+            const otherDropdown = document.getElementById(d);
+            const otherChevron = document.getElementById(ALL_CHEVRON_IDS[i]);
+            if (otherDropdown) {
+                otherDropdown.classList.add('hidden');
+            }
+            if (otherChevron) {
+                otherChevron.classList.remove('rotate-180');
+                otherChevron.style.transform = 'rotate(0deg)';
+            }
         }
-      });
+    });
 
-      if (dropdown.classList.contains('hidden')) {
-        dropdown.classList.remove('hidden');
-        if (chevron) chevron.classList.add('rotate-180');
-      } else {
-        dropdown.classList.add('hidden');
-        if (chevron) chevron.classList.remove('rotate-180');
-      }
+    // Toggle the clicked dropdown
+    if (dropdown) {
+        if (dropdown.classList.contains('hidden')) {
+            dropdown.classList.remove('hidden');
+            if (chevron) {
+                chevron.classList.add('rotate-180');
+                chevron.style.transform = 'rotate(180deg)';
+            }
+        } else {
+            dropdown.classList.add('hidden');
+            if (chevron) {
+                chevron.classList.remove('rotate-180');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
     }
+}
 
-    // SIDEBAR RESPONSIVE
-  let isCollapsed = false;
-
+// ============================================================
+// 5. SIDEBAR COLLAPSE
+// ============================================================
 function toggleSidebar() {
-
     const sidebar = document.getElementById('sidebar');
     const arrow = document.getElementById('toggleArrow');
 
@@ -46,52 +117,47 @@ function toggleSidebar() {
     const dropdownButtons = document.querySelectorAll('.dropdown-btn');
     const dropdownRights = document.querySelectorAll('.dropdown-right');
 
-    const dropdowns = [
-        'userDropdown',
-        'roleDropdown',
-        'deptDropdown',
-        'citizenDropdown',
-        'auditDropdown'
-    ];
-
     isCollapsed = !isCollapsed;
 
     if (isCollapsed) {
-
-        // CLOSE
-        dropdowns.forEach(id => {
+        // CLOSE ALL DROPDOWNS
+        ALL_DROPDOWN_IDS.forEach(id => {
             const menu = document.getElementById(id);
-
             if (menu) {
                 menu.classList.add('hidden');
             }
         });
 
-        // COLLAPSE
+        // Reset all chevrons
+        document.querySelectorAll('.dropdown-chevron').forEach(chv => {
+            chv.classList.remove('rotate-180');
+            chv.style.transform = 'rotate(0deg)';
+        });
+
+        // COLLAPSE SIDEBAR
         sidebar.classList.remove('w-72');
         sidebar.classList.add('w-20');
 
         arrow.className = "fa-solid fa-chevron-right text-xs";
 
-        // HIDE
+        // HIDE TEXT
         sideLabels.forEach(label => {
             label.classList.add('hidden');
         });
 
-        // HIDE DROPDOWN
+        // HIDE DROPDOWN ARROWS
         dropdownRights.forEach(right => {
             right.classList.add('hidden');
         });
 
-        // CENTER ICON
+        // CENTER ICONS
         dropdownButtons.forEach(btn => {
             btn.classList.remove('justify-between');
             btn.classList.add('justify-center');
         });
 
     } else {
-
-        // EXPAND
+        // EXPAND SIDEBAR
         sidebar.classList.remove('w-20');
         sidebar.classList.add('w-72');
 
@@ -102,21 +168,79 @@ function toggleSidebar() {
             label.classList.remove('hidden');
         });
 
-        // SHOW DROP DOWN BUTTON
+        // SHOW DROPDOWN ARROWS
         dropdownRights.forEach(right => {
             right.classList.remove('hidden');
         });
 
-        // RESTORE
+        // RESTORE BUTTON STYLE
         dropdownButtons.forEach(btn => {
             btn.classList.remove('justify-center');
             btn.classList.add('justify-between');
         });
 
-        // RESET
+        // RESET CHEVRONS
         document.querySelectorAll('.dropdown-chevron').forEach(chv => {
             chv.classList.remove('rotate-180');
+            chv.style.transform = 'rotate(0deg)';
         });
-
     }
 }
+
+// ============================================================
+// 6. KEEP DROPDOWNS OPEN ON PAGE LOAD
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+
+    ALL_DROPDOWN_IDS.forEach(id => {
+        const dropdown = document.getElementById(id);
+        if (dropdown) {
+            const links = dropdown.querySelectorAll('a');
+            let shouldOpen = false;
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && currentPath.includes(href)) {
+                    shouldOpen = true;
+                }
+            });
+
+            if (shouldOpen) {
+                // Open the dropdown
+                dropdown.classList.remove('hidden');
+
+                // Rotate its chevron
+                const parentBtn = dropdown.closest('.space-y-1')?.previousElementSibling;
+                if (parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    const chevron = parentBtn.querySelector('.dropdown-chevron');
+                    if (chevron) {
+                        chevron.classList.add('rotate-180');
+                        chevron.style.transform = 'rotate(180deg)';
+                    }
+                }
+            }
+        }
+    });
+});
+
+// ============================================================
+// 7. CLOSE DROPDOWNS WHEN CLICKING OUTSIDE
+// ============================================================
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    if (!sidebar.contains(event.target) && !isCollapsed) {
+        ALL_DROPDOWN_IDS.forEach(id => {
+            const dropdown = document.getElementById(id);
+            if (dropdown) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        document.querySelectorAll('.dropdown-chevron').forEach(chv => {
+            chv.classList.remove('rotate-180');
+            chv.style.transform = 'rotate(0deg)';
+        });
+    }
+});

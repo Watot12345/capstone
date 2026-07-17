@@ -800,3 +800,916 @@ sql
 INSERT INTO roles (name, description, permissions) VALUES 
 ('admin', 'Full system access', '{"all": true}'),
 ('doctor', 'Doctor access for consultations', '{"patients": "rw", "prescriptions": "rw", "consultations": "rw"}');
+
+
+
+
+
+
+
+
+
+
+
+
+ COMPLETE SUPABASE SCHEMA (POSTGRESQL)
+
+
+1. AUTHENTICATION & USER MANAGEMENT
+users table (extends Supabase auth.users)
+sql
+-- users table
+CREATE TABLE public.users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) UNIQUE NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    role_id INTEGER NOT NULL,
+    department VARCHAR(50),
+    contact VARCHAR(20),
+    profile_image_url TEXT,
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended')),
+    last_login TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (role_id) REFERENCES public.roles(id)
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy: Users can read their own profile
+CREATE POLICY "Users can view own profile" ON public.users
+    FOR SELECT USING (auth.uid() = user_id);
+
+-- RLS Policy: Admins can view all users
+CREATE POLICY "Admins can view all users" ON public.users
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.users
+            WHERE user_id = auth.uid() AND role_id = 1
+        )
+    );
+roles table
+sql
+CREATE TABLE public.roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT,
+    permissions JSONB DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Insert default roles
+INSERT INTO public.roles (name, description, permissions) VALUES 
+('admin', 'Full system access', '{"all": true}'),
+('doctor', 'Doctor access for consultations', '{"patients": "rw", "prescriptions": "rw", "consultations": "rw"}'),
+('nurse', 'Nurse access for triage and vitals', '{"triage": "rw", "appointments": "rw"}'),
+('sanitation_officer', 'Sanitation department head', '{"permits": "rw", "inspections": "rw"}'),
+('immunization_coordinator', 'Immunization program head', '{"vaccinations": "rw", "children": "rw"}'),
+('wastewater_officer', 'Wastewater services head', '{"septic": "rw", "requests": "rw"}'),
+('surveillance_officer', 'Health surveillance head', '{"cases": "rw", "outbreaks": "rw"}');
+
+ALTER TABLE public.roles ENABLE ROW LEVEL SECURITY;
+permissions table
+sql
+CREATE TABLE public.permissions (
+    id SERIAL PRIMARY KEY,
+    role_id INTEGER NOT NULL,
+    module VARCHAR(50) NOT NULL,
+    permission VARCHAR(50) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE CASCADE,
+    UNIQUE(role_id, module, permission)
+);
+
+ALTER TABLE public.permissions ENABLE ROW LEVEL SECURITY;
+sessions table
+sql
+CREATE TABLE public.sessions (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    token TEXT UNIQUE NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
+2. HEALTH CENTER SERVICES
+patients table
+sql
+CREATE TABLE public.patients (
+    id SERIAL PRIMARY KEY,
+    patient_id VARCHAR(20) UNIQUE NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    middle_name VARCHAR(50),
+    birth_date DATE NOT NULL,
+    gender TEXT NOT NULL CHECK (gender IN ('Male', 'Female', 'Other')),
+    blood_type TEXT CHECK (blood_type IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')),
+    contact VARCHAR(20) NOT NULL,
+    email VARCHAR(100),
+    address TEXT NOT NULL,
+    barangay VARCHAR(50),
+    emergency_contact VARCHAR(50),
+    emergency_contact_number VARCHAR(20),
+    allergies TEXT,
+    medical_history JSONB,
+    registration_date DATE NOT NULL,
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'archived')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.patients ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy: Only authenticated users can view patients
+CREATE POLICY "Authenticated users can view patients" ON public.patients
+    FOR SELECT USING (auth.role() = 'authenticated');
+
+-- RLS Policy: Doctors can edit their patients
+CREATE POLICY "Doctors can edit patients" ON public.patients
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.users
+            WHERE user_id = auth.uid() AND role_id = 2
+        )
+    );
+appointments table
+sql
+CREATE TABLE public.appointments (
+    id SERIAL PRIMARY KEY,
+    appointment_id VARCHAR(20) UNIQUE NOT NULL,
+    patient_id INTEGER NOT NULL,
+    doctor_id UUID NOT NULL,
+    service_type VARCHAR(100) NOT NULL,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'completed', 'cancelled', 'no_show')),
+    priority TEXT DEFAULT 'medium' CHECK (priority IN ('critical', 'high', 'medium', 'low')),
+    notes TEXT,
+    reminder_sent BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (patient_id) REFERENCES public.patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (doctor_id) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
+
+-- Indexes
+CREATE INDEX idx_appointments_date ON public.appointments(appointment_date);
+CREATE INDEX idx_appointments_status ON public.appointments(status);
+CREATE INDEX idx_appointments_patient ON public.appointments(patient_id);
+triage table
+sql
+CREATE TABLE public.triage (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER NOT NULL,
+    nurse_id UUID NOT NULL,
+    blood_pressure VARCHAR(20),
+    heart_rate INTEGER,
+    temperature DECIMAL(4,1),
+    respiratory_rate INTEGER,
+    oxygen_saturation INTEGER,
+    weight DECIMAL(5,2),
+    height DECIMAL(5,2),
+    symptoms TEXT,
+    priority TEXT NOT NULL CHECK (priority IN ('critical', 'high', 'medium', 'low')),
+    allergies VARCHAR(255),
+    medications VARCHAR(255),
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (patient_id) REFERENCES public.patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (nurse_id) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.triage ENABLE ROW LEVEL SECURITY;
+consultations table
+sql
+CREATE TABLE public.consultations (
+    id SERIAL PRIMARY KEY,
+    consultation_id VARCHAR(20) UNIQUE NOT NULL,
+    patient_id INTEGER NOT NULL,
+    doctor_id UUID NOT NULL,
+    appointment_id INTEGER,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    diagnosis TEXT,
+    icd_code VARCHAR(20),
+    symptoms TEXT,
+    vital_signs JSONB,
+    treatment_plan TEXT,
+    notes TEXT,
+    follow_up_date DATE,
+    status TEXT DEFAULT 'completed' CHECK (status IN ('completed', 'referred')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (patient_id) REFERENCES public.patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (doctor_id) REFERENCES public.users(id),
+    FOREIGN KEY (appointment_id) REFERENCES public.appointments(id)
+);
+
+ALTER TABLE public.consultations ENABLE ROW LEVEL SECURITY;
+prescriptions table
+sql
+CREATE TABLE public.prescriptions (
+    id SERIAL PRIMARY KEY,
+    prescription_id VARCHAR(20) UNIQUE NOT NULL,
+    patient_id INTEGER NOT NULL,
+    doctor_id UUID NOT NULL,
+    consultation_id INTEGER,
+    date DATE NOT NULL,
+    medications JSONB NOT NULL,
+    notes TEXT,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'dispensed', 'cancelled')),
+    dispensed_by UUID,
+    dispensed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (patient_id) REFERENCES public.patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (doctor_id) REFERENCES public.users(id),
+    FOREIGN KEY (consultation_id) REFERENCES public.consultations(id),
+    FOREIGN KEY (dispensed_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.prescriptions ENABLE ROW LEVEL SECURITY;
+referrals table
+sql
+CREATE TABLE public.referrals (
+    id SERIAL PRIMARY KEY,
+    referral_id VARCHAR(20) UNIQUE NOT NULL,
+    patient_id INTEGER NOT NULL,
+    from_doctor_id UUID NOT NULL,
+    to_doctor_id UUID,
+    to_hospital VARCHAR(100),
+    reason TEXT NOT NULL,
+    diagnosis TEXT,
+    urgency TEXT DEFAULT 'medium' CHECK (urgency IN ('emergency', 'high', 'medium', 'low')),
+    notes TEXT,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'completed', 'rejected')),
+    accepted_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    feedback TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (patient_id) REFERENCES public.patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (from_doctor_id) REFERENCES public.users(id),
+    FOREIGN KEY (to_doctor_id) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.referrals ENABLE ROW LEVEL SECURITY;
+medical_records table
+sql
+CREATE TABLE public.medical_records (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER NOT NULL,
+    record_type TEXT NOT NULL CHECK (record_type IN ('consultation', 'lab', 'imaging', 'procedure', 'other')),
+    date DATE NOT NULL,
+    description TEXT NOT NULL,
+    attachments JSONB,
+    created_by UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (patient_id) REFERENCES public.patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.medical_records ENABLE ROW LEVEL SECURITY;
+3. SANITATION PERMITS
+permits table
+sql
+CREATE TABLE public.permits (
+    id SERIAL PRIMARY KEY,
+    permit_id VARCHAR(20) UNIQUE NOT NULL,
+    applicant VARCHAR(100) NOT NULL,
+    business_name VARCHAR(100),
+    business_type VARCHAR(50) NOT NULL,
+    address TEXT NOT NULL,
+    owner_name VARCHAR(100) NOT NULL,
+    contact VARCHAR(20) NOT NULL,
+    email VARCHAR(100),
+    fee DECIMAL(10,2) NOT NULL,
+    paid BOOLEAN DEFAULT FALSE,
+    payment_method VARCHAR(50),
+    payment_reference VARCHAR(100),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'under_review', 'approved', 'rejected', 'expired')),
+    inspector_id UUID,
+    inspection_date DATE,
+    approved_date DATE,
+    expiry_date DATE,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (inspector_id) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.permits ENABLE ROW LEVEL SECURITY;
+
+-- Indexes
+CREATE INDEX idx_permits_status ON public.permits(status);
+CREATE INDEX idx_permits_applicant ON public.permits(applicant);
+CREATE INDEX idx_permits_date ON public.permits(created_at);
+permit_documents table
+sql
+CREATE TABLE public.permit_documents (
+    id SERIAL PRIMARY KEY,
+    permit_id INTEGER NOT NULL,
+    document_type VARCHAR(50) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path TEXT NOT NULL,
+    uploaded_by UUID NOT NULL,
+    uploaded_at TIMESTAMPTZ DEFAULT NOW(),
+    verified BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (permit_id) REFERENCES public.permits(id) ON DELETE CASCADE,
+    FOREIGN KEY (uploaded_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.permit_documents ENABLE ROW LEVEL SECURITY;
+inspections table
+sql
+CREATE TABLE public.inspections (
+    id SERIAL PRIMARY KEY,
+    inspection_id VARCHAR(20) UNIQUE NOT NULL,
+    permit_id INTEGER NOT NULL,
+    inspector_id UUID NOT NULL,
+    scheduled_date DATE NOT NULL,
+    scheduled_time TIME NOT NULL,
+    conducted_date TIMESTAMPTZ,
+    findings JSONB,
+    overall_status TEXT DEFAULT 'partially_compliant' CHECK (overall_status IN ('compliant', 'partially_compliant', 'non_compliant')),
+    recommendations TEXT,
+    attachments JSONB,
+    status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'completed', 'cancelled')),
+    completed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (permit_id) REFERENCES public.permits(id) ON DELETE CASCADE,
+    FOREIGN KEY (inspector_id) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.inspections ENABLE ROW LEVEL SECURITY;
+violations table
+sql
+CREATE TABLE public.violations (
+    id SERIAL PRIMARY KEY,
+    permit_id INTEGER NOT NULL,
+    inspection_id INTEGER,
+    violation_type VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'resolved', 'dismissed')),
+    corrective_action TEXT,
+    corrected_date DATE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (permit_id) REFERENCES public.permits(id) ON DELETE CASCADE,
+    FOREIGN KEY (inspection_id) REFERENCES public.inspections(id)
+);
+
+ALTER TABLE public.violations ENABLE ROW LEVEL SECURITY;
+payments table
+sql
+CREATE TABLE public.payments (
+    id SERIAL PRIMARY KEY,
+    payment_id VARCHAR(20) UNIQUE NOT NULL,
+    permit_id INTEGER NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    method TEXT NOT NULL CHECK (method IN ('cash', 'gcash', 'paymaya', 'bank_transfer', 'over_the_counter')),
+    reference_number VARCHAR(50) UNIQUE,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
+    receipt_path TEXT,
+    paid_by VARCHAR(100),
+    paid_at TIMESTAMPTZ,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (permit_id) REFERENCES public.permits(id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+4. IMMUNIZATION & NUTRITION
+children table
+sql
+CREATE TABLE public.children (
+    id SERIAL PRIMARY KEY,
+    child_id VARCHAR(20) UNIQUE NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    birth_date DATE NOT NULL,
+    gender TEXT NOT NULL CHECK (gender IN ('Male', 'Female')),
+    birth_weight DECIMAL(4,1),
+    birth_height DECIMAL(4,1),
+    blood_type VARCHAR(5),
+    mother_name VARCHAR(100) NOT NULL,
+    mother_contact VARCHAR(20) NOT NULL,
+    father_name VARCHAR(100),
+    address TEXT NOT NULL,
+    barangay VARCHAR(50),
+    health_center VARCHAR(100),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.children ENABLE ROW LEVEL SECURITY;
+vaccinations table
+sql
+CREATE TABLE public.vaccinations (
+    id SERIAL PRIMARY KEY,
+    child_id INTEGER NOT NULL,
+    vaccine_name VARCHAR(50) NOT NULL,
+    dose_number INTEGER NOT NULL,
+    dose_sequence VARCHAR(20),
+    date DATE NOT NULL,
+    administered_by UUID NOT NULL,
+    health_center VARCHAR(100) NOT NULL,
+    batch_number VARCHAR(50),
+    expiry_date DATE,
+    site VARCHAR(20),
+    route VARCHAR(20),
+    next_due_date DATE,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (child_id) REFERENCES public.children(id) ON DELETE CASCADE,
+    FOREIGN KEY (administered_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.vaccinations ENABLE ROW LEVEL SECURITY;
+vaccine_inventory table
+sql
+CREATE TABLE public.vaccine_inventory (
+    id SERIAL PRIMARY KEY,
+    vaccine_name VARCHAR(50) NOT NULL,
+    batch_number VARCHAR(50) UNIQUE NOT NULL,
+    quantity INTEGER NOT NULL,
+    minimum_stock INTEGER NOT NULL,
+    received_date DATE,
+    expiry_date DATE NOT NULL,
+    temperature DECIMAL(4,1),
+    storage_location VARCHAR(100),
+    supplier VARCHAR(100),
+    status TEXT DEFAULT 'in_stock' CHECK (status IN ('in_stock', 'low_stock', 'expired', 'out_of_stock')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.vaccine_inventory ENABLE ROW LEVEL SECURITY;
+
+-- Trigger: Auto-update status
+CREATE OR REPLACE FUNCTION update_vaccine_status()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.quantity <= 0 THEN
+        NEW.status := 'out_of_stock';
+    ELSIF NEW.quantity <= NEW.minimum_stock THEN
+        NEW.status := 'low_stock';
+    ELSIF NEW.expiry_date < CURRENT_DATE THEN
+        NEW.status := 'expired';
+    ELSE
+        NEW.status := 'in_stock';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER vaccine_status_trigger
+BEFORE INSERT OR UPDATE ON public.vaccine_inventory
+FOR EACH ROW EXECUTE FUNCTION update_vaccine_status();
+growth_charts table
+sql
+CREATE TABLE public.growth_charts (
+    id SERIAL PRIMARY KEY,
+    child_id INTEGER NOT NULL,
+    date DATE NOT NULL,
+    weight DECIMAL(5,2),
+    height DECIMAL(5,2),
+    head_circumference DECIMAL(5,2),
+    weight_percentile INTEGER,
+    height_percentile INTEGER,
+    bmi DECIMAL(4,1),
+    nutrition_status VARCHAR(50),
+    recorded_by UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (child_id) REFERENCES public.children(id) ON DELETE CASCADE,
+    FOREIGN KEY (recorded_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.growth_charts ENABLE ROW LEVEL SECURITY;
+nutrition_assessments table
+sql
+CREATE TABLE public.nutrition_assessments (
+    id SERIAL PRIMARY KEY,
+    child_id INTEGER NOT NULL,
+    date DATE NOT NULL,
+    nutrition_status TEXT NOT NULL CHECK (nutrition_status IN ('normal', 'underweight', 'overweight', 'obese', 'malnourished')),
+    risk_level TEXT DEFAULT 'medium' CHECK (risk_level IN ('low', 'medium', 'high')),
+    assessment_notes TEXT,
+    plan_of_action TEXT,
+    supplement_given VARCHAR(100),
+    next_assessment_date DATE,
+    assessed_by UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (child_id) REFERENCES public.children(id) ON DELETE CASCADE,
+    FOREIGN KEY (assessed_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.nutrition_assessments ENABLE ROW LEVEL SECURITY;
+5. WASTEWATER SERVICES
+septic_tanks table
+sql
+CREATE TABLE public.septic_tanks (
+    id SERIAL PRIMARY KEY,
+    tank_id VARCHAR(20) UNIQUE NOT NULL,
+    owner_name VARCHAR(100) NOT NULL,
+    address TEXT NOT NULL,
+    latitude DECIMAL(10,6),
+    longitude DECIMAL(10,6),
+    capacity VARCHAR(20),
+    type TEXT DEFAULT 'concrete' CHECK (type IN ('concrete', 'plastic', 'fiberglass')),
+    installation_year INTEGER,
+    last_maintenance DATE,
+    maintenance_frequency INTEGER,
+    status TEXT DEFAULT 'good' CHECK (status IN ('good', 'needs_maintenance', 'critical')),
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.septic_tanks ENABLE ROW LEVEL SECURITY;
+service_providers table
+sql
+CREATE TABLE public.service_providers (
+    id SERIAL PRIMARY KEY,
+    provider_id VARCHAR(20) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    contact VARCHAR(20) NOT NULL,
+    email VARCHAR(100),
+    address TEXT,
+    license_number VARCHAR(50),
+    specialization VARCHAR(50),
+    rating DECIMAL(3,2),
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.service_providers ENABLE ROW LEVEL SECURITY;
+service_requests table
+sql
+CREATE TABLE public.service_requests (
+    id SERIAL PRIMARY KEY,
+    request_id VARCHAR(20) UNIQUE NOT NULL,
+    tank_id INTEGER NOT NULL,
+    service_type TEXT NOT NULL CHECK (service_type IN ('desludging', 'maintenance', 'inspection', 'installation')),
+    preferred_date DATE NOT NULL,
+    preferred_time TIME,
+    provider_id INTEGER,
+    assigned_to UUID,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'assigned', 'in_progress', 'completed', 'cancelled')),
+    scheduled_date DATE,
+    completed_date TIMESTAMPTZ,
+    notes TEXT,
+    feedback TEXT,
+    rating INTEGER,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (tank_id) REFERENCES public.septic_tanks(id) ON DELETE CASCADE,
+    FOREIGN KEY (provider_id) REFERENCES public.service_providers(id),
+    FOREIGN KEY (assigned_to) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.service_requests ENABLE ROW LEVEL SECURITY;
+maintenance_records table
+sql
+CREATE TABLE public.maintenance_records (
+    id SERIAL PRIMARY KEY,
+    tank_id INTEGER NOT NULL,
+    service_request_id INTEGER,
+    maintenance_date TIMESTAMPTZ NOT NULL,
+    performed_by UUID NOT NULL,
+    services_performed TEXT NOT NULL,
+    materials_used JSONB,
+    cost DECIMAL(10,2),
+    status TEXT DEFAULT 'completed' CHECK (status IN ('completed', 'pending', 'cancelled')),
+    next_maintenance_date DATE,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (tank_id) REFERENCES public.septic_tanks(id) ON DELETE CASCADE,
+    FOREIGN KEY (service_request_id) REFERENCES public.service_requests(id),
+    FOREIGN KEY (performed_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.maintenance_records ENABLE ROW LEVEL SECURITY;
+wastewater_billing table
+sql
+CREATE TABLE public.wastewater_billing (
+    id SERIAL PRIMARY KEY,
+    invoice_id VARCHAR(20) UNIQUE NOT NULL,
+    request_id INTEGER NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    tax DECIMAL(10,2) DEFAULT 0,
+    total_amount DECIMAL(10,2) NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'overdue', 'cancelled')),
+    payment_method VARCHAR(50),
+    payment_reference VARCHAR(50),
+    invoice_date DATE NOT NULL,
+    due_date DATE NOT NULL,
+    paid_at TIMESTAMPTZ,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (request_id) REFERENCES public.service_requests(id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.wastewater_billing ENABLE ROW LEVEL SECURITY;
+6. HEALTH SURVEILLANCE
+cases table
+sql
+CREATE TABLE public.cases (
+    id SERIAL PRIMARY KEY,
+    case_id VARCHAR(20) UNIQUE NOT NULL,
+    disease VARCHAR(100) NOT NULL,
+    patient_name VARCHAR(100) NOT NULL,
+    age INTEGER,
+    gender TEXT NOT NULL CHECK (gender IN ('Male', 'Female')),
+    address TEXT NOT NULL,
+    barangay VARCHAR(50) NOT NULL,
+    contact VARCHAR(20),
+    symptoms TEXT,
+    onset_date DATE NOT NULL,
+    reporting_facility VARCHAR(100),
+    status TEXT DEFAULT 'reported' CHECK (status IN ('reported', 'investigating', 'confirmed', 'resolved', 'closed')),
+    severity TEXT DEFAULT 'moderate' CHECK (severity IN ('low', 'moderate', 'high', 'critical')),
+    reported_by UUID NOT NULL,
+    investigator_id UUID,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (reported_by) REFERENCES public.users(id),
+    FOREIGN KEY (investigator_id) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.cases ENABLE ROW LEVEL SECURITY;
+
+-- Indexes
+CREATE INDEX idx_cases_barangay ON public.cases(barangay);
+CREATE INDEX idx_cases_disease ON public.cases(disease);
+CREATE INDEX idx_cases_status ON public.cases(status);
+outbreaks table
+sql
+CREATE TABLE public.outbreaks (
+    id SERIAL PRIMARY KEY,
+    outbreak_id VARCHAR(20) UNIQUE NOT NULL,
+    disease VARCHAR(100) NOT NULL,
+    barangays JSONB NOT NULL,
+    cases_count INTEGER NOT NULL,
+    severity TEXT NOT NULL CHECK (severity IN ('low', 'moderate', 'high', 'critical')),
+    alert_level TEXT NOT NULL CHECK (alert_level IN ('yellow', 'orange', 'red')),
+    start_date DATE NOT NULL,
+    end_date DATE,
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'contained', 'resolved')),
+    recommendations TEXT,
+    declared_by UUID NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (declared_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.outbreaks ENABLE ROW LEVEL SECURITY;
+contact_tracing table
+sql
+CREATE TABLE public.contact_tracing (
+    id SERIAL PRIMARY KEY,
+    case_id INTEGER NOT NULL,
+    contact_name VARCHAR(100) NOT NULL,
+    contact_age INTEGER,
+    contact_gender TEXT CHECK (contact_gender IN ('Male', 'Female')),
+    contact_address TEXT NOT NULL,
+    contact_phone VARCHAR(20),
+    relationship VARCHAR(50),
+    exposure_date DATE,
+    exposure_type VARCHAR(50),
+    exposure_duration VARCHAR(50),
+    quarantine_start_date DATE,
+    quarantine_end_date DATE,
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'cleared', 'symptomatic', 'confirmed')),
+    monitored_by UUID NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (case_id) REFERENCES public.cases(id) ON DELETE CASCADE,
+    FOREIGN KEY (monitored_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.contact_tracing ENABLE ROW LEVEL SECURITY;
+outbreak_response table
+sql
+CREATE TABLE public.outbreak_response (
+    id SERIAL PRIMARY KEY,
+    outbreak_id INTEGER NOT NULL,
+    response_team VARCHAR(100),
+    actions JSONB NOT NULL,
+    resources_allocated JSONB,
+    response_date TIMESTAMPTZ NOT NULL,
+    status TEXT DEFAULT 'initiated' CHECK (status IN ('initiated', 'in_progress', 'completed')),
+    effectiveness_rating INTEGER,
+    lessons_learned TEXT,
+    reported_by UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (outbreak_id) REFERENCES public.outbreaks(id) ON DELETE CASCADE,
+    FOREIGN KEY (reported_by) REFERENCES public.users(id)
+);
+
+ALTER TABLE public.outbreak_response ENABLE ROW LEVEL SECURITY;
+7. SYSTEM ADMIN & LOGS
+audit_logs table
+sql
+CREATE TABLE public.audit_logs (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    module VARCHAR(50) NOT NULL,
+    target_type VARCHAR(50),
+    target_id VARCHAR(20),
+    details JSONB,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Indexes
+CREATE INDEX idx_audit_user ON public.audit_logs(user_id);
+CREATE INDEX idx_audit_timestamp ON public.audit_logs(created_at);
+CREATE INDEX idx_audit_module ON public.audit_logs(module);
+
+-- RLS Policy: Only admins can view audit logs
+CREATE POLICY "Only admins can view audit logs" ON public.audit_logs
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.users
+            WHERE user_id = auth.uid() AND role_id = 1
+        )
+    );
+
+-- RLS Policy: System can insert audit logs
+CREATE POLICY "System can insert audit logs" ON public.audit_logs
+    FOR INSERT WITH CHECK (true);
+system_settings table
+sql
+CREATE TABLE public.system_settings (
+    id SERIAL PRIMARY KEY,
+    setting_key VARCHAR(50) UNIQUE NOT NULL,
+    setting_value TEXT,
+    setting_group VARCHAR(50),
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
+
+-- Insert default settings
+INSERT INTO public.system_settings (setting_key, setting_value, setting_group, description) VALUES
+('app_name', 'Health & Sanitation Management System', 'general', 'Application name'),
+('app_version', '1.0.0', 'general', 'Application version'),
+('timezone', 'Asia/Manila', 'general', 'System timezone'),
+('enable_2fa', 'false', 'security', 'Enable two-factor authentication'),
+('session_timeout', '3600', 'security', 'Session timeout in seconds'),
+('max_login_attempts', '5', 'security', 'Maximum login attempts before lockout');
+notifications table
+sql
+CREATE TABLE public.notifications (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    link VARCHAR(255),
+    read BOOLEAN DEFAULT FALSE,
+    sent_via VARCHAR(50),
+    sent_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy: Users can view own notifications
+CREATE POLICY "Users can view own notifications" ON public.notifications
+    FOR SELECT USING (auth.uid() = user_id);
+
+-- RLS Policy: Users can update own notifications
+CREATE POLICY "Users can update own notifications" ON public.notifications
+    FOR UPDATE USING (auth.uid() = user_id);
+schedules table
+sql
+CREATE TABLE public.schedules (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id INTEGER NOT NULL,
+    date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    status TEXT DEFAULT 'available' CHECK (status IN ('available', 'booked', 'unavailable')),
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.schedules ENABLE ROW LEVEL SECURITY;
+8. STORAGE BUCKETS (Supabase Storage)
+sql
+-- Create storage buckets
+INSERT INTO storage.buckets (id, name, public) VALUES 
+('patients', 'patients', true),
+('permits', 'permits', true),
+('vaccines', 'vaccines', true),
+('profiles', 'profiles', true),
+('reports', 'reports', true);
+
+-- Storage Policies
+CREATE POLICY "Patients can upload their own files" ON storage.objects
+    FOR INSERT WITH CHECK (bucket_id = 'patients' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Permit files are public" ON storage.objects
+    FOR SELECT USING (bucket_id = 'permits');
+
+
+
+
+SUPABASE CONNECTION (PHP)
+php
+<?php
+// supabase-config.php
+
+define('SUPABASE_URL', 'https://your-project.supabase.co');
+define('SUPABASE_ANON_KEY', 'your-anon-key');
+define('SUPABASE_SERVICE_KEY', 'your-service-role-key');
+
+function supabase_request($endpoint, $method = 'GET', $data = null, $useService = false) {
+    $url = SUPABASE_URL . '/rest/v1/' . $endpoint;
+    $key = $useService ? SUPABASE_SERVICE_KEY : SUPABASE_ANON_KEY;
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'apikey: ' . $key,
+        'Authorization: Bearer ' . $key,
+        'Content-Type: application/json',
+        'Prefer: return=representation'
+    ]);
+    
+    if ($method === 'POST') {
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    } elseif ($method === 'PUT') {
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    } elseif ($method === 'DELETE') {
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    }
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    return [
+        'status' => $httpCode,
+        'data' => json_decode($response, true)
+    ];
+}
+
+// Helper functions
+function supabase_get($table, $filters = []) {
+    $query = $table;
+    if (!empty($filters)) {
+        $query .= '?' . http_build_query($filters);
+    }
+    return supabase_request($query, 'GET');
+}
+
+function supabase_insert($table, $data) {
+    return supabase_request($table, 'POST', $data);
+}
+
+function supabase_update($table, $id, $data) {
+    return supabase_request($table . '?id=eq.' . $id, 'PUT', $data);
+}
+
+function supabase_delete($table, $id) {
+    return supabase_request($table . '?id=eq.' . $id, 'DELETE');
+}
+?>
