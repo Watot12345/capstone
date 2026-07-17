@@ -229,30 +229,30 @@ REGULAR STAFF
 └── 📊 Support Staff
     └── Focus: Daily Operations
 
-
+                      SIDEBAR ALIGNMENT
 ADMIN SIDE
 
-MAIN CONTROLS
+MAIN CONTROLS 
 │
-├── 1. SYSTEM OVERVIEW
-│   ├── Dashboard with KPIs
-│   ├── Module Activity Summary
-│   ├── Alerts & Notifications
-│   └── System Health Status
+├── 1. SYSTEM OVERVIEW ▼  (FEATURE)
+│   ├── Dashboard with KPIs   (SUB-FEATURES)
+│   ├── Module Activity Summary (SUB-FEATURES)
+│   ├── Alerts & Notifications (SUB-FEATURES)
+│   └── System Health Status (SUB-FEATURES)
 │
-├── 2. ANALYTICS
+├── 2. ANALYTICS  ▼ 
 │   ├── AI Insights
 │   ├── Trend Analysis
 │   ├── Predictive Analytics
 │   └── Performance Metrics
 │
-├── 3. REPORTS
+├── 3. REPORTS  ▼ 
 │   ├── Custom Report Generation
 │   ├── Scheduled Reports
 │   ├── Export Options (PDF/Excel)
 │   └── Report Templates
 │
-└── 4. COMPLIANCE & VIOLATIONS
+└── 4. COMPLIANCE & VIOLATIONS  ▼ 
     ├── Compliance Monitoring
     ├── Violation Tracking
     ├── Corrective Actions
@@ -263,46 +263,46 @@ MAIN CONTROLS
 OPERATIONAL MODULES
 
 MODULE 1: HEALTH CENTER SERVICES (7 Sub-features)
-HEALTH CENTER SERVICES
+HEALTH CENTER SERVICES ▼  (MODULE)
 │
-├── PATIENT MANAGEMENT
-│   ├── Patient Registration
-│   ├── Patient Records
-│   ├── Search & Filter
-│   ├── Patient Dashboard
-│   └── Patient History
+├── PATIENT MANAGEMENT ▼      (FEATURES)
+│   ├── Patient Registration (SUB-FEATURES)
+│   ├── Patient Records      (SUB-FEATURES)
+│   ├── Search & Filter      (SUB-FEATURES)
+│   ├── Patient Dashboard    (SUB-FEATURES)
+│   └── Patient History      (SUB-FEATURES)
 │
-├── CONSULTATIONS
+├── CONSULTATIONS ▼ 
 │   ├── Physical Examination
 │   ├── Diagnosis (ICD-10)
 │   ├── Treatment Plan
 │   └── Consultation Notes
 │
-├── MEDICAL RECORDS
+├── MEDICAL RECORDS ▼ 
 │   ├── Electronic Health Record (EHR)
 │   ├── Documentation
 │   ├── Record Sharing
 │   └── Reporting
 │
-├── APPOINTMENTS ⭐
+├── APPOINTMENTS ▼  ⭐
 │   ├── Schedule Appointments
 │   ├── Manage Appointments
 │   ├── Reminders (SMS/Email)
 │   └── Doctor Schedule
 │
-├── TRIAGE ⭐
+├── TRIAGE ▼  ⭐
 │   ├── Vital Signs Recording
 │   ├── Priority Classification
 │   ├── Queue Management
 │   └── Symptom Checker
 │
-├── PRESCRIPTIONS ⭐
+├── PRESCRIPTIONS ▼  ⭐
 │   ├── Electronic Prescription
 │   ├── Drug Selection
 │   ├── Dosage Management
 │   └── Prescription History
 │
-└── REFERRALS ⭐
+└── REFERRALS ▼  ⭐
     ├── Specialist Referral
     ├── Referral Tracking
     ├── Hospital Referral
@@ -310,39 +310,39 @@ HEALTH CENTER SERVICES
 
 ///////////
 MODULE 2: SANITATION PERMITS (6 Sub-features)
-SANITATION PERMITS
+SANITATION PERMITS ▼ 
 │
-├── PERMIT APPLICATIONS
+├── PERMIT APPLICATIONS ▼ 
 │   ├── New Application
 │   ├── Application Review
 │   ├── Status Tracking
 │   └── Application History
 │
-├── INSPECTIONS
+├── INSPECTIONS ▼ 
 │   ├── Schedule Inspection
 │   ├── Conduct Inspection
 │   ├── Inspection Reports
 │   └── Follow-up Inspections
 │
-├── PERMIT RECORDS
+├── PERMIT RECORDS ▼  
 │   ├── Permit History
 │   ├── Active Permits
 │   ├── Expired Permits
 │   └── Search & Filter
 │
-├── PAYMENTS ⭐
+├── PAYMENTS ▼  ⭐
 │   ├── Fee Structure
 │   ├── Payment Processing
 │   ├── Receipt Generation
 │   └── Payment History
 │
-├── DOCUMENTS ⭐
+├── DOCUMENTS ▼  ⭐
 │   ├── Document Upload
 │   ├── Digital Permits
 │   ├── QR Code Verification
 │   └── Document Expiry
 │
-└── RENEWALS ⭐
+└── RENEWALS ▼  ⭐
     ├── Renewal Applications
     ├── Auto-Reminders
     ├── Renewal History
@@ -350,34 +350,34 @@ SANITATION PERMITS
 
 ///////////
 MODULE 3: IMMUNIZATION & NUTRITION (5 Sub-features)
-IMMUNIZATION & NUTRITION
+IMMUNIZATION & NUTRITION ▼ 
 │
-├── CHILD RECORDS
+├── CHILD RECORDS ▼ 
 │   ├── Child Registration
 │   ├── Demographics
 │   ├── Family History
 │   └── Health Records
 │
-├── VACCINATION TRACKING
+├── VACCINATION TRACKING ▼ 
 │   ├── Vaccine Schedule
 │   ├── Record Vaccination
 │   ├── Missed Vaccines
 │   ├── Due Date Alerts
 │   └── Immunization History
 │
-├── GROWTH CHARTS
+├── GROWTH CHARTS ▼ 
 │   ├── Growth Charts
 │   ├── Percentile Tracking
 │   ├── Growth Alerts
 │   └── Weight/Height Tracking
 │
-├── VACCINE INVENTORY ⭐
+├── VACCINE INVENTORY  ▼ ⭐
 │   ├── Stock Management
 │   ├── Expiry Tracking
 │   ├── Cold Chain Monitoring
 │   └── Stock Alerts
 │
-└── NUTRITION ASSESSMENT ⭐
+└── NUTRITION ASSESSMENT  ▼ ⭐
     ├── Nutrition Screening
     ├── Malnutrition Detection
     ├── Nutrition Plans
@@ -386,33 +386,33 @@ IMMUNIZATION & NUTRITION
 //////////
 MODULE 4: WASTEWATER SERVICES (5 Sub-features)
 
-WASTEWATER SERVICES
+WASTEWATER SERVICES ▼ 
 │
-├── SEPTIC TANK REGISTRY
+├── SEPTIC TANK REGISTRY ▼ 
 │   ├── Tank Registration
 │   ├── Tank Details
 │   ├── Location Mapping
 │   └── Tank History
 │
-├── MAINTENANCE & DESLUDGING
+├── MAINTENANCE & DESLUDGING ▼ 
 │   ├── Schedule Services
 │   ├── Service Records
 │   ├── Route Planning
 │   └── Completion Reports
 │
-├── SERVICE REQUESTS
+├── SERVICE REQUESTS ▼ 
 │   ├── New Request
 │   ├── Request Tracking
 │   ├── Status Updates
 │   └── Customer Feedback
 │
-├── SERVICE PROVIDERS ⭐
+├── SERVICE PROVIDERS ▼  ⭐
 │   ├── Provider Registration
 │   ├── Provider Assignment
 │   ├── Performance Tracking
 │   └── Equipment Management
 │
-└── BILLING ⭐
+└── BILLING ▼  ⭐
     ├── Fee Structure
     ├── Quotation Generation
     ├── Payment Processing
@@ -421,59 +421,59 @@ WASTEWATER SERVICES
 ///////////
 MODULE 5: HEALTH SURVEILLANCE (6 Sub-features)
 
-HEALTH SURVEILLANCE
+HEALTH SURVEILLANCE ▼ 
 │
-├── CASE REPORTS
+├── CASE REPORTS ▼ 
 │   ├── Case Reporting
 │   ├── Case Management
 │   ├── Case Tracking
 │   └── Case Investigation
 │
-├── MAPPING & CLUSTERING
+├── MAPPING & CLUSTERING ▼ 
 │   ├── Geographic Mapping
 │   ├── Cluster Analysis
 │   ├── Risk Heatmaps
 │   └── Trend Visualization
 │
-├── OUTBREAK DETECTION
+├── OUTBREAK DETECTION ▼ 
 │   ├── Automated Detection
 │   ├── Pattern Recognition
 │   ├── Threshold Monitoring
 │   └── Alert Generation
 │
-├── REAL-TIME ALERTS ⭐
+├── REAL-TIME ALERTS ▼  ⭐
 │   ├── Automated Alerts
 │   ├── Escalation Protocol
 │   └── Emergency Response
 │
-├── CONTACT TRACING ⭐
+├── CONTACT TRACING ▼   ⭐
 │   ├── Contact Identification
 │   ├── Exposure Assessment
 │   ├── Contact Monitoring
 │   └── Quarantine Management
 │
-└── RESPONSE MANAGEMENT ⭐
+└── RESPONSE MANAGEMENT ▼  ⭐
     ├── Team Activation
     ├── Resource Allocation
     ├── Intervention Tracking
     └── Effectiveness Reports
 
 
-SYSTEM MANAGEMENT
+SYSTEM MANAGEMENT (TITLE PAGE)
 │
-├── USER MANAGEMENT
+├── USER MANAGEMENT ▼ 
 │   ├── User Registration
 │   ├── Role Assignment
 │   ├── Permission Management
 │   └── User Activity
 │
-├── SYSTEM LOGS
+├── SYSTEM LOGS ▼ 
 │   ├── Audit Trail
 │   ├── Activity Logs
 │   ├── Error Logs
 │   └── Log Search
 │
-└── SETTINGS
+└── SETTINGS ▼ 
     ├── System Configuration
     ├── Module Settings
     ├── Notification Settings
@@ -481,7 +481,7 @@ SYSTEM MANAGEMENT
 
 
     COMPLETE ROLE-MODULE MAPPING TABLE
-Staff Role	Module	Features They Access
+Staff Roles(26)	& Module  Features They Access
 
 Health Center Director	Health Center	               All Features (Full Access)
 Doctor	                Health Center	               Consultations, Prescriptions, Referrals, Records
