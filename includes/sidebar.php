@@ -32,10 +32,10 @@
         <div id="systemOverviewDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
           <a href="dashboard.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-chart-simple text-[10px] opacity-50"></i> 
-            <span>Dashboard with KPIs</span>
+            <span>Dashboard</span>
           </a>
           <a href="module_activity.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-activity text-[10px] opacity-50"></i> 
+            <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> 
             <span>Module Activity Summary</span>
           </a>
           <a href="alerts.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
@@ -235,7 +235,7 @@
           </a>
           
           <a href="permit_records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-files text-[10px] opacity-50"></i> 
+            <i class="fa-solid fa-folder text-[10px] opacity-50"></i> 
             <span>Permit Records</span>
           </a>
           
@@ -277,7 +277,7 @@
           </a>
           
           <a href="vaccination_tracking.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-vaccine-vial text-[10px] opacity-50"></i> 
+            <i class="fa-solid fa-vial text-[10px] opacity-50"></i> 
             <span>Vaccination Tracking</span>
           </a>
           
@@ -439,7 +439,7 @@
             <i class="fa-solid fa-list-check text-[10px] opacity-50"></i> <span>Audit Trail</span>
           </a>
           <a href="activity_logs.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-activity text-[10px] opacity-50"></i> <span>Activity Logs</span>
+            <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> <span>Activity Logs</span>
           </a>
           <a href="error_logs.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-bug text-[10px] opacity-50"></i> <span>Error Logs</span>
