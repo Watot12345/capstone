@@ -230,7 +230,7 @@ REGULAR STAFF
     └── Focus: Daily Operations
 
                       SIDEBAR ALIGNMENT
-ADMIN SIDE
+ADMIN SIDE 
 
 MAIN CONTROLS 
 │

@@ -38,48 +38,17 @@
             <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> 
             <span>Module Activity Summary</span>
           </a>
-          <a href="alerts.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-bell text-[10px] opacity-50"></i> 
-            <span>Alerts & Notifications</span>
-          </a>
-          <a href="system_health.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-heart-pulse text-[10px] opacity-50"></i> 
-            <span>System Health Status</span>
-          </a>
+    
         </div>
       </div>
 
-      <!-- 2. ANALYTICS -->
-      <div class="space-y-1">
-        <button onclick="toggleDropdown('analyticsDropdown', 'analyticsChevron')" 
-                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-chart-line text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-            <span class="sidebar-text truncate">Analytics</span>
-          </div>
-          <div class="dropdown-right">
-            <i id="analyticsChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
-          </div>
-        </button>
-        <div id="analyticsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="ai_insights.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-brain text-[10px] opacity-50"></i> 
-            <span>AI Insights</span>
-          </a>
-          <a href="trend_analysis.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-arrow-trend-up text-[10px] opacity-50"></i> 
-            <span>Trend Analysis</span>
-          </a>
-          <a href="predictive.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-robot text-[10px] opacity-50"></i> 
-            <span>Predictive Analytics</span>
-          </a>
-          <a href="performance.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-gauge-high text-[10px] opacity-50"></i> 
-            <span>Performance Metrics</span>
-          </a>
+      <!-- 2. ANALYTICS - DIRECT LINK to AI Insights -->
+      <a href="ai_insights.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-chart-line text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+          <span class="sidebar-text truncate">Analytics</span>
         </div>
-      </div>
+      </a>
 
       <!-- 3. REPORTS -->
       <div class="space-y-1">
@@ -98,10 +67,6 @@
             <i class="fa-solid fa-sliders text-[10px] opacity-50"></i> 
             <span>Custom Report Generation</span>
           </a>
-          <a href="scheduled_reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-clock text-[10px] opacity-50"></i> 
-            <span>Scheduled Reports</span>
-          </a>
           <a href="export.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-export text-[10px] opacity-50"></i> 
             <span>Export Options (PDF/Excel)</span>
@@ -113,37 +78,13 @@
         </div>
       </div>
 
-      <!-- 4. COMPLIANCE & VIOLATIONS -->
-      <div class="space-y-1">
-        <button onclick="toggleDropdown('complianceDropdown', 'complianceChevron')" 
-                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-gavel text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-            <span class="sidebar-text truncate">Compliance & Violations</span>
-          </div>
-          <div class="dropdown-right">
-            <i id="complianceChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
-          </div>
-        </button>
-        <div id="complianceDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="compliance_monitoring.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-check-circle text-[10px] opacity-50"></i> 
-            <span>Compliance Monitoring</span>
-          </a>
-          <a href="violation_tracking.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-triangle-exclamation text-[10px] opacity-50"></i> 
-            <span>Violation Tracking</span>
-          </a>
-          <a href="corrective_actions.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-hammer text-[10px] opacity-50"></i> 
-            <span>Corrective Actions</span>
-          </a>
-          <a href="regulatory_compliance.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-scale-balanced text-[10px] opacity-50"></i> 
-            <span>Regulatory Compliance</span>
-          </a>
+      <!-- 4. COMPLIANCE & VIOLATIONS - DIRECT LINK to Compliance Monitoring -->
+      <a href="compliance_monitoring.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-gavel text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+          <span class="sidebar-text truncate">Compliance & Violations</span>
         </div>
-      </div>
+      </a>
 
       <!-- ============================================================ -->
       <!-- SECTION 2: OPERATIONAL MODULES                               -->

@@ -1,0 +1,98 @@
+dashb style css
+body {
+  background-color: #EEF5FF;
+  height: 100vh;
+  overflow: hidden;
+  /* Lock the main viewport */
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  right: -16px;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: #B4D4FF;
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.stat-card.warn::after {
+  background: #ffd6a0;
+  opacity: 0.45;
+}
+
+.stat-card.alert::after {
+  background: #ffb3b3;
+  opacity: 0.38;
+}
+
+.stat-card.ok::after {
+  background: #b3f0d4;
+  opacity: 0.42;
+}
+
+.overlay {
+  display: none;
+}
+
+.overlay.open {
+  display: flex;
+}
+
+.success-anim {
+  display: none;
+}
+
+.success-anim.show {
+  display: flex;
+}
+
+/* Hardware-Accelerated Pure CSS Bar Rising Animation */
+@keyframes barRise {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.bar-rise {
+  transform-origin: bottom;
+  animation: barRise 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.popup::-webkit-scrollbar {
+  width: 5px;
+}
+
+.popup::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.popup::-webkit-scrollbar-thumb {
+  background: #B4D4FF;
+  border-radius: 4px;
+}
+
+select option {
+  color: #1a2e44;
+}
+
+/* Scrollbar styling inside cards */
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
