@@ -292,25 +292,25 @@ $title = 'Response Management';
             </div>
         </div>
 
-        <!-- Card 2: Active Interventions -->
-        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
-            <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
-            <div class="relative">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
-                        <i class="fa-solid fa-activity text-lg"></i>
-                    </div>
-                    <div>
-                        <p class="text-2xl font-black text-amber-600"><?php echo $activeInterventions; ?></p>
-                        <p class="text-xs font-medium text-slate-500">Active Interventions</p>
-                    </div>
-                </div>
-                <div class="mt-3 flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">🔄 In Progress</span>
-                    <span class="text-[10px] text-slate-400"><?php echo $completedInterventions; ?> Completed</span>
-                </div>
+       <!-- Card 2: Active Interventions -->
+<div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+    <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+    <div class="relative">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                <i class="fa-solid fa-bolt text-lg"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-black text-amber-600"><?php echo $activeInterventions; ?></p>
+                <p class="text-xs font-medium text-slate-500">Active Interventions</p>
             </div>
         </div>
+        <div class="mt-3 flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">🔄 In Progress</span>
+            <span class="text-[10px] text-slate-400"><?php echo $completedInterventions; ?> Completed</span>
+        </div>
+    </div>
+</div>
 
         <!-- Card 3: Resource Utilization -->
         <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">

@@ -188,45 +188,110 @@ $title = 'Case Reports';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total Cases</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo $totalCases; ?></p>
+    <!-- ============================================================ -->
+    <!-- MODERN KPI CARDS                                            -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <!-- Card 1: Total Cases -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fa-solid fa-notes-medical text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-slate-900"><?php echo $totalCases; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Cases</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">📋 All cases</span>
+                    <span class="text-[10px] text-slate-400">Including <?php echo $resolvedCount; ?> resolved</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Reported</p>
-            <p class="text-xl font-bold text-blue-600"><?php echo $reportedCount; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Confirmed</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo $confirmedCount; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Critical</p>
-            <p class="text-xl font-bold text-rose-600"><?php echo $criticalCount; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Resolved</p>
-            <p class="text-xl font-bold text-slate-500"><?php echo $resolvedCount; ?></p>
-        </div>
-    </div>
 
-    <!-- Critical Alert -->
-    <?php if ($criticalCount > 0): ?>
-    <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg"></i>
-            <span class="text-sm text-rose-700">
-                <span class="font-bold"><?php echo $criticalCount; ?></span> critical case(s) require immediate attention
-            </span>
+        <!-- Card 2: Reported -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                        <i class="fa-solid fa-flag text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-amber-600"><?php echo $reportedCount; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Reported</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">📢 New</span>
+                    <span class="text-[10px] text-slate-400">Awaiting review</span>
+                </div>
+            </div>
         </div>
-        <button onclick="document.getElementById('filterSeverity').value='critical'; filterCases();" 
-                class="text-xs font-semibold text-rose-700 hover:text-rose-900 underline">
-            View critical
-        </button>
+
+        <!-- Card 3: Confirmed -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fa-solid fa-check-circle text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-emerald-600"><?php echo $confirmedCount; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Confirmed</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Verified</span>
+                    <span class="text-[10px] text-slate-400">Laboratory confirmed</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Critical -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-rose-600"><?php echo $criticalCount; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Critical</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">🚨 Urgent</span>
+                    <span class="text-[10px] text-slate-400">Immediate attention</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Resolved -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-slate-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+                        <i class="fa-solid fa-flag-checkered text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-slate-600"><?php echo $resolvedCount; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Resolved</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold">✅ Done</span>
+                    <span class="text-[10px] text-slate-400">Case closed</span>
+                </div>
+            </div>
+        </div>
     </div>
-    <?php endif; ?>
 
     <!-- Search & Filter -->
     <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 mb-6">
@@ -344,18 +409,18 @@ $title = 'Case Reports';
                                     </button>
                                 <?php endif; ?>
                                 <?php if ($case['status'] === 'reported' || $case['status'] === 'investigating'): ?>
-                                    <button onclick="confirmCase(<?php echo $case['id']; ?>)"
+                                    <button onclick="showConfirm('Confirm Case', 'Are you sure you want to confirm this case?', 'confirm', <?php echo $case['id']; ?>)"
                                             class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Confirm">
                                         <i class="fa-solid fa-check text-sm"></i>
                                     </button>
                                 <?php endif; ?>
                                 <?php if ($case['status'] === 'confirmed'): ?>
-                                    <button onclick="resolveCase(<?php echo $case['id']; ?>)"
+                                    <button onclick="showConfirm('Resolve Case', 'Are you sure you want to mark this case as resolved?', 'resolve', <?php echo $case['id']; ?>)"
                                             class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Resolve">
                                         <i class="fa-solid fa-flag-checkered text-sm"></i>
                                     </button>
                                 <?php endif; ?>
-                                <button onclick="editCase(<?php echo $case['id']; ?>)"
+                                <button onclick="openEditModal(<?php echo $case['id']; ?>)"
                                         class="p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition" title="Edit">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
@@ -499,6 +564,98 @@ $title = 'Case Reports';
 </div>
 
 <!-- ============================================================ -->
+<!-- EDIT CASE MODAL                                              -->
+<!-- ============================================================ -->
+<div id="editCaseModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-pen text-brand-medium"></i>
+                Edit Case
+            </h3>
+            <button onclick="closeModal('editCaseModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="editCaseForm" class="p-6 space-y-4" onsubmit="updateCase(event)">
+            <input type="hidden" id="edit_case_id">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient Name</label>
+                <input type="text" id="edit_patient" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Age</label>
+                    <input type="number" id="edit_age" required min="0" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Gender</label>
+                    <select id="edit_gender" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Disease</label>
+                <input type="text" id="edit_disease" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Address</label>
+                <input type="text" id="edit_address" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Barangay</label>
+                <select id="edit_barangay" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <option value="Barangay San Jose">Barangay San Jose</option>
+                    <option value="Barangay Poblacion">Barangay Poblacion</option>
+                    <option value="Barangay Riverside">Barangay Riverside</option>
+                    <option value="Barangay San Roque">Barangay San Roque</option>
+                    <option value="Barangay Sta. Cruz">Barangay Sta. Cruz</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Contact</label>
+                <input type="text" id="edit_contact" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Onset Date</label>
+                <input type="date" id="edit_onset" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</label>
+                <select id="edit_status" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <option value="reported">Reported</option>
+                    <option value="investigating">Investigating</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Severity</label>
+                <select id="edit_severity" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <option value="low">Low</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeModal('editCaseModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold">
+                    <i class="fa-solid fa-save mr-1.5"></i> Update Case
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================ -->
 <!-- VIEW CASE MODAL                                              -->
 <!-- ============================================================ -->
 <div id="viewCaseModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
@@ -512,6 +669,31 @@ $title = 'Case Reports';
         <div id="caseDetailsContent" class="p-6">
             <div class="flex items-center justify-center py-10 text-slate-400 text-sm">
                 <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CONFIRM MODAL                                                -->
+<!-- ============================================================ -->
+<div id="confirmModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+        <div class="p-6 text-center">
+            <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-amber-600 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2" id="confirmTitle">Confirm Action</h3>
+            <p class="text-sm text-slate-500 mb-6" id="confirmMessage">Are you sure you want to proceed?</p>
+            <input type="hidden" id="confirmAction">
+            <input type="hidden" id="confirmId">
+            <div class="flex gap-3">
+                <button onclick="closeModal('confirmModal')" class="flex-1 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
+                    Cancel
+                </button>
+                <button onclick="executeConfirm()" class="flex-1 px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold" id="confirmBtn">
+                    Confirm
+                </button>
             </div>
         </div>
     </div>
@@ -600,6 +782,48 @@ $title = 'Case Reports';
     });
 
     // ============================================================
+    // CONFIRM MODAL
+    // ============================================================
+    function showConfirm(title, message, action, id) {
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        document.getElementById('confirmAction').value = action;
+        document.getElementById('confirmId').value = id;
+        
+        // Change button color based on action
+        const btn = document.getElementById('confirmBtn');
+        if (action === 'delete') {
+            btn.className = 'flex-1 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition text-sm font-semibold';
+            btn.textContent = 'Delete';
+        } else if (action === 'confirm') {
+            btn.className = 'flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold';
+            btn.textContent = 'Confirm';
+        } else if (action === 'resolve') {
+            btn.className = 'flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold';
+            btn.textContent = 'Resolve';
+        } else {
+            btn.className = 'flex-1 px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold';
+            btn.textContent = 'Confirm';
+        }
+        
+        openModal('confirmModal');
+    }
+
+    function executeConfirm() {
+        const action = document.getElementById('confirmAction').value;
+        const id = parseInt(document.getElementById('confirmId').value);
+        closeModal('confirmModal');
+        
+        if (action === 'confirm') {
+            doConfirmCase(id);
+        } else if (action === 'resolve') {
+            doResolveCase(id);
+        } else if (action === 'delete') {
+            doDeleteCase(id);
+        }
+    }
+
+    // ============================================================
     // VIEW CASE
     // ============================================================
     function viewCase(id) {
@@ -657,12 +881,58 @@ $title = 'Case Reports';
                     <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
                         <button onclick="closeModal('viewCaseModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Close</button>
                         ${c.status === 'reported' || c.status === 'investigating' ? `<button onclick="closeModal('viewCaseModal'); investigateCase(${c.id})" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition text-sm font-semibold"><i class="fa-solid fa-magnifying-glass mr-1.5"></i> Investigate</button>` : ''}
-                        ${c.status === 'reported' || c.status === 'investigating' ? `<button onclick="closeModal('viewCaseModal'); confirmCase(${c.id})" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"><i class="fa-solid fa-check mr-1.5"></i> Confirm</button>` : ''}
-                        ${c.status === 'confirmed' ? `<button onclick="closeModal('viewCaseModal'); resolveCase(${c.id})" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold"><i class="fa-solid fa-flag-checkered mr-1.5"></i> Resolve</button>` : ''}
+                        ${c.status === 'reported' || c.status === 'investigating' ? `<button onclick="closeModal('viewCaseModal'); showConfirm('Confirm Case', 'Are you sure you want to confirm this case?', 'confirm', ${c.id})" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"><i class="fa-solid fa-check mr-1.5"></i> Confirm</button>` : ''}
+                        ${c.status === 'confirmed' ? `<button onclick="closeModal('viewCaseModal'); showConfirm('Resolve Case', 'Are you sure you want to mark this case as resolved?', 'resolve', ${c.id})" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold"><i class="fa-solid fa-flag-checkered mr-1.5"></i> Resolve</button>` : ''}
                     </div>
                 </div>
             `;
         }, 300);
+    }
+
+    // ============================================================
+    // OPEN EDIT MODAL
+    // ============================================================
+    function openEditModal(id) {
+        const c = CASES[id];
+        if (!c) return;
+        
+        document.getElementById('edit_case_id').value = id;
+        document.getElementById('edit_patient').value = c.patient_name;
+        document.getElementById('edit_age').value = c.age;
+        document.getElementById('edit_gender').value = c.gender;
+        document.getElementById('edit_disease').value = c.disease;
+        document.getElementById('edit_address').value = c.address;
+        document.getElementById('edit_barangay').value = c.barangay;
+        document.getElementById('edit_contact').value = c.contact || '';
+        document.getElementById('edit_onset').value = c.onset_date;
+        document.getElementById('edit_status').value = c.status;
+        document.getElementById('edit_severity').value = c.severity;
+        
+        openModal('editCaseModal');
+    }
+
+    function updateCase(event) {
+        event.preventDefault();
+        const id = parseInt(document.getElementById('edit_case_id').value);
+        const c = CASES[id];
+        if (!c) return;
+        
+        c.patient_name = document.getElementById('edit_patient').value;
+        c.age = parseInt(document.getElementById('edit_age').value);
+        c.gender = document.getElementById('edit_gender').value;
+        c.disease = document.getElementById('edit_disease').value;
+        c.address = document.getElementById('edit_address').value;
+        c.barangay = document.getElementById('edit_barangay').value;
+        c.contact = document.getElementById('edit_contact').value;
+        c.onset_date = document.getElementById('edit_onset').value;
+        c.status = document.getElementById('edit_status').value;
+        c.severity = document.getElementById('edit_severity').value;
+        c.updated_at = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        
+        // Update the table row
+        updateCaseRow(c);
+        closeModal('editCaseModal');
+        showToast('Case #' + c.case_id + ' updated successfully!', 'success');
     }
 
     // ============================================================
@@ -696,10 +966,9 @@ $title = 'Case Reports';
     }
 
     // ============================================================
-    // CONFIRM CASE
+    // CONFIRM CASE (called from confirm modal)
     // ============================================================
-    function confirmCase(id) {
-        if (!confirm('Confirm this case?')) return;
+    function doConfirmCase(id) {
         const c = CASES[id];
         if (!c) return;
         
@@ -711,10 +980,9 @@ $title = 'Case Reports';
     }
 
     // ============================================================
-    // RESOLVE CASE
+    // RESOLVE CASE (called from confirm modal)
     // ============================================================
-    function resolveCase(id) {
-        if (!confirm('Mark this case as resolved?')) return;
+    function doResolveCase(id) {
         const c = CASES[id];
         if (!c) return;
         
@@ -726,6 +994,14 @@ $title = 'Case Reports';
     }
 
     // ============================================================
+    // DELETE CASE
+    // ============================================================
+    function doDeleteCase(id) {
+        // In production, this would remove from database
+        showToast('Case #' + CASES[id].case_id + ' deleted!', 'info');
+    }
+
+    // ============================================================
     // UPDATE CASE ROW
     // ============================================================
     function updateCaseRow(c) {
@@ -733,6 +1009,7 @@ $title = 'Case Reports';
         rows.forEach(row => {
             const patient = row.querySelector('.font-semibold.text-slate-800.text-sm')?.textContent;
             if (patient === c.patient_name) {
+                // Update status badge
                 const statusBadge = row.querySelector('.px-2.py-1.rounded-full');
                 const statusColors = {
                     reported: 'bg-blue-100 text-blue-700',
@@ -742,15 +1019,21 @@ $title = 'Case Reports';
                 };
                 statusBadge.className = `px-2 py-1 rounded-full text-xs font-semibold ${statusColors[c.status] || statusColors.reported}`;
                 statusBadge.textContent = c.status.charAt(0).toUpperCase() + c.status.slice(1);
+                
+                // Update severity badge
+                const severityBadge = row.querySelector('.px-2.py-1.rounded-full:last-child');
+                if (severityBadge && severityBadge !== statusBadge) {
+                    const severityColors = {
+                        low: 'bg-green-100 text-green-700',
+                        moderate: 'bg-yellow-100 text-yellow-700',
+                        high: 'bg-orange-100 text-orange-700',
+                        critical: 'bg-rose-100 text-rose-700'
+                    };
+                    severityBadge.className = `px-2 py-1 rounded-full text-xs font-semibold ${severityColors[c.severity] || severityColors.moderate}`;
+                    severityBadge.textContent = c.severity.charAt(0).toUpperCase() + c.severity.slice(1);
+                }
             }
         });
-    }
-
-    // ============================================================
-    // EDIT CASE
-    // ============================================================
-    function editCase(id) {
-        showToast('Edit case ID: ' + id + ' (Edit modal coming soon)', 'info');
     }
 
     // ============================================================
