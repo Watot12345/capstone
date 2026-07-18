@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
+
+* {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #e9eef3;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #86B6F6;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #176B87;
+}
+
+/* ── CARD SHAPES ── */
+.card-shape {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+}
+.card-shape-1 {
+  width: 200px;
+  height: 200px;
+  top: -60px;
+  right: -60px;
+  background: #B4D4FF;
+}
+.card-shape-2 {
+  width: 120px;
+  height: 120px;
+  bottom: -40px;
+  left: -40px;
+  background: #86B6F6;
+  opacity: 0.10;
+}
+.card-shape-3 {
+  width: 70px;
+  height: 70px;
+  top: 10px;
+  left: 10px;
+  background: #176B87;
+  opacity: 0.08;
+}
+.card-shape-4 {
+  width: 160px;
+  height: 160px;
+  bottom: -50px;
+  right: -50px;
+  background: #176B87;
+  opacity: 0.06;
+}
+.card-shape-sm {
+  width: 40px;
+  height: 40px;
+  top: -10px;
+  right: -10px;
+  background: #B4D4FF;
+  opacity: 0.25;
+}
+
+.dot-pattern {
+  background-image: radial-gradient(#176B87 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── CARD STYLES ── */
+.report-card {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(23, 107, 135, 0.06);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.report-card:hover {
+  box-shadow: 0 12px 48px rgba(23, 107, 135, 0.10);
+  transform: translateY(-2px);
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 20px rgba(23, 107, 135, 0.04);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(23, 107, 135, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ── UI ELEMENTS ── */
+.filter-chip {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid rgba(134, 182, 246, 0.25);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+}
+.filter-chip:hover {
+  background: #B4D4FF;
+  border-color: #86B6F6;
+  transform: translateY(-1px);
+}
+.filter-chip.active {
+  background: #176B87;
+  color: #fff;
+  border-color: #176B87;
+  box-shadow: 0 4px 12px rgba(23, 107, 135, 0.25);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #176B87, #86B6F6);
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(23, 107, 135, 0.25);
+  position: relative;
+  z-index: 1;
+}
+.btn-primary:hover {
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: 0 8px 28px rgba(23, 107, 135, 0.35);
+}
+
+.btn-outline-primary {
+  border: 1.5px solid #86B6F6;
+  color: #176B87;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+}
+.btn-outline-primary:hover {
+  background: #176B87;
+  color: #fff;
+  border-color: #176B87;
+  box-shadow: 0 4px 16px rgba(23, 107, 135, 0.20);
+}
+
+.tab-btn {
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  color: #64748b;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn.active {
+  border-bottom-color: #176B87;
+  color: #176B87;
+  font-weight: 600;
+}
+.tab-btn:hover {
+  color: #176B87;
+}
+
+.status-badge {
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.table-row-hover:hover {
+  background: rgba(134, 182, 246, 0.08);
+}
+
+.modal-overlay {
+  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.40);
+}
+.modal-content {
+  animation: fadeSlideUp 0.3s ease-out;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.chart-container {
+  position: relative;
+  height: 220px;
+}
+
+#toast {
+  background: rgba(23, 107, 135, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+select,
+input[type="date"],
+input[type="time"],
+input[type="text"] {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(134, 182, 246, 0.25);
+  transition: all 0.2s ease;
+}
+select:focus,
+input:focus {
+  border-color: #86B6F6;
+  box-shadow: 0 0 0 3px rgba(134, 182, 246, 0.20);
+  outline: none;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .card-shape-1 {
+    width: 120px;
+    height: 120px;
+    top: -40px;
+    right: -40px;
+  }
+  .card-shape-2 {
+    width: 80px;
+    height: 80px;
+    bottom: -30px;
+    left: -30px;
+  }
+  .card-shape-3 {
+    width: 40px;
+    height: 40px;
+  }
+}

@@ -47,6 +47,7 @@ function site_url($path) {
             <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> 
             <span>Module Activity Summary</span>
           </a>
+<<<<<<< HEAD
           <a href="<?= site_url('alerts.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-bell text-[10px] opacity-50"></i> 
             <span>Alerts & Notifications</span>
@@ -87,8 +88,19 @@ function site_url($path) {
             <i class="fa-solid fa-gauge-high text-[10px] opacity-50"></i> 
             <span>Performance Metrics</span>
           </a>
+=======
+    
         </div>
       </div>
+
+      <!-- 2. ANALYTICS - DIRECT LINK to AI Insights -->
+      <a href="ai_insights.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-chart-line text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+          <span class="sidebar-text truncate">Analytics</span>
+>>>>>>> c9c10573373f6c64ac74b245be945f26e79ea8b8
+        </div>
+      </a>
 
       <!-- 3. REPORTS -->
       <div class="space-y-1">
@@ -107,11 +119,15 @@ function site_url($path) {
             <i class="fa-solid fa-sliders text-[10px] opacity-50"></i> 
             <span>Custom Report Generation</span>
           </a>
+<<<<<<< HEAD
           <a href="<?= site_url('scheduled_reports.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-clock text-[10px] opacity-50"></i> 
             <span>Scheduled Reports</span>
           </a>
           <a href="<?= site_url('export.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+=======
+          <a href="export.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+>>>>>>> c9c10573373f6c64ac74b245be945f26e79ea8b8
             <i class="fa-solid fa-file-export text-[10px] opacity-50"></i> 
             <span>Export Options (PDF/Excel)</span>
           </a>
@@ -122,6 +138,7 @@ function site_url($path) {
         </div>
       </div>
 
+<<<<<<< HEAD
       <!-- 4. COMPLIANCE & VIOLATIONS -->
       <div class="space-y-1">
         <button onclick="toggleDropdown('complianceDropdown', 'complianceChevron')" 
@@ -151,8 +168,15 @@ function site_url($path) {
             <i class="fa-solid fa-scale-balanced text-[10px] opacity-50"></i> 
             <span>Regulatory Compliance</span>
           </a>
+=======
+      <!-- 4. COMPLIANCE & VIOLATIONS - DIRECT LINK to Compliance Monitoring -->
+      <a href="compliance_monitoring.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-gavel text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+          <span class="sidebar-text truncate">Compliance & Violations</span>
+>>>>>>> c9c10573373f6c64ac74b245be945f26e79ea8b8
         </div>
-      </div>
+      </a>
 
       <!-- ============================================================ -->
       <!-- SECTION 2: OPERATIONAL MODULES                               -->
