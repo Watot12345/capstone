@@ -1,17 +1,4 @@
-<<<<<<< HEAD
-<!-- admin/includes/sidebar.php UPDATED -->
-=======
-<?php
-$scriptSegments = explode('/', trim($_SERVER['PHP_SELF'], '/'));
-$projectRoot = isset($scriptSegments[0]) ? '/' . $scriptSegments[0] : '';
-function site_url($path) {
-    global $projectRoot;
-    $clean = preg_replace('#^(?:\./|\.\./)+#', '', $path);
-    return $projectRoot . '/' . ltrim($clean, '/');
-}
-?>
 <!-- admin/includes/sidebar.php -->
->>>>>>> 172f4bf673006d3194b6553baec2d88b5d8ea10e
 <aside id="sidebar" class="bg-brand-light text-slate-600 w-72 min-h-[calc(100vh-5rem)] flex flex-col justify-between transition-all duration-300 border-r border-brand-border/60 sticky top-20 h-[calc(100vh-5rem)] z-30 shrink-0 shadow-sm">
   
   <div class="flex flex-col h-full overflow-hidden">
@@ -43,56 +30,25 @@ function site_url($path) {
           </div>
         </button>
         <div id="systemOverviewDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('pages/dashboard.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="dashboard.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-chart-simple text-[10px] opacity-50"></i> 
             <span>Dashboard</span>
           </a>
-          <a href="<?= site_url('pages/module_activity.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="module_activity.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> 
             <span>Module Activity Summary</span>
           </a>
-          <a href="<?= site_url('pages/alerts.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-bell text-[10px] opacity-50"></i> 
-            <span>Alerts & Notifications</span>
-          </a>
-          <a href="<?= site_url('pages/system_health.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-heart-pulse text-[10px] opacity-50"></i> 
-            <span>System Health Status</span>
-          </a>
+    
         </div>
       </div>
 
-      <!-- 2. ANALYTICS -->
-      <div class="space-y-1">
-        <button onclick="toggleDropdown('analyticsDropdown', 'analyticsChevron')" 
-                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-chart-line text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-            <span class="sidebar-text truncate">Analytics</span>
-          </div>
-          <div class="dropdown-right">
-            <i id="analyticsChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
-          </div>
-        </button>
-        <div id="analyticsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('pages/ai_insights.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-brain text-[10px] opacity-50"></i> 
-            <span>AI Insights</span>
-          </a>
-          <a href="<?= site_url('pages/trend_analysis.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-arrow-trend-up text-[10px] opacity-50"></i> 
-            <span>Trend Analysis</span>
-          </a>
-          <a href="<?= site_url('pages/predictive.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-robot text-[10px] opacity-50"></i> 
-            <span>Predictive Analytics</span>
-          </a>
-          <a href="<?= site_url('pages/performance.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-gauge-high text-[10px] opacity-50"></i> 
-            <span>Performance Metrics</span>
-          </a>
+      <!-- 2. ANALYTICS - DIRECT LINK to AI Insights -->
+      <a href="ai_insights.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-chart-line text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+          <span class="sidebar-text truncate">Analytics</span>
         </div>
-      </div>
+      </a>
 
       <!-- 3. REPORTS -->
       <div class="space-y-1">
@@ -107,56 +63,28 @@ function site_url($path) {
           </div>
         </button>
         <div id="reportsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('pages/custom_report.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="custom_report.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-sliders text-[10px] opacity-50"></i> 
             <span>Custom Report Generation</span>
           </a>
-          <a href="<?= site_url('pages/scheduled_reports.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-clock text-[10px] opacity-50"></i> 
-            <span>Scheduled Reports</span>
-          </a>
-          <a href="<?= site_url('pages/export.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="export.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-export text-[10px] opacity-50"></i> 
             <span>Export Options (PDF/Excel)</span>
           </a>
-          <a href="<?= site_url('pages/report_templates.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="report_templates.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-copy text-[10px] opacity-50"></i> 
             <span>Report Templates</span>
           </a>
         </div>
       </div>
 
-      <!-- 4. COMPLIANCE & VIOLATIONS -->
-      <div class="space-y-1">
-        <button onclick="toggleDropdown('complianceDropdown', 'complianceChevron')" 
-                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-gavel text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-            <span class="sidebar-text truncate">Compliance & Violations</span>
-          </div>
-          <div class="dropdown-right">
-            <i id="complianceChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
-          </div>
-        </button>
-        <div id="complianceDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('pages/compliance_monitoring.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-check-circle text-[10px] opacity-50"></i> 
-            <span>Compliance Monitoring</span>
-          </a>
-          <a href="<?= site_url('violation_tracking.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-triangle-exclamation text-[10px] opacity-50"></i> 
-            <span>Violation Tracking</span>
-          </a>
-          <a href="<?= site_url('corrective_actions.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-hammer text-[10px] opacity-50"></i> 
-            <span>Corrective Actions</span>
-          </a>
-          <a href="<?= site_url('regulatory_compliance.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-scale-balanced text-[10px] opacity-50"></i> 
-            <span>Regulatory Compliance</span>
-          </a>
+      <!-- 4. COMPLIANCE & VIOLATIONS - DIRECT LINK to Compliance Monitoring -->
+      <a href="compliance_monitoring.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-gavel text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+          <span class="sidebar-text truncate">Compliance & Violations</span>
         </div>
-      </div>
+      </a>
 
       <!-- ============================================================ -->
       <!-- SECTION 2: OPERATIONAL MODULES                               -->
@@ -179,45 +107,45 @@ function site_url($path) {
         <div id="healthCenterDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
           
           <!-- Patient Management -->
-          <a href="<?= site_url('../modules/healthservices/patients.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="patient_management.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-users text-[10px] opacity-50"></i> 
             <span>Patient Management</span>
           </a>
 
           <!-- Consultations -->
-          <a href="<?= site_url('../modules/healthservices/consultations.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="consultations.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-stethoscope text-[10px] opacity-50"></i> 
             <span>Consultations</span>
           </a>
 
           <!-- Medical Records -->
-          <a href="<?= site_url('../modules/healthservices/medical_records.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="medical_records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-folder text-[10px] opacity-50"></i> 
             <span>Medical Records</span>
           </a>
 
           <!-- Appointments   -->
-          <a href="<?= site_url('../modules/healthservices/appointments.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="appointments.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-calendar-check text-[10px] opacity-50"></i> 
-            <span>Appointments</span>
+            <span>Appointments </span>
           </a>
 
           <!-- Triage   -->
-          <a href="<?= site_url('../modules/healthservices/triage.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="triage.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-heart-pulse text-[10px] opacity-50"></i> 
-            <span>Triage</span>
+            <span>Triage  </span>
           </a>
 
           <!-- Prescriptions   -->
-          <a href="<?= site_url('../modules/healthservices/prescriptions.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="prescriptions.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-prescription-bottle text-[10px] opacity-50"></i> 
-            <span>Prescriptions</span>
+            <span>Prescriptions  </span>
           </a>
 
           <!-- Referrals   -->
-          <a href="<?= site_url('../modules/healthservices/referrals.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="referrals.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-arrow-right-arrow-left text-[10px] opacity-50"></i> 
-            <span>Referrals</span>
+            <span>Referrals  </span>
           </a>
 
         </div>
@@ -237,34 +165,34 @@ function site_url($path) {
         </button>
         <div id="sanitationDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
           
-          <a href="<?= site_url('../modules/sanitation/permit_applications.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="permit_applications.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-pen text-[10px] opacity-50"></i> 
             <span>Permit Applications</span>
           </a>
           
-          <a href="<?= site_url('../modules/sanitation/inspections.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="inspections.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-search text-[10px] opacity-50"></i> 
             <span>Inspections</span>
           </a>
           
-          <a href="<?= site_url('../modules/sanitation/permit_records.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="permit_records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-folder text-[10px] opacity-50"></i> 
             <span>Permit Records</span>
           </a>
           
-          <a href="<?= site_url('../modules/sanitation/payments.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="payments.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-money-bill-wave text-[10px] opacity-50"></i> 
-            <span>Payments</span>
+            <span>Payments  </span>
           </a>
           
-          <a href="<?= site_url('../modules/sanitation/documents.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="documents.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file text-[10px] opacity-50"></i> 
-            <span>Documents</span>
+            <span>Documents  </span>
           </a>
           
-          <a href="<?= site_url('../modules/sanitation/renewals.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="renewals.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-rotate text-[10px] opacity-50"></i> 
-            <span>Renewals</span>
+            <span>Renewals  </span>
           </a>
 
         </div>
@@ -284,29 +212,29 @@ function site_url($path) {
         </button>
         <div id="immunizationDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
           
-          <a href="<?= site_url('../modules/immunization/child_records.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="child_records.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-child text-[10px] opacity-50"></i> 
             <span>Child Records</span>
           </a>
           
-          <a href="<?= site_url('../modules/immunization/vaccination_tracking.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="vaccination_tracking.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-vial text-[10px] opacity-50"></i> 
             <span>Vaccination Tracking</span>
           </a>
           
-          <a href="<?= site_url('../modules/immunization/growth_charts.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="growth_charts.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> 
             <span>Growth Charts</span>
           </a>
           
-          <a href="<?= site_url('../modules/immunization/vaccine_inventory.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="vaccine_inventory.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-boxes text-[10px] opacity-50"></i> 
-            <span>Vaccine Inventory</span>
+            <span>Vaccine Inventory  </span>
           </a>
           
-          <a href="<?= site_url('../modules/immunization/nutrition_assessment.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="nutrition_assessment.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-apple-alt text-[10px] opacity-50"></i> 
-            <span>Nutrition Assessment</span>
+            <span>Nutrition Assessment  </span>
           </a>
 
         </div>
@@ -326,29 +254,29 @@ function site_url($path) {
         </button>
         <div id="wastewaterDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
           
-          <a href="<?= site_url('../modules/services/septic_tanks.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="septic_tanks.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-water text-[10px] opacity-50"></i> 
             <span>Septic Tank Registry</span>
           </a>
           
-          <a href="<?= site_url('../modules/services/maintenance.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="maintenance.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-wrench text-[10px] opacity-50"></i> 
             <span>Maintenance & Desludging</span>
           </a>
           
-          <a href="<?= site_url('../modules/services/service_requests.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="service_requests.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-tools text-[10px] opacity-50"></i> 
             <span>Service Requests</span>
           </a>
           
-          <a href="<?= site_url('../modules/services/providers.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="providers.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-user-cog text-[10px] opacity-50"></i> 
-            <span>Service Providers</span>
+            <span>Service Providers  </span>
           </a>
           
-          <a href="<?= site_url('../modules/services/wastewater_billing.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="wastewater_billing.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-invoice text-[10px] opacity-50"></i> 
-            <span>Billing</span>
+            <span>Billing  </span>
           </a>
 
         </div>
@@ -368,34 +296,34 @@ function site_url($path) {
         </button>
         <div id="surveillanceDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
           
-          <a href="<?= site_url('../modules/surveillence/case_reports.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="case_reports.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-medical text-[10px] opacity-50"></i> 
             <span>Case Reports</span>
           </a>
           
-          <a href="<?= site_url('../modules/surveillence/mapping.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="mapping.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-map text-[10px] opacity-50"></i> 
             <span>Mapping & Clustering</span>
           </a>
           
-          <a href="<?= site_url('../modules/surveillence/outbreak_detection.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="outbreak_detection.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-triangle-exclamation text-[10px] opacity-50"></i> 
             <span>Outbreak Detection</span>
           </a>
           
-          <a href="<?= site_url('../modules/surveillence/alerts.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="alerts.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-bell text-[10px] opacity-50"></i> 
-            <span>Real-time Alerts</span>
+            <span>Real-time Alerts  </span>
           </a>
           
-          <a href="<?= site_url('../modules/surveillence/contact_tracing.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="contact_tracing.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-people-arrows text-[10px] opacity-50"></i> 
-            <span>Contact Tracing</span>
+            <span>Contact Tracing  </span>
           </a>
           
-          <a href="<?= site_url('../modules/surveillence/response_management.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="response_management.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-phone-alt text-[10px] opacity-50"></i> 
-            <span>Response Management</span>
+            <span>Response Management </span>
           </a>
 
         </div>
@@ -409,42 +337,93 @@ function site_url($path) {
 
       <!-- User Management -->
       <div class="space-y-1">
-  <a href="<?= site_url('management/user_management.php') ?>"
-     class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600">
-    <div class="flex items-center space-x-3">
-      <i class="fa-solid fa-users-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-      <span class="sidebar-text truncate">User Management</span>
-    </div>
-  </a>
-</div>
+        <button onclick="toggleDropdown('userMgmtDropdown', 'userMgmtChevron')" 
+                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-users-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+            <span class="sidebar-text truncate">User Management</span>
+          </div>
+          <div class="dropdown-right">
+            <i id="userMgmtChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
+          </div>
+        </button>
+        <div id="userMgmtDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+          <a href="create_staff.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-user-plus text-[10px] opacity-50"></i> <span>User Registration</span>
+          </a>
+          <a href="manage_users.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-user-pen text-[10px] opacity-50"></i> <span>Role Assignment</span>
+          </a>
+          <a href="rbac_permissions.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-key text-[10px] opacity-50"></i> <span>Permission Management</span>
+          </a>
+          <a href="user_activity.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> <span>User Activity</span>
+          </a>
+        </div>
+      </div>
 
       <!-- System Logs -->
       <div class="space-y-1">
-  <a href="<?= site_url('management/system_logs.php') ?>"
-     class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600">
-    <div class="flex items-center space-x-3">
-      <i class="fa-solid fa-clock-rotate-left text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-      <span class="sidebar-text truncate">System Logs</span>
-    </div>
-  </a>
-</div>
+        <button onclick="toggleDropdown('sysLogsDropdown', 'sysLogsChevron')" 
+                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-clock-rotate-left text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+            <span class="sidebar-text truncate">System Logs</span>
+          </div>
+          <div class="dropdown-right">
+            <i id="sysLogsChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
+          </div>
+        </button>
+        <div id="sysLogsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+          <a href="audit_trail.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-list-check text-[10px] opacity-50"></i> <span>Audit Trail</span>
+          </a>
+          <a href="activity_logs.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> <span>Activity Logs</span>
+          </a>
+          <a href="error_logs.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-bug text-[10px] opacity-50"></i> <span>Error Logs</span>
+          </a>
+          <a href="log_search.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-search text-[10px] opacity-50"></i> <span>Log Search</span>
+          </a>
+        </div>
+      </div>
 
       <!-- Settings -->
       <div class="space-y-1">
-  <a href="<?= site_url('management/settings.php') ?>"
-     class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600">
-    <div class="flex items-center space-x-3">
-      <i class="fa-solid fa-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-      <span class="sidebar-text truncate">Settings</span>
-    </div>
-  </a>
-</div>
+        <button onclick="toggleDropdown('settingsDropdown', 'settingsChevron')" 
+                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+            <span class="sidebar-text truncate">Settings</span>
+          </div>
+          <div class="dropdown-right">
+            <i id="settingsChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
+          </div>
+        </button>
+        <div id="settingsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
+          <a href="system_config.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-sliders text-[10px] opacity-50"></i> <span>System Configuration</span>
+          </a>
+          <a href="module_settings.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-puzzle-piece text-[10px] opacity-50"></i> <span>Module Settings</span>
+          </a>
+          <a href="notification_settings.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-bell text-[10px] opacity-50"></i> <span>Notification Settings</span>
+          </a>
+          <a href="backup_recovery.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+            <i class="fa-solid fa-database text-[10px] opacity-50"></i> <span>Backup & Recovery</span>
+          </a>
+        </div>
+      </div>
 
     </nav>
     
     <!-- Logout -->
     <div class="p-4 border-t border-brand-border/40 shrink-0 bg-white/40">
-      <a href="<?= site_url('logout.php') ?>" class="flex items-center space-x-3 px-3 py-2.5 hover:bg-red-50 hover:text-red-600 text-slate-500 rounded-xl text-xs font-bold tracking-wide transition group cursor-pointer">
+      <a href="logout.php" class="flex items-center space-x-3 px-3 py-2.5 hover:bg-red-50 hover:text-red-600 text-slate-500 rounded-xl text-xs font-bold tracking-wide transition group cursor-pointer">
         <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
         <span class="sidebar-text truncate">Logout</span>
       </a>
