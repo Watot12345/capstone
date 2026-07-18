@@ -1,0 +1,829 @@
+<?php
+// ============================================================
+// COLOR PALETTE USED ON THIS PAGE
+// ============================================================
+//   'brand-dark':   '#0B4F4A',
+//   'brand-medium': '#14807A',
+//   'brand-light':  '#E6F5F3',
+//   'brand-border': '#B8E0DC',
+// ============================================================
+
+// ============================================================
+// 1. PHP BACKEND - Fetch Data
+// ============================================================
+require_once '../../includes/header.php';
+require_once '../../includes/sidebar.php';
+
+// Sample Fee Structure
+$feeStructure = [
+    ['category' => 'Desludging (Residential)', 'base_fee' => 1200.00, 'per_unit' => null, 'description' => 'Standard residential desludging service'],
+    ['category' => 'Desludging (Commercial)', 'base_fee' => 2000.00, 'per_unit' => null, 'description' => 'Commercial establishment desludging'],
+    ['category' => 'Septic Tank Inspection', 'base_fee' => 800.00, 'per_unit' => null, 'description' => 'Complete septic tank inspection'],
+    ['category' => 'Septic Tank Maintenance', 'base_fee' => 1500.00, 'per_unit' => null, 'description' => 'Regular maintenance service'],
+    ['category' => 'Installation (New Tank)', 'base_fee' => 5000.00, 'per_unit' => null, 'description' => 'New septic tank installation'],
+    ['category' => 'Emergency Service', 'base_fee' => 2500.00, 'per_unit' => null, 'description' => 'Emergency call-out service'],
+    ['category' => 'Pipe Inspection', 'base_fee' => 600.00, 'per_unit' => null, 'description' => 'CCTV pipe inspection'],
+    ['category' => 'Wastewater Treatment', 'base_fee' => 3000.00, 'per_unit' => null, 'description' => 'Wastewater treatment service'],
+];
+
+// Sample Invoices/Billing
+$invoices = [
+    [
+        'id' => 1,
+        'invoice_id' => 'INV-001',
+        'client_name' => 'Pedro Garcia',
+        'tank_id' => 'ST-001',
+        'service_type' => 'Desludging (Residential)',
+        'amount' => 1200.00,
+        'tax' => 72.00,
+        'total_amount' => 1272.00,
+        'status' => 'paid',
+        'payment_method' => 'GCash',
+        'payment_reference' => 'GCH-20260720-001',
+        'invoice_date' => '2026-07-20',
+        'due_date' => '2026-08-04',
+        'paid_at' => '2026-07-21 10:30:00',
+        'notes' => 'Regular desludging service',
+        'items' => [
+            ['description' => 'Desludging Service', 'quantity' => 1, 'unit_price' => 1200.00, 'total' => 1200.00]
+        ]
+    ],
+    [
+        'id' => 2,
+        'invoice_id' => 'INV-002',
+        'client_name' => 'Carlos Lim',
+        'tank_id' => 'ST-003',
+        'service_type' => 'Emergency Service',
+        'amount' => 2500.00,
+        'tax' => 150.00,
+        'total_amount' => 2650.00,
+        'status' => 'pending',
+        'payment_method' => null,
+        'payment_reference' => null,
+        'invoice_date' => '2026-07-18',
+        'due_date' => '2026-08-01',
+        'paid_at' => null,
+        'notes' => 'Emergency maintenance - cracked tank',
+        'items' => [
+            ['description' => 'Emergency Service Call', 'quantity' => 1, 'unit_price' => 1000.00, 'total' => 1000.00],
+            ['description' => 'Cracked Tank Repair', 'quantity' => 1, 'unit_price' => 1500.00, 'total' => 1500.00],
+        ]
+    ],
+    [
+        'id' => 3,
+        'invoice_id' => 'INV-003',
+        'client_name' => 'Elena Torres',
+        'tank_id' => 'ST-004',
+        'service_type' => 'Installation (New Tank)',
+        'amount' => 5000.00,
+        'tax' => 300.00,
+        'total_amount' => 5300.00,
+        'status' => 'paid',
+        'payment_method' => 'Bank Transfer',
+        'payment_reference' => 'BTR-20260715-001',
+        'invoice_date' => '2026-07-15',
+        'due_date' => '2026-07-29',
+        'paid_at' => '2026-07-16 14:20:00',
+        'notes' => 'New tank installation',
+        'items' => [
+            ['description' => 'New Septic Tank Installation', 'quantity' => 1, 'unit_price' => 5000.00, 'total' => 5000.00],
+        ]
+    ],
+    [
+        'id' => 4,
+        'invoice_id' => 'INV-004',
+        'client_name' => 'Rosa Mendoza',
+        'tank_id' => 'ST-002',
+        'service_type' => 'Septic Tank Maintenance',
+        'amount' => 1500.00,
+        'tax' => 90.00,
+        'total_amount' => 1590.00,
+        'status' => 'overdue',
+        'payment_method' => null,
+        'payment_reference' => null,
+        'invoice_date' => '2026-07-10',
+        'due_date' => '2026-07-24',
+        'paid_at' => null,
+        'notes' => 'Regular maintenance service',
+        'items' => [
+            ['description' => 'Maintenance Service', 'quantity' => 1, 'unit_price' => 1500.00, 'total' => 1500.00],
+        ]
+    ],
+    [
+        'id' => 5,
+        'invoice_id' => 'INV-005',
+        'client_name' => 'Ramon Garcia',
+        'tank_id' => 'ST-005',
+        'service_type' => 'Desludging (Residential)',
+        'amount' => 1200.00,
+        'tax' => 72.00,
+        'total_amount' => 1272.00,
+        'status' => 'paid',
+        'payment_method' => 'Cash',
+        'payment_reference' => 'CSH-20260722-001',
+        'invoice_date' => '2026-07-22',
+        'due_date' => '2026-08-05',
+        'paid_at' => '2026-07-22 09:15:00',
+        'notes' => 'Regular desludging',
+        'items' => [
+            ['description' => 'Desludging Service', 'quantity' => 1, 'unit_price' => 1200.00, 'total' => 1200.00],
+        ]
+    ],
+    [
+        'id' => 6,
+        'invoice_id' => 'INV-006',
+        'client_name' => 'Miguel Reyes',
+        'tank_id' => 'ST-006',
+        'service_type' => 'Wastewater Treatment',
+        'amount' => 3000.00,
+        'tax' => 180.00,
+        'total_amount' => 3180.00,
+        'status' => 'pending',
+        'payment_method' => null,
+        'payment_reference' => null,
+        'invoice_date' => '2026-07-25',
+        'due_date' => '2026-08-08',
+        'paid_at' => null,
+        'notes' => 'Wastewater treatment service',
+        'items' => [
+            ['description' => 'Wastewater Treatment', 'quantity' => 1, 'unit_price' => 3000.00, 'total' => 3000.00],
+        ]
+    ],
+];
+
+// Stats
+$totalInvoices = count($invoices);
+$totalPaid = count(array_filter($invoices, fn($i) => $i['status'] === 'paid'));
+$totalPending = count(array_filter($invoices, fn($i) => $i['status'] === 'pending'));
+$totalOverdue = count(array_filter($invoices, fn($i) => $i['status'] === 'overdue'));
+$totalRevenue = array_sum(array_filter(array_column($invoices, 'total_amount'), function($v, $k) use ($invoices) {
+    return $invoices[$k]['status'] === 'paid';
+}, ARRAY_FILTER_USE_BOTH));
+
+$title = 'Wastewater Billing';
+?>
+
+<!-- ============================================================ -->
+<!-- 2. HTML + PHP EMBEDDED + Tailwind CSS                       -->
+<!-- ============================================================ -->
+
+<div class="flex-1 px-6 pt-[26px] pb-20 mb-10 flex flex-col min-h-0 overflow-hidden">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Wastewater Billing</h2>
+            <p class="text-sm text-slate-500 mt-0.5">Manage fee structure, quotations, payments & invoices</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="openModal('quotationModal')"
+                    class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-file-invoice text-xs"></i> Generate Quotation
+            </button>
+            <button onclick="openModal('paymentModal')"
+                    class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-credit-card text-xs"></i> Process Payment
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
+            <p class="text-xs text-slate-500 font-medium">Total Invoices</p>
+            <p class="text-xl font-bold text-slate-900"><?php echo $totalInvoices; ?></p>
+        </div>
+        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
+            <p class="text-xs text-slate-500 font-medium">Paid</p>
+            <p class="text-xl font-bold text-emerald-600"><?php echo $totalPaid; ?></p>
+        </div>
+        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
+            <p class="text-xs text-slate-500 font-medium">Pending</p>
+            <p class="text-xl font-bold text-amber-600"><?php echo $totalPending; ?></p>
+        </div>
+        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
+            <p class="text-xs text-slate-500 font-medium">Overdue</p>
+            <p class="text-xl font-bold text-rose-600"><?php echo $totalOverdue; ?></p>
+        </div>
+        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
+            <p class="text-xs text-slate-500 font-medium">Revenue</p>
+            <p class="text-xl font-bold text-brand-dark">₱<?php echo number_format($totalRevenue, 2); ?></p>
+        </div>
+    </div>
+
+    <!-- Overdue Alert -->
+    <?php if ($totalOverdue > 0): ?>
+    <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg"></i>
+            <span class="text-sm text-rose-700">
+                <span class="font-bold"><?php echo $totalOverdue; ?></span> invoice(s) are overdue. Immediate payment required.
+            </span>
+        </div>
+        <button onclick="document.getElementById('filterStatus').value='overdue'; filterInvoices();" 
+                class="text-xs font-semibold text-rose-700 hover:text-rose-900 underline">
+            View overdue
+        </button>
+    </div>
+    <?php endif; ?>
+
+    <!-- Fee Structure Section -->
+    <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 mb-6">
+        <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-brand-medium"></i> Fee Structure
+            </h4>
+            <button onclick="openModal('feeStructureModal')" class="text-xs font-semibold text-brand-medium hover:text-brand-dark transition">
+                <i class="fa-solid fa-pen mr-1"></i> Edit Fees
+            </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <?php foreach ($feeStructure as $fee): ?>
+            <div class="bg-slate-50 rounded-lg p-3 border border-slate-200 hover:shadow-sm transition">
+                <p class="font-semibold text-slate-800 text-sm"><?php echo $fee['category']; ?></p>
+                <p class="text-xs text-slate-400"><?php echo $fee['description']; ?></p>
+                <p class="text-lg font-bold text-brand-dark mt-1">₱<?php echo number_format($fee['base_fee'], 2); ?></p>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 mb-6">
+        <div class="flex flex-col sm:flex-row gap-3">
+            <div class="flex-1 relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text"
+                       id="searchInvoice"
+                       placeholder="Search by invoice ID, client, or tank..."
+                       class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm transition">
+            </div>
+            <div class="flex gap-2 flex-wrap">
+                <select id="filterStatus" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white">
+                    <option value="">All Status</option>
+                    <option value="paid">Paid</option>
+                    <option value="pending">Pending</option>
+                    <option value="overdue">Overdue</option>
+                </select>
+                <select id="filterMethod" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white">
+                    <option value="">All Methods</option>
+                    <option value="GCash">GCash</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Cash">Cash</option>
+                </select>
+                <button onclick="resetFilters()" title="Reset filters"
+                        class="px-3 py-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 hover:text-slate-700 transition-colors text-sm">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Invoice ID</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Client</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Service</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Due Date</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Payment</th>
+                        <th class="px-4 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="invoiceTableBody">
+                    <?php foreach ($invoices as $invoice): ?>
+                    <tr class="border-b border-slate-100 hover:bg-brand-light/40 transition-colors invoice-row <?php echo $invoice['status'] === 'overdue' ? 'bg-rose-50/50' : ''; ?>"
+                        data-client="<?php echo strtolower($invoice['client_name']); ?>"
+                        data-id="<?php echo $invoice['invoice_id']; ?>"
+                        data-status="<?php echo $invoice['status']; ?>"
+                        data-method="<?php echo $invoice['payment_method'] ?? ''; ?>">
+                        <td class="px-4 py-3 font-mono text-xs text-brand-dark font-semibold"><?php echo $invoice['invoice_id']; ?></td>
+                        <td class="px-4 py-3">
+                            <div>
+                                <p class="font-semibold text-slate-800 text-sm"><?php echo $invoice['client_name']; ?></p>
+                                <p class="text-xs text-slate-400"><?php echo $invoice['tank_id']; ?></p>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-slate-600 text-xs"><?php echo $invoice['service_type']; ?></td>
+                        <td class="px-4 py-3">
+                            <span class="text-sm font-bold text-slate-800">₱<?php echo number_format($invoice['total_amount'], 2); ?></span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-500 text-xs">
+                            <?php echo date('M d, Y', strtotime($invoice['due_date'])); ?>
+                            <?php if ($invoice['status'] === 'overdue'): ?>
+                                <span class="block text-[10px] text-rose-500">Overdue</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-4 py-3">
+                            <?php
+                                $statusColors = [
+                                    'paid' => 'bg-emerald-100 text-emerald-700',
+                                    'pending' => 'bg-amber-100 text-amber-700',
+                                    'overdue' => 'bg-rose-100 text-rose-700'
+                                ];
+                            ?>
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold <?php echo $statusColors[$invoice['status']] ?? $statusColors['pending']; ?>">
+                                <?php echo ucfirst($invoice['status']); ?>
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-500 text-xs">
+                            <?php if ($invoice['payment_method']): ?>
+                                <span class="text-emerald-600"><?php echo $invoice['payment_method']; ?></span>
+                            <?php else: ?>
+                                <span class="text-slate-400">—</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="viewInvoice(<?php echo $invoice['id']; ?>)"
+                                        class="p-1.5 text-brand-medium hover:bg-brand-light rounded-lg transition" title="View">
+                                    <i class="fa-solid fa-eye text-sm"></i>
+                                </button>
+                                <?php if ($invoice['status'] === 'pending' || $invoice['status'] === 'overdue'): ?>
+                                    <button onclick="processPayment(<?php echo $invoice['id']; ?>)"
+                                            class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Pay">
+                                        <i class="fa-solid fa-credit-card text-sm"></i>
+                                    </button>
+                                <?php endif; ?>
+                                <button onclick="editInvoice(<?php echo $invoice['id']; ?>)"
+                                        class="p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition" title="Edit">
+                                    <i class="fa-solid fa-pen text-sm"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-14 text-center">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                <i class="fa-solid fa-file-invoice text-slate-400"></i>
+            </div>
+            <p class="text-sm font-semibold text-slate-600">No invoices match your filters</p>
+            <p class="text-xs text-slate-400 mt-1">Try adjusting your search or clearing filters</p>
+            <button onclick="resetFilters()" class="mt-3 text-xs font-semibold text-brand-medium hover:text-brand-dark">Clear all filters</button>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50">
+            <p class="text-xs text-slate-500">
+                Showing <span class="font-semibold text-slate-700">1</span> to
+                <span class="font-semibold text-slate-700"><?php echo $totalInvoices; ?></span> of
+                <span class="font-semibold text-slate-700"><?php echo $totalInvoices; ?></span> invoices
+            </p>
+            <div class="flex gap-1">
+                <button class="px-3 py-1.5 rounded-lg text-sm bg-slate-100 text-slate-300 cursor-not-allowed" disabled>
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <button class="px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-dark text-white">1</button>
+                <button class="px-3 py-1.5 rounded-lg text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- QUOTATION GENERATION MODAL                                   -->
+<!-- ============================================================ -->
+<div id="quotationModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice text-brand-medium"></i>
+                Generate Quotation
+            </h3>
+            <button onclick="closeModal('quotationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="quotationForm" class="p-6 space-y-4" onsubmit="saveQuotation(event)">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Client Name</label>
+                <input type="text" id="quote_client" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Tank ID</label>
+                <input type="text" id="quote_tank" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Service Type</label>
+                <select id="quote_service" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <?php foreach ($feeStructure as $fee): ?>
+                        <option value="<?php echo $fee['category']; ?>" data-fee="<?php echo $fee['base_fee']; ?>">
+                            <?php echo $fee['category']; ?> - ₱<?php echo number_format($fee['base_fee'], 2); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Additional Items (Optional)</label>
+                <textarea id="quote_items" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="Additional items or notes..."></textarea>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Notes</label>
+                <textarea id="quote_notes" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="Additional notes..."></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeModal('quotationModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold">
+                    <i class="fa-solid fa-file-pdf mr-1.5"></i> Generate Quotation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW INVOICE MODAL                                           -->
+<!-- ============================================================ -->
+<div id="viewInvoiceModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
+            <h3 class="font-bold text-slate-900">Invoice Details</h3>
+            <button onclick="closeModal('viewInvoiceModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div id="invoiceDetailsContent" class="p-6">
+            <div class="flex items-center justify-center py-10 text-slate-400 text-sm">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAYMENT PROCESSING MODAL                                     -->
+<!-- ============================================================ -->
+<div id="paymentModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-credit-card text-brand-medium"></i>
+                Process Payment
+            </h3>
+            <button onclick="closeModal('paymentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="paymentForm" class="p-6 space-y-4" onsubmit="savePayment(event)">
+            <input type="hidden" id="pay_invoice_id">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Invoice ID</label>
+                <input type="text" id="pay_invoice_display" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Amount</label>
+                <input type="number" id="pay_amount" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Payment Method</label>
+                <select id="pay_method" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <option value="GCash">GCash</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Over-the-Counter">Over-the-Counter</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Reference Number</label>
+                <input type="text" id="pay_reference" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="Optional reference number">
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeModal('paymentModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold">
+                    <i class="fa-solid fa-check mr-1.5"></i> Process Payment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FEE STRUCTURE MODAL                                          -->
+<!-- ============================================================ -->
+<div id="feeStructureModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-brand-medium"></i>
+                Fee Structure Management
+            </h3>
+            <button onclick="closeModal('feeStructureModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                <?php foreach ($feeStructure as $index => $fee): ?>
+                <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800 text-sm"><?php echo $fee['category']; ?></p>
+                        <p class="text-xs text-slate-400"><?php echo $fee['description']; ?></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="fee_<?php echo $index; ?>" value="<?php echo $fee['base_fee']; ?>" 
+                               class="w-24 px-2 py-1 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                        <button onclick="updateFee(<?php echo $index; ?>)" class="text-xs text-brand-medium hover:text-brand-dark transition">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <div class="flex justify-end gap-2 pt-4 border-t border-slate-100 mt-4">
+                <button type="button" onclick="closeModal('feeStructureModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMessage"></span>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                   -->
+<!-- ============================================================ -->
+<script>
+    const INVOICES = <?php echo json_encode(array_column($invoices, null, 'id'), JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK); ?>;
+
+    // ============================================================
+    // MODAL FUNCTIONS
+    // ============================================================
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+        document.getElementById(id).classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+        document.getElementById(id).classList.remove('flex');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Close modal on backdrop click
+    document.querySelectorAll('.fixed.inset-0').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                this.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            }
+        });
+    });
+
+    // ============================================================
+    // VIEW INVOICE
+    // ============================================================
+    function viewInvoice(id) {
+        openModal('viewInvoiceModal');
+        const i = INVOICES[id];
+        if (!i) return;
+
+        setTimeout(() => {
+            const statusColors = {
+                paid: 'bg-emerald-100 text-emerald-700',
+                pending: 'bg-amber-100 text-amber-700',
+                overdue: 'bg-rose-100 text-rose-700'
+            };
+
+            const itemsHtml = i.items.map(item => `
+                <div class="flex justify-between items-center p-2 bg-white rounded-lg border border-slate-200">
+                    <div>
+                        <p class="text-sm text-slate-800">${item.description}</p>
+                        <p class="text-xs text-slate-400">${item.quantity} x ₱${Number(item.unit_price).toFixed(2)}</p>
+                    </div>
+                    <span class="font-semibold text-slate-800">₱${Number(item.total).toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('invoiceDetailsContent').innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 pb-4 border-b border-slate-200">
+                        <div class="w-14 h-14 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-xl flex-shrink-0">
+                            ${i.client_name.charAt(0)}
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-900">${i.client_name}</h4>
+                            <p class="text-sm text-slate-500">${i.invoice_id} • ${i.tank_id}</p>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${statusColors[i.status] || statusColors.pending}">
+                                ${i.status.toUpperCase()}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><p class="text-xs text-slate-400 font-semibold">Service</p><p class="text-sm text-slate-800">${i.service_type}</p></div>
+                        <div><p class="text-xs text-slate-400 font-semibold">Invoice Date</p><p class="text-sm text-slate-800">${new Date(i.invoice_date).toLocaleDateString()}</p></div>
+                        <div><p class="text-xs text-slate-400 font-semibold">Due Date</p><p class="text-sm text-slate-800">${new Date(i.due_date).toLocaleDateString()}</p></div>
+                        <div><p class="text-xs text-slate-400 font-semibold">Payment Method</p><p class="text-sm text-slate-800">${i.payment_method || '—'}</p></div>
+                        ${i.paid_at ? `<div><p class="text-xs text-slate-400 font-semibold">Paid At</p><p class="text-sm text-slate-800">${new Date(i.paid_at).toLocaleString()}</p></div>` : ''}
+                        ${i.payment_reference ? `<div><p class="text-xs text-slate-400 font-semibold">Reference</p><p class="text-sm text-slate-800 font-mono">${i.payment_reference}</p></div>` : ''}
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <h5 class="text-sm font-bold text-slate-700 mb-2">Items</h5>
+                        <div class="space-y-2">${itemsHtml}</div>
+                        <div class="mt-2 pt-2 border-t border-slate-200 flex justify-between">
+                            <span class="font-semibold text-slate-700">Total</span>
+                            <span class="font-bold text-brand-dark">₱${Number(i.total_amount).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    ${i.notes ? `<div class="bg-brand-light/40 rounded-xl p-4 border border-brand-border"><h5 class="text-sm font-bold text-slate-700 mb-2">Notes</h5><p class="text-sm text-slate-800">${i.notes}</p></div>` : ''}
+                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+                        <button onclick="closeModal('viewInvoiceModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Close</button>
+                        ${i.status === 'pending' || i.status === 'overdue' ? `<button onclick="closeModal('viewInvoiceModal'); processPayment(${i.id})" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"><i class="fa-solid fa-credit-card mr-1.5"></i> Pay Now</button>` : ''}
+                        <button onclick="downloadInvoice('${i.invoice_id}')" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold"><i class="fa-solid fa-download mr-1.5"></i> Download</button>
+                    </div>
+                </div>
+            `;
+        }, 300);
+    }
+
+    // ============================================================
+    // PROCESS PAYMENT
+    // ============================================================
+    function processPayment(id) {
+        const i = INVOICES[id];
+        if (!i) return;
+        
+        document.getElementById('pay_invoice_id').value = id;
+        document.getElementById('pay_invoice_display').value = i.invoice_id;
+        document.getElementById('pay_amount').value = i.total_amount;
+        document.getElementById('pay_reference').value = '';
+        
+        openModal('paymentModal');
+    }
+
+    function savePayment(event) {
+        event.preventDefault();
+        const id = document.getElementById('pay_invoice_id').value;
+        const i = INVOICES[id];
+        if (!i) return;
+        
+        i.status = 'paid';
+        i.payment_method = document.getElementById('pay_method').value;
+        i.payment_reference = document.getElementById('pay_reference').value.trim() || 'PAY-' + Date.now();
+        i.paid_at = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        
+        updateInvoiceRow(i);
+        closeModal('paymentModal');
+        showToast('Payment for ' + i.invoice_id + ' processed successfully!', 'success');
+    }
+
+    function updateInvoiceRow(i) {
+        const rows = document.querySelectorAll('.invoice-row');
+        rows.forEach(row => {
+            const client = row.querySelector('.font-semibold.text-slate-800.text-sm')?.textContent;
+            if (client === i.client_name) {
+                const statusBadge = row.querySelector('.px-2.py-1.rounded-full');
+                const statusColors = {
+                    paid: 'bg-emerald-100 text-emerald-700',
+                    pending: 'bg-amber-100 text-amber-700',
+                    overdue: 'bg-rose-100 text-rose-700'
+                };
+                statusBadge.className = `px-2 py-1 rounded-full text-xs font-semibold ${statusColors[i.status] || statusColors.pending}`;
+                statusBadge.textContent = i.status.charAt(0).toUpperCase() + i.status.slice(1);
+                
+                const methodEl = row.querySelector('.text-slate-500.text-xs');
+                if (methodEl) {
+                    if (i.payment_method) {
+                        methodEl.innerHTML = `<span class="text-emerald-600">${i.payment_method}</span>`;
+                    } else {
+                        methodEl.innerHTML = '<span class="text-slate-400">—</span>';
+                    }
+                }
+            }
+        });
+    }
+
+    // ============================================================
+    // QUOTATION
+    // ============================================================
+    function saveQuotation(event) {
+        event.preventDefault();
+        showToast('Quotation generated successfully!', 'success');
+        closeModal('quotationModal');
+    }
+
+    // ============================================================
+    // FEE STRUCTURE
+    // ============================================================
+    function updateFee(index) {
+        const value = document.getElementById('fee_' + index).value;
+        showToast('Fee updated to ₱' + parseFloat(value).toFixed(2), 'success');
+    }
+
+    // ============================================================
+    // DOWNLOAD INVOICE
+    // ============================================================
+    function downloadInvoice(invoiceId) {
+        showToast('Downloading invoice: ' + invoiceId, 'success');
+    }
+
+    // ============================================================
+    // EDIT INVOICE
+    // ============================================================
+    function editInvoice(id) {
+        showToast('Edit invoice ID: ' + id + ' (Edit modal coming soon)', 'info');
+    }
+
+    // ============================================================
+    // TOAST NOTIFICATIONS
+    // ============================================================
+    let toastTimer = null;
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const colors = {
+            success: 'bg-brand-dark',
+            danger: 'bg-rose-600',
+            info: 'bg-blue-600',
+            warning: 'bg-amber-600'
+        };
+        toast.className = 'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 ' + (colors[type] || colors.success);
+        toast.querySelector('i').className = 'fa-solid fa-circle-check';
+        document.getElementById('toastMessage').textContent = message;
+        toast.classList.remove('hidden');
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
+
+    // ============================================================
+    // SEARCH & FILTER
+    // ============================================================
+    document.getElementById('searchInvoice').addEventListener('input', filterInvoices);
+    document.getElementById('filterStatus').addEventListener('change', filterInvoices);
+    document.getElementById('filterMethod').addEventListener('change', filterInvoices);
+
+    function filterInvoices() {
+        const search = document.getElementById('searchInvoice').value.toLowerCase();
+        const status = document.getElementById('filterStatus').value;
+        const method = document.getElementById('filterMethod').value.toLowerCase();
+        let visibleCount = 0;
+
+        document.querySelectorAll('.invoice-row').forEach(row => {
+            const client = row.dataset.client;
+            const id = row.dataset.id.toLowerCase();
+            const rowStatus = row.dataset.status;
+            const rowMethod = row.dataset.method.toLowerCase();
+
+            const matchesSearch = client.includes(search) || id.includes(search);
+            const matchesStatus = !status || rowStatus === status;
+            const matchesMethod = !method || rowMethod === method;
+            const isVisible = matchesSearch && matchesStatus && matchesMethod;
+
+            row.style.display = isVisible ? '' : 'none';
+            if (isVisible) visibleCount++;
+        });
+
+        document.getElementById('emptyState').style.display = visibleCount === 0 ? 'flex' : 'none';
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInvoice').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterMethod').value = '';
+        document.querySelectorAll('.invoice-row').forEach(row => row.style.display = '');
+        document.getElementById('emptyState').style.display = 'none';
+    }
+
+    // ESC to close modals
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            });
+        }
+    });
+</script>
+
+<?php include_once '../../includes/footer.php'; ?>

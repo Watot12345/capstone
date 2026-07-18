@@ -1,10 +1,13 @@
+<?php
+$assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF']), '/'), '/'));
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Civentral</title>
-  <link rel="icon" type="image/png" href="../assets/images/logo.png">
+  <link rel="icon" type="image/png" href="<?= $assetBasePath; ?>assets/images/logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style type="text/tailwindcss">
     @theme {
@@ -21,7 +24,7 @@
   <header class="bg-white border-b border-slate-200 h-20 px-6 flex items-center justify-between sticky top-0 z-40 shadow-xs shrink-0">
     <div class="flex items-center space-x-4 text-brand-dark">
         <div class="shrink-0 flex items-center justify-center">
-          <img src="../assets/images/logo.png" alt="Logo" class="h-16 w-auto object-contain">
+          <img src="<?= $assetBasePath; ?>assets/images/logo.png" alt="Logo" class="h-16 w-auto object-contain">
         </div>
     <div class="flex flex-col">
       <span class="text-base font-black tracking-[0.15em] uppercase leading-none">CIVENTRAL</span>

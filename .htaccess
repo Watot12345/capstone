@@ -1,0 +1,44 @@
+RewriteEngine On
+
+# ==========================================
+# Force HTTPS (Optional)
+# ==========================================
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# ==========================================
+# Admin Routes
+# ==========================================
+
+# /admin
+RewriteRule ^admin/?$ admin/index.php [NC,L]
+
+# /admin/module/health-center
+RewriteRule ^admin/module/([a-zA-Z0-9_-]+)/?$ admin/modules/$1/index.php [NC,L]
+
+# /admin/module/health-center/patients
+RewriteRule ^admin/module/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/?$ admin/modules/$1/$2.php [NC,L]
+
+# /admin/dashboard
+RewriteRule ^admin/([a-zA-Z0-9_-]+)/?$ admin/modules/$1/index.php [NC,L]
+
+# ==========================================
+# API Routes
+# ==========================================
+
+# /api/login
+RewriteRule ^api/([a-zA-Z0-9_-]+)/?$ mobile/api/$1.php [NC,L]
+
+# ==========================================
+# Remove .php Extension
+# ==========================================
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+?)/?$ $1.php [NC,L]
+
+# ==========================================
+# 404 Page
+# ==========================================
+
+ErrorDocument 404 /404.php
