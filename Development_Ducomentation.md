@@ -1,4 +1,4 @@
-WHO GETS MAIN CONTROLS ACCESS
+WHO GETS MAIN CONTROLS ACCESS?
 1. Health Center Director
 text
 HEALTH CENTER DIRECTOR
@@ -481,7 +481,7 @@ SYSTEM MANAGEMENT (TITLE PAGE)
 
 
     COMPLETE ROLE-MODULE MAPPING TABLE
-Staff Roles(26)	& Module  Features They Access
+Staff Roles(26)	&         Module                         Features They Access
 
 Health Center Director	Health Center	               All Features (Full Access)
 Doctor	                Health Center	               Consultations, Prescriptions, Referrals, Records
