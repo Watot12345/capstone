@@ -43,16 +43,15 @@ function site_url($path) {
             <i class="fa-solid fa-chart-simple text-[10px] opacity-50"></i> 
             <span>Dashboard</span>
           </a>
-          <a href="<?= site_url('module_activity.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/module_activity.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> 
             <span>Module Activity Summary</span>
           </a>
-<<<<<<< HEAD
-          <a href="<?= site_url('alerts.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/alerts.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-bell text-[10px] opacity-50"></i> 
             <span>Alerts & Notifications</span>
           </a>
-          <a href="<?= site_url('system_health.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/system_health.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-heart-pulse text-[10px] opacity-50"></i> 
             <span>System Health Status</span>
           </a>
@@ -88,19 +87,8 @@ function site_url($path) {
             <i class="fa-solid fa-gauge-high text-[10px] opacity-50"></i> 
             <span>Performance Metrics</span>
           </a>
-=======
-    
         </div>
       </div>
-
-      <!-- 2. ANALYTICS - DIRECT LINK to AI Insights -->
-      <a href="ai_insights.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-chart-line text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-          <span class="sidebar-text truncate">Analytics</span>
->>>>>>> c9c10573373f6c64ac74b245be945f26e79ea8b8
-        </div>
-      </a>
 
       <!-- 3. REPORTS -->
       <div class="space-y-1">
@@ -119,15 +107,11 @@ function site_url($path) {
             <i class="fa-solid fa-sliders text-[10px] opacity-50"></i> 
             <span>Custom Report Generation</span>
           </a>
-<<<<<<< HEAD
           <a href="<?= site_url('scheduled_reports.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-clock text-[10px] opacity-50"></i> 
             <span>Scheduled Reports</span>
           </a>
           <a href="<?= site_url('export.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-=======
-          <a href="export.php" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
->>>>>>> c9c10573373f6c64ac74b245be945f26e79ea8b8
             <i class="fa-solid fa-file-export text-[10px] opacity-50"></i> 
             <span>Export Options (PDF/Excel)</span>
           </a>
@@ -138,7 +122,6 @@ function site_url($path) {
         </div>
       </div>
 
-<<<<<<< HEAD
       <!-- 4. COMPLIANCE & VIOLATIONS -->
       <div class="space-y-1">
         <button onclick="toggleDropdown('complianceDropdown', 'complianceChevron')" 
@@ -168,15 +151,8 @@ function site_url($path) {
             <i class="fa-solid fa-scale-balanced text-[10px] opacity-50"></i> 
             <span>Regulatory Compliance</span>
           </a>
-=======
-      <!-- 4. COMPLIANCE & VIOLATIONS - DIRECT LINK to Compliance Monitoring -->
-      <a href="compliance_monitoring.php" class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-gavel text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-          <span class="sidebar-text truncate">Compliance & Violations</span>
->>>>>>> c9c10573373f6c64ac74b245be945f26e79ea8b8
         </div>
-      </a>
+      </div>
 
       <!-- ============================================================ -->
       <!-- SECTION 2: OPERATIONAL MODULES                               -->
@@ -219,25 +195,25 @@ function site_url($path) {
           <!-- Appointments   -->
           <a href="<?= site_url('../modules/healthservices/appointments.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-calendar-check text-[10px] opacity-50"></i> 
-            <span>Appointments </span>
+            <span>Appointments</span>
           </a>
 
           <!-- Triage   -->
           <a href="<?= site_url('../modules/healthservices/triage.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-heart-pulse text-[10px] opacity-50"></i> 
-            <span>Triage  </span>
+            <span>Triage</span>
           </a>
 
           <!-- Prescriptions   -->
           <a href="<?= site_url('../modules/healthservices/prescriptions.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-prescription-bottle text-[10px] opacity-50"></i> 
-            <span>Prescriptions  </span>
+            <span>Prescriptions</span>
           </a>
 
           <!-- Referrals   -->
           <a href="<?= site_url('../modules/healthservices/referrals.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-arrow-right-arrow-left text-[10px] opacity-50"></i> 
-            <span>Referrals  </span>
+            <span>Referrals</span>
           </a>
 
         </div>
@@ -274,17 +250,17 @@ function site_url($path) {
           
           <a href="<?= site_url('../modules/sanitation/payments.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-money-bill-wave text-[10px] opacity-50"></i> 
-            <span>Payments  </span>
+            <span>Payments</span>
           </a>
           
           <a href="<?= site_url('../modules/sanitation/documents.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file text-[10px] opacity-50"></i> 
-            <span>Documents  </span>
+            <span>Documents</span>
           </a>
           
           <a href="<?= site_url('../modules/sanitation/renewals.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-rotate text-[10px] opacity-50"></i> 
-            <span>Renewals  </span>
+            <span>Renewals</span>
           </a>
 
         </div>
@@ -321,12 +297,12 @@ function site_url($path) {
           
           <a href="<?= site_url('../modules/immunization/vaccine_inventory.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-boxes text-[10px] opacity-50"></i> 
-            <span>Vaccine Inventory  </span>
+            <span>Vaccine Inventory</span>
           </a>
           
           <a href="<?= site_url('../modules/immunization/nutrition_assessment.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-apple-alt text-[10px] opacity-50"></i> 
-            <span>Nutrition Assessment  </span>
+            <span>Nutrition Assessment</span>
           </a>
 
         </div>
@@ -363,12 +339,12 @@ function site_url($path) {
           
           <a href="<?= site_url('../modules/services/providers.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-user-cog text-[10px] opacity-50"></i> 
-            <span>Service Providers  </span>
+            <span>Service Providers</span>
           </a>
           
           <a href="<?= site_url('../modules/services/wastewater_billing.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-invoice text-[10px] opacity-50"></i> 
-            <span>Billing  </span>
+            <span>Billing</span>
           </a>
 
         </div>
@@ -405,17 +381,17 @@ function site_url($path) {
           
           <a href="<?= site_url('../modules/surveillence/alerts.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-bell text-[10px] opacity-50"></i> 
-            <span>Real-time Alerts  </span>
+            <span>Real-time Alerts</span>
           </a>
           
           <a href="<?= site_url('../modules/surveillence/contact_tracing.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-people-arrows text-[10px] opacity-50"></i> 
-            <span>Contact Tracing  </span>
+            <span>Contact Tracing</span>
           </a>
           
           <a href="<?= site_url('../modules/surveillence/response_management.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-phone-alt text-[10px] opacity-50"></i> 
-            <span>Response Management </span>
+            <span>Response Management</span>
           </a>
 
         </div>
