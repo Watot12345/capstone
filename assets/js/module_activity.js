@@ -1,6 +1,7 @@
  // ============================================================
   // 1. CASE FLOW
   // ============================================================
+  // UPDATED
   const stages = document.querySelectorAll('.flow-stage');
   const flowFill = document.getElementById('flowFill');
   const stageDescText = document.getElementById('stageDescText');

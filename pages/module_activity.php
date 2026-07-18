@@ -2,7 +2,7 @@
 <?php include '../includes/sidebar.php'; ?>
 <main class="p-6 bg-[#EEF5FF] min-h-screen font-sans">
   <link rel="stylesheet" href="../css/modAct.css" />
-
+<!-- UPDATED -->
   <!-- ===== CASE FLOW PIPELINE ===== -->
   <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-md hover:shadow-xl transition-all duration-300 animate-fade-up card-accent">
     <div class="flex items-start justify-between gap-6 mb-6 flex-wrap">

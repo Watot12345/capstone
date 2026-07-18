@@ -1,7 +1,7 @@
 <?php include '../includes/header.php'; ?>
 
 <?php include '../includes/sidebar.php'; ?>
-
+<!-- UPDATED -->
 <main class="flex-1 bg-dash-bg h-screen flex flex-col overflow-hidden">
     <script src="https://cdn.tailwindcss.com">
     </script>

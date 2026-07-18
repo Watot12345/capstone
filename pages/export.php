@@ -1,6 +1,6 @@
 <?php include '../includes/header.php'; ?>
 <?php include '../includes/sidebar.php'; ?>
-
+<!-- UPDATED -->
 <main class="flex-1 bg-dash-bg h-screen m-5  rounded-2xl font-sans overflow-y-auto scrollbar-track-transparent">
   <link rel="stylesheet" href="../assets/css/export.css" />
     <div class="export-dashboard">
