@@ -71,19 +71,19 @@ function site_url($path) {
           </div>
         </button>
         <div id="analyticsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('ai_insights.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/ai_insights.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-brain text-[10px] opacity-50"></i> 
             <span>AI Insights</span>
           </a>
-          <a href="<?= site_url('trend_analysis.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/trend_analysis.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-arrow-trend-up text-[10px] opacity-50"></i> 
             <span>Trend Analysis</span>
           </a>
-          <a href="<?= site_url('predictive.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/predictive.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-robot text-[10px] opacity-50"></i> 
             <span>Predictive Analytics</span>
           </a>
-          <a href="<?= site_url('performance.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/performance.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-gauge-high text-[10px] opacity-50"></i> 
             <span>Performance Metrics</span>
           </a>
@@ -103,19 +103,19 @@ function site_url($path) {
           </div>
         </button>
         <div id="reportsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('custom_report.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/custom_report.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-sliders text-[10px] opacity-50"></i> 
             <span>Custom Report Generation</span>
           </a>
-          <a href="<?= site_url('scheduled_reports.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/scheduled_reports.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-clock text-[10px] opacity-50"></i> 
             <span>Scheduled Reports</span>
           </a>
-          <a href="<?= site_url('export.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/export.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-file-export text-[10px] opacity-50"></i> 
             <span>Export Options (PDF/Excel)</span>
           </a>
-          <a href="<?= site_url('report_templates.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/report_templates.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-copy text-[10px] opacity-50"></i> 
             <span>Report Templates</span>
           </a>
@@ -135,7 +135,7 @@ function site_url($path) {
           </div>
         </button>
         <div id="complianceDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('compliance_monitoring.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
+          <a href="<?= site_url('pages/compliance_monitoring.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
             <i class="fa-solid fa-check-circle text-[10px] opacity-50"></i> 
             <span>Compliance Monitoring</span>
           </a>
