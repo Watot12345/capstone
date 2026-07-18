@@ -205,93 +205,119 @@ $title = 'Vaccine Inventory';
     </div>
 
     <!-- ============================================================ -->
-    <!-- ENHANCED KPI CARDS WITH ICONS                               -->
+    <!-- MODERN KPI CARDS - Updated to match design               -->
     <!-- ============================================================ -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <!-- Total Vaccines -->
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 hover:shadow-md transition-all duration-300">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-light border border-brand-border flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-syringe text-brand-dark text-lg"></i>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <!-- Card 1: Total Vaccines -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fa-solid fa-syringe text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-slate-900"><?php echo $totalVaccines; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Vaccines</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Total Vaccines</p>
-                    <p class="text-xl font-bold text-slate-900"><?php echo $totalVaccines; ?></p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Total Stock -->
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 hover:shadow-md transition-all duration-300">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-boxes-stacked text-emerald-600 text-lg"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Total Stock</p>
-                    <p class="text-xl font-bold text-slate-900"><?php echo number_format($totalStock); ?></p>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">💉 All types</span>
+                    <span class="text-[10px] text-slate-400"><?php echo $totalStock; ?> units total</span>
                 </div>
             </div>
         </div>
-        
-        <!-- Low Stock -->
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 hover:shadow-md transition-all duration-300 <?php echo $totalLowStock > 0 ? 'border-l-4 border-l-amber-500' : ''; ?>">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
+
+        <!-- Card 2: Total Stock -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fa-solid fa-boxes-stacked text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-emerald-600"><?php echo number_format($totalStock); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Stock</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Low Stock</p>
-                    <p class="text-xl font-bold <?php echo $totalLowStock > 0 ? 'text-amber-600' : 'text-slate-900'; ?>">
-                        <?php echo $totalLowStock; ?>
-                    </p>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">📦 Inventory</span>
+                    <span class="text-[10px] text-slate-400">All vaccines combined</span>
                 </div>
             </div>
-            <?php if ($totalLowStock > 0): ?>
-                <div class="mt-2 pt-2 border-t border-slate-100">
-                    <span class="text-[10px] text-amber-600 font-medium">⚠️ Needs attention</span>
-                </div>
-            <?php endif; ?>
         </div>
-        
-        <!-- Critical -->
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 hover:shadow-md transition-all duration-300 <?php echo $totalCritical > 0 ? 'border-l-4 border-l-rose-500' : ''; ?>">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-circle-exclamation text-rose-600 text-lg"></i>
+
+        <!-- Card 3: Low Stock -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black <?php echo $totalLowStock > 0 ? 'text-amber-600' : 'text-slate-900'; ?>">
+                            <?php echo $totalLowStock; ?>
+                        </p>
+                        <p class="text-xs font-medium text-slate-500">Low Stock</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Critical</p>
-                    <p class="text-xl font-bold <?php echo $totalCritical > 0 ? 'text-rose-600' : 'text-slate-900'; ?>">
-                        <?php echo $totalCritical; ?>
-                    </p>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 <?php echo $totalLowStock > 0 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'; ?> rounded-full text-[10px] font-bold">
+                        <?php echo $totalLowStock > 0 ? '⚠️ Needs attention' : '✅ Stock adequate'; ?>
+                    </span>
+                    <span class="text-[10px] text-slate-400">Below minimum</span>
                 </div>
             </div>
-            <?php if ($totalCritical > 0): ?>
-                <div class="mt-2 pt-2 border-t border-slate-100">
-                    <span class="text-[10px] text-rose-600 font-medium">🚨 Immediate action!</span>
-                </div>
-            <?php endif; ?>
         </div>
-        
-        <!-- Out of Stock -->
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 hover:shadow-md transition-all duration-300 <?php echo $totalOutOfStock > 0 ? 'border-l-4 border-l-slate-500' : ''; ?>">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-ban text-slate-500 text-lg"></i>
+
+        <!-- Card 4: Critical -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                        <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black <?php echo $totalCritical > 0 ? 'text-rose-600' : 'text-slate-900'; ?>">
+                            <?php echo $totalCritical; ?>
+                        </p>
+                        <p class="text-xs font-medium text-slate-500">Critical</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Out of Stock</p>
-                    <p class="text-xl font-bold <?php echo $totalOutOfStock > 0 ? 'text-slate-500' : 'text-slate-900'; ?>">
-                        <?php echo $totalOutOfStock; ?>
-                    </p>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 <?php echo $totalCritical > 0 ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'; ?> rounded-full text-[10px] font-bold">
+                        <?php echo $totalCritical > 0 ? '🚨 Immediate action' : '✅ All good'; ?>
+                    </span>
+                    <span class="text-[10px] text-slate-400">Urgent reorder</span>
                 </div>
             </div>
-            <?php if ($totalOutOfStock > 0): ?>
-                <div class="mt-2 pt-2 border-t border-slate-100">
-                    <span class="text-[10px] text-slate-500 font-medium">📦 Reorder required</span>
+        </div>
+
+        <!-- Card 5: Out of Stock -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-slate-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+                        <i class="fa-solid fa-ban text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black <?php echo $totalOutOfStock > 0 ? 'text-slate-500' : 'text-slate-900'; ?>">
+                            <?php echo $totalOutOfStock; ?>
+                        </p>
+                        <p class="text-xs font-medium text-slate-500">Out of Stock</p>
+                    </div>
                 </div>
-            <?php endif; ?>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 <?php echo $totalOutOfStock > 0 ? 'bg-slate-200 text-slate-700' : 'bg-emerald-100 text-emerald-700'; ?> rounded-full text-[10px] font-bold">
+                        <?php echo $totalOutOfStock > 0 ? '📦 Reorder required' : '✅ In stock'; ?>
+                    </span>
+                    <span class="text-[10px] text-slate-400">Unavailable</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -521,11 +547,11 @@ $title = 'Vaccine Inventory';
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
                                 <?php if ($item['status'] === 'low_stock' || $item['status'] === 'critical' || $item['status'] === 'out_of_stock'): ?>
-    <button onclick="reorderVaccine(<?php echo $item['id']; ?>)"
-            class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Reorder">
-        <i class="fa-solid fa-truck text-sm"></i>
-    </button>
-<?php endif; ?>
+                                    <button onclick="reorderVaccine(<?php echo $item['id']; ?>)"
+                                            class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Reorder">
+                                        <i class="fa-solid fa-truck text-sm"></i>
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>
@@ -796,6 +822,7 @@ $title = 'Vaccine Inventory';
         </form>
     </div>
 </div>
+
 <!-- ============================================================ -->
 <!-- REORDER CONFIRMATION MODAL                                   -->
 <!-- ============================================================ -->
@@ -859,9 +886,6 @@ $title = 'Vaccine Inventory';
 <!-- JAVASCRIPT                                                   -->
 <!-- ============================================================ -->
 <script>
-    // ============================================================
-    // FIXED: Proper JSON encoding with numeric check
-    // ============================================================
     const INVENTORY = <?php echo json_encode(array_column($vaccineInventory, null, 'id'), JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK); ?>;
 
     // ============================================================
@@ -951,9 +975,7 @@ $title = 'Vaccine Inventory';
     // EDIT VACCINE
     // ============================================================
     function editVaccine(id) {
-        // Convert id to number if it's a string
-        const vaccineId = parseInt(id);
-        const v = INVENTORY[vaccineId];
+        const v = INVENTORY[id];
         if (!v) {
             showToast('Vaccine not found', 'danger');
             return;
@@ -998,15 +1020,12 @@ $title = 'Vaccine Inventory';
         const rows = document.querySelectorAll('.inventory-row');
         rows.forEach(row => {
             if (row.dataset.id == v.id) {
-                // Update vaccine name
                 const nameEl = row.querySelector('.font-semibold.text-slate-800.text-sm');
                 if (nameEl) nameEl.textContent = v.vaccine_name;
                 
-                // Update batch
                 const batchEl = row.querySelector('.font-mono.text-xs.text-slate-600');
                 if (batchEl) batchEl.textContent = v.batch_number;
                 
-                // Update stock
                 const stockSpan = row.querySelector('.text-sm.font-bold');
                 if (stockSpan) {
                     stockSpan.textContent = v.quantity;
@@ -1015,7 +1034,6 @@ $title = 'Vaccine Inventory';
                 const minEl = row.querySelector('.text-\\[10px\\].text-slate-400');
                 if (minEl) minEl.textContent = 'Min: ' + v.minimum_stock;
                 
-                // Update expiry
                 const expirySpan = row.querySelector('.px-4.py-3 .text-xs');
                 if (expirySpan) {
                     const daysLeft = Math.round((new Date(v.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
@@ -1023,18 +1041,15 @@ $title = 'Vaccine Inventory';
                     expirySpan.className = `text-xs ${daysLeft <= 30 ? 'text-rose-600 font-bold' : 'text-slate-500'}`;
                 }
                 
-                // Update temperature
                 const tempSpan = row.querySelector('.text-xs.font-medium');
                 if (tempSpan) {
                     tempSpan.textContent = v.temperature + '°C';
                     tempSpan.className = `text-xs font-medium ${v.temperature >= 2 && v.temperature <= 8 ? 'text-emerald-600' : 'text-rose-600'}`;
                 }
                 
-                // Update location
                 const locEl = row.querySelector('.text-slate-600.text-xs');
                 if (locEl) locEl.textContent = v.storage_location;
                 
-                // Update status
                 const statusColors = {
                     in_stock: 'bg-emerald-100 text-emerald-700',
                     low_stock: 'bg-amber-100 text-amber-700',
@@ -1047,64 +1062,50 @@ $title = 'Vaccine Inventory';
                     statusBadge.textContent = v.status.replace('_', ' ').toUpperCase();
                 }
                 
-                // Update row background
                 row.className = `border-b border-slate-100 hover:bg-brand-light/40 transition-colors inventory-row ${v.status === 'critical' || v.status === 'out_of_stock' ? 'bg-rose-50/50' : ''}`;
                 row.dataset.status = v.status;
             }
         });
     }
 
-      // ============================================================
-// REORDER VACCINE (Opens Modal instead of alert)
-// ============================================================
-let reorderVaccineId = null;
+    // ============================================================
+    // REORDER VACCINE
+    // ============================================================
+    let reorderVaccineId = null;
 
-function reorderVaccine(id) {
-    const vaccineId = parseInt(id);
-    const v = INVENTORY[vaccineId];
-    if (!v) {
-        showToast('Vaccine not found', 'danger');
-        return;
+    function reorderVaccine(id) {
+        const v = INVENTORY[id];
+        if (!v) {
+            showToast('Vaccine not found', 'danger');
+            return;
+        }
+        
+        reorderVaccineId = id;
+        
+        document.getElementById('reorderVaccineName').textContent = v.vaccine_name;
+        document.getElementById('reorderCurrentStock').textContent = v.quantity;
+        document.getElementById('reorderQuantity').value = v.minimum_stock * 2;
+        document.getElementById('reorderNotes').value = 'Low stock alert - ' + v.vaccine_name + ' is at ' + v.quantity + ' units. Minimum required: ' + v.minimum_stock;
+        
+        openModal('reorderModal');
     }
-    
-    // Store the vaccine ID for confirmation
-    reorderVaccineId = vaccineId;
-    
-    // Populate the modal
-    document.getElementById('reorderVaccineName').textContent = v.vaccine_name;
-    document.getElementById('reorderCurrentStock').textContent = v.quantity;
-    document.getElementById('reorderQuantity').value = v.minimum_stock * 2;
-    document.getElementById('reorderNotes').value = 'Low stock alert - ' + v.vaccine_name + ' is at ' + v.quantity + ' units. Minimum required: ' + v.minimum_stock;
-    
-    openModal('reorderModal');
-}
 
-// ============================================================
-// CONFIRM REORDER
-// ============================================================
-function confirmReorder() {
-    const v = INVENTORY[reorderVaccineId];
-    if (!v) {
-        showToast('Vaccine not found', 'danger');
+    function confirmReorder() {
+        const v = INVENTORY[reorderVaccineId];
+        if (!v) {
+            showToast('Vaccine not found', 'danger');
+            closeModal('reorderModal');
+            return;
+        }
+        
+        const quantity = parseInt(document.getElementById('reorderQuantity').value) || 100;
+        const notes = document.getElementById('reorderNotes').value.trim() || 'Reorder requested';
+        
+        showToast('✅ Reorder request for ' + v.vaccine_name + ' (' + quantity + ' units) submitted successfully!', 'success');
+        
         closeModal('reorderModal');
-        return;
+        reorderVaccineId = null;
     }
-    
-    const quantity = parseInt(document.getElementById('reorderQuantity').value) || 100;
-    const notes = document.getElementById('reorderNotes').value.trim() || 'Reorder requested';
-    
-    // Show success toast
-    showToast('✅ Reorder request for ' + v.vaccine_name + ' (' + quantity + ' units) submitted successfully!', 'success');
-    
-    // Optionally update the stock or status
-    // v.quantity += quantity;
-    // v.status = 'in_stock';
-    // updateInventoryRow(v);
-    
-    closeModal('reorderModal');
-    reorderVaccineId = null;
-}
-   
 
     // ============================================================
     // ADD STOCK
@@ -1231,14 +1232,6 @@ function confirmReorder() {
         if (tempInput) {
             tempInput.value = 2.5;
         }
-        
-        // Fix: Ensure reorder button onclick works
-        document.querySelectorAll('[onclick*="reorderVaccine"]').forEach(el => {
-            const onclickAttr = el.getAttribute('onclick');
-            if (onclickAttr) {
-                // The onclick already has the function call, just keep it
-            }
-        });
     });
 </script>
 

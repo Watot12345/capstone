@@ -172,27 +172,108 @@ $title = 'Service Providers';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total Providers</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo $totalProviders; ?></p>
+    <!-- ============================================================ -->
+    <!-- MODERN KPI CARDS - Updated to match design               -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <!-- Card 1: Total Providers -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fa-solid fa-users text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-slate-900"><?php echo $totalProviders; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Providers</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">👥 All providers</span>
+                    <span class="text-[10px] text-slate-400"><?php echo $inactiveProviders; ?> inactive</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Active</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo $activeProviders; ?></p>
+
+        <!-- Card 2: Active -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fa-solid fa-user-check text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-emerald-600"><?php echo $activeProviders; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Active</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Available</span>
+                    <span class="text-[10px] text-slate-400">Ready for assignments</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Equipment</p>
-            <p class="text-xl font-bold text-brand-dark"><?php echo $totalEquipment; ?></p>
+
+        <!-- Card 3: Equipment -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                        <i class="fa-solid fa-toolbox text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-amber-600"><?php echo $totalEquipment; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Equipment</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">🔧 Inventory</span>
+                    <span class="text-[10px] text-slate-400">Across all providers</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Avg Rating</p>
-            <p class="text-xl font-bold text-amber-500"><?php echo number_format($avgRating, 1); ?> ⭐</p>
+
+        <!-- Card 4: Avg Rating -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-purple-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-200">
+                        <i class="fa-solid fa-star text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-purple-600"><?php echo number_format($avgRating, 1); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Avg Rating</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold">⭐ Quality</span>
+                    <span class="text-[10px] text-slate-400"><?php echo $avgRating >= 4.5 ? 'Excellent' : 'Good'; ?></span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total Jobs</p>
-            <p class="text-xl font-bold text-blue-600"><?php echo number_format($totalJobs); ?></p>
+
+        <!-- Card 5: Total Jobs -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-light rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-brand-dark to-brand-medium rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-light">
+                        <i class="fa-solid fa-briefcase text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-brand-dark"><?php echo number_format($totalJobs); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Jobs</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">📊 Completed</span>
+                    <span class="text-[10px] text-slate-400">All time</span>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -298,33 +298,177 @@ $title = 'Permit Records';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo $totalPermits; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Active</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo $activePermits; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Pending</p>
-            <p class="text-xl font-bold text-amber-600"><?php echo $pendingPermits; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Under Review</p>
-            <p class="text-xl font-bold text-blue-600"><?php echo $underReview; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Expired</p>
-            <p class="text-xl font-bold text-slate-400"><?php echo $expiredPermits; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Rejected</p>
-            <p class="text-xl font-bold text-rose-600"><?php echo $rejected; ?></p>
+    <!-- ============================================================ -->
+<!-- MODERN KPI CARDS - Updated to match design               -->
+<!-- ============================================================ -->
+<div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+    <!-- Card 1: Total Permits -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-file-lines text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-slate-900"><?php echo $totalPermits; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Total Permits</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">📋 All permits</span>
+                <span class="text-[10px] text-slate-400"><?php echo $activePermits; ?> active</span>
+            </div>
         </div>
     </div>
+
+    <!-- Card 2: Active -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fa-solid fa-check-circle text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-emerald-600"><?php echo $activePermits; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Active</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Valid</span>
+                <span class="text-[10px] text-slate-400">Currently active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Pending -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                    <i class="fa-solid fa-clock text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-amber-600"><?php echo $pendingPermits; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Pending</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">⏳ Awaiting</span>
+                <span class="text-[10px] text-slate-400">Initial review</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Under Review -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-clipboard-list text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-blue-600"><?php echo $underReview; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Under Review</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">🔍 In progress</span>
+                <span class="text-[10px] text-slate-400">Being evaluated</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 5: Expired -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-slate-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+                    <i class="fa-solid fa-calendar-xmark text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-slate-600"><?php echo $expiredPermits; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Expired</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold">📅 Overdue</span>
+                <span class="text-[10px] text-slate-400">Needs renewal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 6: Rejected -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                    <i class="fa-solid fa-circle-xmark text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-rose-600"><?php echo $rejected; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Rejected</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">❌ Denied</span>
+                <span class="text-[10px] text-slate-400">Non-compliant</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODERN SUMMARY CARDS                                        -->
+<!-- ============================================================ -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <!-- Revenue Card -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-5 shadow-sm">
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full"></div>
+        <div class="relative flex items-center justify-between text-white">
+            <div>
+                <p class="text-sm font-medium opacity-80">💰 Total Revenue</p>
+                <p class="text-2xl font-bold mt-1">₱<?php echo number_format($totalRevenue, 2); ?></p>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-coins text-2xl text-white/80"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Renewals Card -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-5 shadow-sm">
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full"></div>
+        <div class="relative flex items-center justify-between text-white">
+            <div>
+                <p class="text-sm font-medium opacity-80">🔄 Total Renewals</p>
+                <p class="text-2xl font-bold mt-1"><?php echo $totalRenewals; ?></p>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-rotate text-2xl text-white/80"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Rate Card -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-5 shadow-sm">
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full"></div>
+        <div class="relative flex items-center justify-between text-white">
+            <div>
+                <p class="text-sm font-medium opacity-80">📋 Active Rate</p>
+                <p class="text-2xl font-bold mt-1"><?php echo $totalPermits > 0 ? round(($activePermits / $totalPermits) * 100) : 0; ?>%</p>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-chart-pie text-2xl text-white/80"></i>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">

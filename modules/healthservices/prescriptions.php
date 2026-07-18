@@ -202,45 +202,90 @@ $totalMedications = array_sum(array_map(fn($p) => count($p['medications']), $pre
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-brand-light border border-brand-border flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-prescription text-brand-dark"></i>
+    <!-- ============================================================ -->
+<!-- MODERN KPI CARDS - Updated to match design               -->
+<!-- ============================================================ -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <!-- Card 1: Total Prescriptions -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-prescription text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-slate-900"><?php echo $totalPrescriptions; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Total Prescriptions</p>
+                </div>
             </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Prescriptions</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $totalPrescriptions; ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-check-circle text-emerald-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Dispensed</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $totalDispensed; ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-clock text-amber-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Pending</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $totalPending; ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-capsules text-violet-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Medications</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $totalMedications; ?></p>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">💊 All prescriptions</span>
+                <span class="text-[10px] text-slate-400"><?php echo $totalDispensed; ?> dispensed</span>
             </div>
         </div>
     </div>
+
+    <!-- Card 2: Dispensed -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fa-solid fa-check-circle text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-emerald-600"><?php echo $totalDispensed; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Dispensed</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Filled</span>
+                <span class="text-[10px] text-slate-400">Successfully dispensed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Pending -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                    <i class="fa-solid fa-clock text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-amber-600"><?php echo $totalPending; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Pending</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">⏳ Awaiting</span>
+                <span class="text-[10px] text-slate-400">Ready for dispensing</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Total Medications -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-violet-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-violet-200">
+                    <i class="fa-solid fa-capsules text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-violet-600"><?php echo $totalMedications; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Total Medications</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full text-[10px] font-bold">🧪 Items</span>
+                <span class="text-[10px] text-slate-400">Across all prescriptions</span>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Search & Filter -->
     <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 mb-6">

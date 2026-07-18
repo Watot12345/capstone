@@ -228,52 +228,150 @@ $title = 'Documents';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo $totalDocuments; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Verified</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo $verifiedDocs; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Pending</p>
-            <p class="text-xl font-bold text-amber-600"><?php echo $pendingDocs; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Expired</p>
-            <p class="text-xl font-bold text-rose-600"><?php echo $expiredDocs; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">QR Codes</p>
-            <p class="text-xl font-bold text-brand-medium"><?php echo $hasQR; ?></p>
+    <!-- ============================================================ -->
+<!-- MODERN KPI CARDS - Updated to match design               -->
+<!-- ============================================================ -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <!-- Card 1: Total Documents -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-file-lines text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-slate-900"><?php echo $totalDocuments; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Total Documents</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">📄 All documents</span>
+                <span class="text-[10px] text-slate-400"><?php echo $verifiedDocs; ?> verified</span>
+            </div>
         </div>
     </div>
 
-    <!-- Document Expiry Alerts -->
-    <?php 
-        $expiringSoon = array_filter($documents, function($d) {
-            if (!$d['expiry_date']) return false;
-            $daysLeft = (strtotime($d['expiry_date']) - time()) / 86400;
-            return $daysLeft <= 30 && $daysLeft > 0 && $d['status'] !== 'expired';
-        });
-    ?>
-    <?php if (count($expiringSoon) > 0): ?>
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <i class="fa-solid fa-clock text-amber-500 text-lg"></i>
-            <span class="text-sm text-amber-700">
-                <span class="font-bold"><?php echo count($expiringSoon); ?></span> document(s) expiring within 30 days
-            </span>
+    <!-- Card 2: Verified -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fa-solid fa-check-circle text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-emerald-600"><?php echo $verifiedDocs; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Verified</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Approved</span>
+                <span class="text-[10px] text-slate-400">Authenticated</span>
+            </div>
         </div>
-        <button onclick="document.getElementById('filterStatus').value='expiring_soon'; filterDocuments();" 
-                class="text-xs font-semibold text-amber-700 hover:text-amber-900 underline">
-            View expiring
-        </button>
     </div>
-    <?php endif; ?>
+
+    <!-- Card 3: Pending -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                    <i class="fa-solid fa-clock text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-amber-600"><?php echo $pendingDocs; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Pending</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">⏳ Awaiting</span>
+                <span class="text-[10px] text-slate-400">Needs review</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Expired -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                    <i class="fa-solid fa-calendar-xmark text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-rose-600"><?php echo $expiredDocs; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Expired</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">📅 Overdue</span>
+                <span class="text-[10px] text-slate-400">Needs renewal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 5: QR Codes -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-light rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-brand-dark to-brand-medium rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-light">
+                    <i class="fa-solid fa-qrcode text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-brand-dark"><?php echo $hasQR; ?></p>
+                    <p class="text-xs font-medium text-slate-500">QR Codes</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-brand-light text-brand-dark rounded-full text-[10px] font-bold">📱 Generated</span>
+                <span class="text-[10px] text-slate-400">Digital verification</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Document Expiry Alerts - Modern -->
+<?php 
+    $expiringSoon = array_filter($documents, function($d) {
+        if (!$d['expiry_date']) return false;
+        $daysLeft = (strtotime($d['expiry_date']) - time()) / 86400;
+        return $daysLeft <= 30 && $daysLeft > 0 && $d['status'] !== 'expired';
+    });
+?>
+<?php if (count($expiringSoon) > 0): ?>
+<div class="relative overflow-hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4 flex items-center justify-between">
+    <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-30"></div>
+    <div class="relative flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-clock text-amber-500 text-lg"></i>
+        </div>
+        <div>
+            <p class="text-sm font-semibold text-amber-700">
+                ⏰ <span class="font-bold"><?php echo count($expiringSoon); ?></span> document(s) expiring within 30 days
+            </p>
+            <div class="flex flex-wrap gap-2 mt-1">
+                <?php foreach (array_slice($expiringSoon, 0, 3) as $doc): ?>
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                        <?php echo $doc['document_type']; ?> (<?php echo $doc['applicant']; ?>)
+                    </span>
+                <?php endforeach; ?>
+                <?php if (count($expiringSoon) > 3): ?>
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                        +<?php echo count($expiringSoon) - 3; ?> more
+                    </span>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+    <button onclick="document.getElementById('filterStatus').value='expiring_soon'; filterDocuments();" 
+            class="relative px-4 py-2 text-xs font-semibold text-amber-700 hover:text-amber-900 bg-white/60 rounded-lg hover:bg-white transition border border-amber-200">
+        View All
+    </button>
+</div>
+<?php endif; ?>
 
     <!-- Search & Filter -->
     <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 mb-6">

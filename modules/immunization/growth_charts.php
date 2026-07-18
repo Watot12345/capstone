@@ -115,6 +115,11 @@ $growthAlerts = [
     ['child' => 'Emma Lim', 'type' => 'weight', 'message' => 'Weight above 85th percentile', 'severity' => 'low'],
 ];
 
+// Count children with alerts
+$childrenWithAlerts = count(array_filter($children, function($c) use ($growthAlerts) {
+    return in_array($c['name'], array_column($growthAlerts, 'child'));
+}));
+
 $title = 'Growth Charts';
 ?>
 
@@ -138,23 +143,88 @@ $title = 'Growth Charts';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Children</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo count($children); ?></p>
+    <!-- ============================================================ -->
+    <!-- MODERN KPI CARDS - Updated to match design               -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <!-- Card 1: Total Children -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fa-solid fa-child text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-slate-900"><?php echo count($children); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Children</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">👶 All children</span>
+                    <span class="text-[10px] text-slate-400"><?php echo $childrenWithAlerts; ?> with alerts</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Measurements</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo count($growthData); ?></p>
+
+        <!-- Card 2: Measurements -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fa-solid fa-chart-line text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-emerald-600"><?php echo count($growthData); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Measurements</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">📊 Records</span>
+                    <span class="text-[10px] text-slate-400">Growth tracking</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Alerts</p>
-            <p class="text-xl font-bold text-rose-600"><?php echo count($growthAlerts); ?></p>
+
+        <!-- Card 3: Alerts -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-rose-600"><?php echo count($growthAlerts); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Alerts</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">⚠️ Attention</span>
+                    <span class="text-[10px] text-slate-400">Needs review</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Normal Growth</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo count($children) - count($growthAlerts); ?></p>
+
+        <!-- Card 4: Normal Growth -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fa-solid fa-heart-pulse text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-emerald-600"><?php echo count($children) - $childrenWithAlerts; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Normal Growth</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Healthy</span>
+                    <span class="text-[10px] text-slate-400">On track</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -364,9 +434,9 @@ $title = 'Growth Charts';
 </div>
 
 <!-- ============================================================ -->
-<!-- APEXCHARTS CDN                                               -->
+<!-- Local libraries                                              -->
 <!-- ============================================================ -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="../../assets/js/apexcharts.min.js"></script>
 
 <!-- ============================================================ -->
 <!-- JAVASCRIPT                                                   -->

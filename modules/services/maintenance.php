@@ -201,27 +201,108 @@ $title = 'Maintenance & Desludging';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total Services</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo $totalServices; ?></p>
+    <!-- ============================================================ -->
+    <!-- MODERN KPI CARDS - Updated to match design               -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <!-- Card 1: Total Services -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fa-solid fa-tools text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-slate-900"><?php echo $totalServices; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Services</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">🔧 All services</span>
+                    <span class="text-[10px] text-slate-400">Including <?php echo $completedServices; ?> completed</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Scheduled</p>
-            <p class="text-xl font-bold text-blue-600"><?php echo $scheduledServices; ?></p>
+
+        <!-- Card 2: Scheduled -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fa-solid fa-calendar-check text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-blue-600"><?php echo $scheduledServices; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Scheduled</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">📅 Upcoming</span>
+                    <span class="text-[10px] text-slate-400">Awaiting execution</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">In Progress</p>
-            <p class="text-xl font-bold text-amber-600"><?php echo $inProgress; ?></p>
+
+        <!-- Card 3: In Progress -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                        <i class="fa-solid fa-spinner text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-amber-600"><?php echo $inProgress; ?></p>
+                        <p class="text-xs font-medium text-slate-500">In Progress</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">🔄 Active</span>
+                    <span class="text-[10px] text-slate-400">Being worked on</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Completed</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo $completedServices; ?></p>
+
+        <!-- Card 4: Completed -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fa-solid fa-check-circle text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-emerald-600"><?php echo $completedServices; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Completed</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Done</span>
+                    <span class="text-[10px] text-slate-400">Successfully finished</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Revenue</p>
-            <p class="text-xl font-bold text-brand-dark">₱<?php echo number_format($totalRevenue, 2); ?></p>
+
+        <!-- Card 5: Revenue -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-light rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-brand-dark to-brand-medium rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-light">
+                        <i class="fa-solid fa-coins text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-brand-dark">₱<?php echo number_format($totalRevenue, 0); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Revenue</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">💰 Collected</span>
+                    <span class="text-[10px] text-slate-400">From <?php echo $completedServices; ?> services</span>
+                </div>
+            </div>
         </div>
     </div>
 

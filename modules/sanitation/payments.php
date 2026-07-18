@@ -36,6 +36,15 @@ $feeStructure = [
     ['category' => 'Hotel/Lodging', 'base_fee' => 3000.00, 'inspection_fee' => 800.00, 'total' => 3800.00],
 ];
 
+// Payment Methods
+$paymentMethods = [
+    ['id' => 'cash', 'name' => 'Cash', 'icon' => 'fa-money-bill-wave', 'color' => 'emerald'],
+    ['id' => 'gcash', 'name' => 'GCash', 'icon' => 'fa-mobile-screen', 'color' => 'blue'],
+    ['id' => 'visa', 'name' => 'Visa/Mastercard', 'icon' => 'fa-credit-card', 'color' => 'purple'],
+    ['id' => 'bank_transfer', 'name' => 'Bank Transfer', 'icon' => 'fa-building-columns', 'color' => 'amber'],
+    ['id' => 'over_the_counter', 'name' => 'Over-the-Counter', 'icon' => 'fa-store', 'color' => 'slate'],
+];
+
 // Sample Payment History
 $paymentHistory = [
     [
@@ -44,7 +53,7 @@ $paymentHistory = [
         'permit_id' => 'SP-1040',
         'applicant' => 'ABC Restaurant',
         'amount' => 1500.00,
-        'method' => 'GCash',
+        'method' => 'gcash',
         'reference' => 'GCH-20260717-001',
         'status' => 'completed',
         'date' => '2026-07-17 10:30:00',
@@ -56,7 +65,7 @@ $paymentHistory = [
         'permit_id' => 'SP-1041',
         'applicant' => 'Green Market Stall',
         'amount' => 800.00,
-        'method' => 'Cash',
+        'method' => 'cash',
         'reference' => 'CSH-20260716-001',
         'status' => 'completed',
         'date' => '2026-07-16 09:15:00',
@@ -68,7 +77,7 @@ $paymentHistory = [
         'permit_id' => 'SP-1043',
         'applicant' => 'City Gym',
         'amount' => 2000.00,
-        'method' => 'Bank Transfer',
+        'method' => 'bank_transfer',
         'reference' => 'BTR-20260715-001',
         'status' => 'completed',
         'date' => '2026-07-15 14:20:00',
@@ -80,8 +89,8 @@ $paymentHistory = [
         'permit_id' => 'SP-1044',
         'applicant' => 'Mega Mart',
         'amount' => 1000.00,
-        'method' => 'GCash',
-        'reference' => 'GCH-20260714-001',
+        'method' => 'visa',
+        'reference' => 'VIS-20260714-001',
         'status' => 'completed',
         'date' => '2026-07-14 11:45:00',
         'receipt' => 'RCP-004.pdf'
@@ -92,7 +101,7 @@ $paymentHistory = [
         'permit_id' => 'SP-1046',
         'applicant' => 'Green Valley Farm',
         'amount' => 900.00,
-        'method' => 'Bank Transfer',
+        'method' => 'bank_transfer',
         'reference' => 'BTR-20260713-001',
         'status' => 'completed',
         'date' => '2026-07-13 08:30:00',
@@ -104,7 +113,7 @@ $paymentHistory = [
         'permit_id' => 'SP-1042',
         'applicant' => 'Fresh Bakes Co.',
         'amount' => 1200.00,
-        'method' => 'Cash',
+        'method' => 'cash',
         'reference' => 'CSH-20260718-001',
         'status' => 'pending',
         'date' => '2026-07-18 16:00:00',
@@ -116,7 +125,7 @@ $paymentHistory = [
         'permit_id' => 'SP-1047',
         'applicant' => 'Tech Hub Inc.',
         'amount' => 2500.00,
-        'method' => 'GCash',
+        'method' => 'gcash',
         'reference' => 'GCH-20260719-001',
         'status' => 'failed',
         'date' => '2026-07-19 13:20:00',
@@ -162,27 +171,108 @@ $title = 'Payments';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo $totalPayments; ?></p>
+    <!-- ============================================================ -->
+    <!-- MODERN KPI CARDS - Updated to match design               -->
+    <!-- ============================================================ -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <!-- Card 1: Total Payments -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fa-solid fa-credit-card text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-slate-900"><?php echo $totalPayments; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Payments</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">💳 All payments</span>
+                    <span class="text-[10px] text-slate-400"><?php echo $totalCompleted; ?> completed</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Completed</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo $totalCompleted; ?></p>
+
+        <!-- Card 2: Completed -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fa-solid fa-check-circle text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-emerald-600"><?php echo $totalCompleted; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Completed</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Success</span>
+                    <span class="text-[10px] text-slate-400">Payment confirmed</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Pending</p>
-            <p class="text-xl font-bold text-amber-600"><?php echo $totalPending; ?></p>
+
+        <!-- Card 3: Pending -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                        <i class="fa-solid fa-clock text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-amber-600"><?php echo $totalPending; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Pending</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">⏳ Awaiting</span>
+                    <span class="text-[10px] text-slate-400">Payment processing</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Failed</p>
-            <p class="text-xl font-bold text-rose-600"><?php echo $totalFailed; ?></p>
+
+        <!-- Card 4: Failed -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                        <i class="fa-solid fa-circle-xmark text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-rose-600"><?php echo $totalFailed; ?></p>
+                        <p class="text-xs font-medium text-slate-500">Failed</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">❌ Failed</span>
+                    <span class="text-[10px] text-slate-400">Requires attention</span>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Revenue</p>
-            <p class="text-xl font-bold text-brand-dark">₱<?php echo number_format($totalRevenue, 2); ?></p>
+
+        <!-- Card 5: Revenue -->
+        <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+            <div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-light rounded-full opacity-50 group-hover:scale-110 transition"></div>
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-gradient-to-br from-brand-dark to-brand-medium rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-light">
+                        <i class="fa-solid fa-coins text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-brand-dark">₱<?php echo number_format($totalRevenue, 0); ?></p>
+                        <p class="text-xs font-medium text-slate-500">Total Revenue</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">💰 Collected</span>
+                    <span class="text-[10px] text-slate-400">From payments</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -258,9 +348,11 @@ $title = 'Payments';
                 </select>
                 <select id="filterMethod" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white">
                     <option value="">All Methods</option>
-                    <option value="Cash">Cash</option>
-                    <option value="GCash">GCash</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="cash">Cash</option>
+                    <option value="gcash">GCash</option>
+                    <option value="visa">Visa/Mastercard</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="over_the_counter">Over-the-Counter</option>
                 </select>
                 <button onclick="resetFilters()" title="Reset filters"
                         class="px-3 py-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 hover:text-slate-700 transition-colors text-sm">
@@ -307,13 +399,31 @@ $title = 'Payments';
                         <td class="px-4 py-3 text-slate-600 text-xs">
                             <?php
                                 $methodIcons = [
-                                    'Cash' => 'fa-money-bill-wave',
-                                    'GCash' => 'fa-mobile-screen',
-                                    'Bank Transfer' => 'fa-building-columns'
+                                    'cash' => 'fa-money-bill-wave',
+                                    'gcash' => 'fa-mobile-screen',
+                                    'visa' => 'fa-credit-card',
+                                    'bank_transfer' => 'fa-building-columns',
+                                    'over_the_counter' => 'fa-store'
+                                ];
+                                $methodColors = [
+                                    'cash' => 'text-emerald-600',
+                                    'gcash' => 'text-blue-600',
+                                    'visa' => 'text-purple-600',
+                                    'bank_transfer' => 'text-amber-600',
+                                    'over_the_counter' => 'text-slate-600'
                                 ];
                             ?>
-                            <i class="fa-solid <?php echo $methodIcons[$payment['method']] ?? 'fa-credit-card'; ?> mr-1"></i>
-                            <?php echo $payment['method']; ?>
+                            <i class="fa-solid <?php echo $methodIcons[$payment['method']] ?? 'fa-credit-card'; ?> <?php echo $methodColors[$payment['method']] ?? ''; ?> mr-1"></i>
+                            <?php 
+                                $methodNames = [
+                                    'cash' => 'Cash',
+                                    'gcash' => 'GCash',
+                                    'visa' => 'Visa/Mastercard',
+                                    'bank_transfer' => 'Bank Transfer',
+                                    'over_the_counter' => 'OTC'
+                                ];
+                                echo $methodNames[$payment['method']] ?? $payment['method']; 
+                            ?>
                         </td>
                         <td class="px-4 py-3 text-slate-500 text-xs font-mono"><?php echo $payment['reference'] ?? '—'; ?></td>
                         <td class="px-4 py-3">
@@ -395,7 +505,7 @@ $title = 'Payments';
 </div>
 
 <!-- ============================================================ -->
-<!-- PROCESS PAYMENT MODAL                                        -->
+<!-- PROCESS PAYMENT MODAL - Enhanced with modern payment methods -->
 <!-- ============================================================ -->
 <div id="processPaymentModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
@@ -426,16 +536,72 @@ $title = 'Payments';
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Payment Method</label>
-                <select id="payment_method" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                    <option value="Cash">Cash</option>
-                    <option value="GCash">GCash</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Over-the-Counter">Over-the-Counter</option>
-                </select>
+                <div class="grid grid-cols-2 gap-2 mt-1" id="paymentMethods">
+                    <?php foreach ($paymentMethods as $method): 
+                        $methodIcons = [
+                            'cash' => 'fa-money-bill-wave',
+                            'gcash' => 'fa-mobile-screen',
+                            'visa' => 'fa-credit-card',
+                            'bank_transfer' => 'fa-building-columns',
+                            'over_the_counter' => 'fa-store'
+                        ];
+                        $methodColors = [
+                            'cash' => 'border-emerald-200 hover:bg-emerald-50',
+                            'gcash' => 'border-blue-200 hover:bg-blue-50',
+                            'visa' => 'border-purple-200 hover:bg-purple-50',
+                            'bank_transfer' => 'border-amber-200 hover:bg-amber-50',
+                            'over_the_counter' => 'border-slate-200 hover:bg-slate-50'
+                        ];
+                        $methodTextColors = [
+                            'cash' => 'text-emerald-600',
+                            'gcash' => 'text-blue-600',
+                            'visa' => 'text-purple-600',
+                            'bank_transfer' => 'text-amber-600',
+                            'over_the_counter' => 'text-slate-600'
+                        ];
+                    ?>
+                    <label class="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition <?php echo $methodColors[$method['id']] ?? ''; ?> has-[:checked]:ring-2 has-[:checked]:ring-brand-medium has-[:checked]:border-brand-medium">
+                        <input type="radio" name="payment_method_radio" value="<?php echo $method['id']; ?>" 
+                               class="w-4 h-4 text-brand-dark focus:ring-brand-medium" 
+                               <?php echo $method['id'] === 'cash' ? 'checked' : ''; ?>>
+                        <i class="fa-solid <?php echo $methodIcons[$method['id']] ?? 'fa-credit-card'; ?> <?php echo $methodTextColors[$method['id']] ?? ''; ?>"></i>
+                        <span class="text-sm font-medium text-slate-700"><?php echo $method['name']; ?></span>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+                <input type="hidden" id="payment_method" value="cash">
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Reference Number</label>
-                <input type="text" id="payment_reference" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="Optional reference number">
+            <div id="cardDetailsSection" class="hidden p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <h5 class="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2">💳 Card Details</h5>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600">Card Number</label>
+                        <input type="text" id="card_number" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="**** **** **** ****">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600">Expiry</label>
+                            <input type="text" id="card_expiry" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="MM/YY">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600">CVV</label>
+                            <input type="text" id="card_cvv" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="***">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="gcashDetailsSection" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <h5 class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">📱 GCash Details</h5>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600">GCash Number</label>
+                        <input type="text" id="gcash_number" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="09XX XXX XXXX">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600">Reference Number</label>
+                        <input type="text" id="payment_reference" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none" placeholder="Enter reference number">
+                    </div>
+                </div>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Notes</label>
@@ -520,26 +686,6 @@ $title = 'Payments';
     </div>
 </div>
 
-<!-- ============================================================ -->
-<!-- RECEIPT MODAL                                                -->
-<!-- ============================================================ -->
-<div id="receiptModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
-            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-receipt text-brand-medium"></i>
-                Official Receipt
-            </h3>
-            <button onclick="closeModal('receiptModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="p-6" id="receiptContent">
-            <!-- Receipt content loaded by JavaScript -->
-        </div>
-    </div>
-</div>
-
 <!-- Toast notification -->
 <div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2">
     <i class="fa-solid fa-circle-check"></i>
@@ -580,6 +726,26 @@ $title = 'Payments';
     });
 
     // ============================================================
+    // PAYMENT METHOD TOGGLE
+    // ============================================================
+    document.querySelectorAll('input[name="payment_method_radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('payment_method').value = this.value;
+            
+            // Hide all sections
+            document.getElementById('cardDetailsSection').classList.add('hidden');
+            document.getElementById('gcashDetailsSection').classList.add('hidden');
+            
+            // Show relevant section
+            if (this.value === 'visa') {
+                document.getElementById('cardDetailsSection').classList.remove('hidden');
+            } else if (this.value === 'gcash') {
+                document.getElementById('gcashDetailsSection').classList.remove('hidden');
+            }
+        });
+    });
+
+    // ============================================================
     // AUTO-FILL AMOUNT ON PERMIT SELECT
     // ============================================================
     document.getElementById('payment_permit').addEventListener('change', function() {
@@ -593,7 +759,15 @@ $title = 'Payments';
     // ============================================================
     function savePayment(event) {
         event.preventDefault();
-        showToast('Payment processed successfully!', 'success');
+        const method = document.getElementById('payment_method').value;
+        const methodNames = {
+            cash: 'Cash',
+            gcash: 'GCash',
+            visa: 'Visa/Mastercard',
+            bank_transfer: 'Bank Transfer',
+            over_the_counter: 'Over-the-Counter'
+        };
+        showToast('✅ Payment processed successfully via ' + methodNames[method] + '!', 'success');
         closeModal('processPaymentModal');
     }
 
@@ -610,6 +784,14 @@ $title = 'Payments';
                 completed: 'bg-emerald-100 text-emerald-700',
                 pending: 'bg-amber-100 text-amber-700',
                 failed: 'bg-rose-100 text-rose-700'
+            };
+            
+            const methodNames = {
+                cash: 'Cash',
+                gcash: 'GCash',
+                visa: 'Visa/Mastercard',
+                bank_transfer: 'Bank Transfer',
+                over_the_counter: 'Over-the-Counter'
             };
 
             document.getElementById('paymentDetailsContent').innerHTML = `
@@ -628,7 +810,7 @@ $title = 'Payments';
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div><p class="text-xs text-slate-400 font-semibold">Amount</p><p class="text-sm font-bold text-slate-800">₱${Number(p.amount).toFixed(2)}</p></div>
-                        <div><p class="text-xs text-slate-400 font-semibold">Method</p><p class="text-sm text-slate-800">${p.method}</p></div>
+                        <div><p class="text-xs text-slate-400 font-semibold">Method</p><p class="text-sm text-slate-800">${methodNames[p.method] || p.method}</p></div>
                         <div><p class="text-xs text-slate-400 font-semibold">Reference</p><p class="text-sm text-slate-800 font-mono">${p.reference || '—'}</p></div>
                         <div><p class="text-xs text-slate-400 font-semibold">Date</p><p class="text-sm text-slate-800">${new Date(p.date).toLocaleString()}</p></div>
                     </div>

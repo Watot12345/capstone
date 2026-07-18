@@ -255,12 +255,12 @@ $title = 'Mapping & Clustering';
 </div>
 
 <!-- ============================================================ -->
-<!-- CDN LIBRARIES                                                -->
+<!-- Local libraries                                              -->
 <!-- ============================================================ -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<link rel="stylesheet" href="../../assets/css/leaflet.css" />
+<script src="../../assets/js/leaflet.js"></script>
+<script src="../../assets/js/apexcharts.min.js"></script>
+<script src="../../assets/js/leaflet-heat.js"></script>
 
 <style>
     input[type="range"]::-webkit-slider-thumb {

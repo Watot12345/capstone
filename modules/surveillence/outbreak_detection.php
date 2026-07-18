@@ -474,9 +474,9 @@ $title = 'Outbreak Detection';
 </div>
 
 <!-- ============================================================ -->
-<!-- CDN LIBRARIES                                                -->
+<!-- Local libraries                                              -->
 <!-- ============================================================ -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="../../assets/js/apexcharts.min.js"></script>
 
 <script>
     // PHP Data to JavaScript

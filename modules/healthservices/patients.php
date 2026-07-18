@@ -279,81 +279,90 @@ $title = 'Patient Management';
     $maxBarangay = max(1, max($barangayCounts));
     ?>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-brand-light border border-brand-border flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-users text-brand-dark"></i>
+    <!-- ============================================================ -->
+<!-- MODERN KPI CARDS - Updated to match design               -->
+<!-- ============================================================ -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <!-- Card 1: Total Patients -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-users text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-slate-900" id="statTotal"><?php echo $totalPatients; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Total Patients</p>
+                </div>
             </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Patients</p>
-                <p class="text-xl font-bold text-slate-900" id="statTotal"><?php echo $totalPatients; ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-user-check text-emerald-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Active</p>
-                <p class="text-xl font-bold text-slate-900" id="statActive"><?php echo count(array_filter($patients, fn($p) => $p['status'] === 'active')); ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-user-clock text-amber-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Inactive</p>
-                <p class="text-xl font-bold text-slate-900" id="statInactive"><?php echo count(array_filter($patients, fn($p) => $p['status'] === 'inactive')); ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-brand-light border border-brand-border flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-calendar-day text-brand-medium"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">New This Month</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo rand(3, 10); ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-calendar-check text-sky-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Today's Appointments</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $todaysAppointments; ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-vial text-violet-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Pending Lab Results</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $pendingLabResults; ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-clock-rotate-left text-orange-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Follow-ups Due</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $followUpsDue; ?></p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-heart-pulse text-rose-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Critical Patients</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $criticalCount; ?></p>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">👥 All patients</span>
+                <span class="text-[10px] text-slate-400"><?php echo count(array_filter($patients, fn($p) => $p['status'] === 'active')); ?> active</span>
             </div>
         </div>
     </div>
+
+    <!-- Card 2: Active -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fa-solid fa-user-check text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-emerald-600" id="statActive"><?php echo count(array_filter($patients, fn($p) => $p['status'] === 'active')); ?></p>
+                    <p class="text-xs font-medium text-slate-500">Active</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Verified</span>
+                <span class="text-[10px] text-slate-400">Currently enrolled</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Today's Appointments -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-sky-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-200">
+                    <i class="fa-solid fa-calendar-check text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-sky-600"><?php echo $todaysAppointments; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Today's Appointments</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-sky-100 text-sky-700 rounded-full text-[10px] font-bold">📅 Today</span>
+                <span class="text-[10px] text-slate-400"><?php echo date('F d, Y'); ?></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Critical Patients -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                    <i class="fa-solid fa-heart-pulse text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-rose-600"><?php echo $criticalCount; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Critical Patients</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">🚨 Urgent</span>
+                <span class="text-[10px] text-slate-400">Needs attention</span>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Distribution Panels -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">

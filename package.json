@@ -1,0 +1,32 @@
+{
+  "name": "capstone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Watot12345/capstone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Watot12345/capstone/issues"
+  },
+  "homepage": "https://github.com/Watot12345/capstone#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1",
+    "@tabler/icons-webfont": "^3.45.0",
+    "apexcharts": "^6.0.0",
+    "autoprefixer": "^10.5.4",
+    "leaflet": "^1.9.4",
+    "leaflet.heat": "^0.2.0",
+    "postcss": "^8.5.19"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.4"
+  }
+}

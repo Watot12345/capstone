@@ -233,29 +233,110 @@ $title = 'Renewals';
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Total</p>
-            <p class="text-xl font-bold text-slate-900"><?php echo $totalRenewals; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Pending</p>
-            <p class="text-xl font-bold text-amber-600"><?php echo $pendingRenewals; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Approved</p>
-            <p class="text-xl font-bold text-emerald-600"><?php echo $approvedRenewals; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Expired Permits</p>
-            <p class="text-xl font-bold text-rose-600"><?php echo $expiredPermits; ?></p>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-3 border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 font-medium">Revenue</p>
-            <p class="text-xl font-bold text-brand-dark">₱<?php echo number_format($totalRenewalRevenue, 2); ?></p>
+    <!-- ============================================================ -->
+<!-- MODERN KPI CARDS - Updated to match design               -->
+<!-- ============================================================ -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <!-- Card 1: Total Renewals -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-rotate text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-slate-900"><?php echo $totalRenewals; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Total Renewals</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">🔄 All renewals</span>
+                <span class="text-[10px] text-slate-400"><?php echo $approvedRenewals; ?> approved</span>
+            </div>
         </div>
     </div>
+
+    <!-- Card 2: Pending -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                    <i class="fa-solid fa-clock text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-amber-600"><?php echo $pendingRenewals; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Pending</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">⏳ Awaiting</span>
+                <span class="text-[10px] text-slate-400">Needs review</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Approved -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fa-solid fa-check-circle text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-emerald-600"><?php echo $approvedRenewals; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Approved</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Completed</span>
+                <span class="text-[10px] text-slate-400">Successfully renewed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Expired Permits -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                    <i class="fa-solid fa-calendar-xmark text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-rose-600"><?php echo $expiredPermits; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Expired Permits</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">🚨 Overdue</span>
+                <span class="text-[10px] text-slate-400">Immediate renewal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 5: Revenue -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-light rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-brand-dark to-brand-medium rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-light">
+                    <i class="fa-solid fa-coins text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-brand-dark">₱<?php echo number_format($totalRenewalRevenue, 0); ?></p>
+                    <p class="text-xs font-medium text-slate-500">Revenue</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">💰 Collected</span>
+                <span class="text-[10px] text-slate-400">From renewals</span>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Expiring Soon Alert -->
     <?php if (count($expiringSoon) > 0): ?>

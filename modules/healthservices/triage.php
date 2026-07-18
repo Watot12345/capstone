@@ -198,49 +198,90 @@ $avgWaitTime = rand(15, 45);
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-brand-light border border-brand-border flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-people-group text-brand-dark"></i>
+    <!-- ============================================================ -->
+<!-- MODERN KPI CARDS - Updated to match design               -->
+<!-- ============================================================ -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <!-- Card 1: Waiting -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-amber-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                    <i class="fa-solid fa-people-group text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-amber-600" id="statWaiting"><?php echo $totalWaiting; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Waiting</p>
+                </div>
             </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Waiting</p>
-                <p class="text-xl font-bold text-slate-900" id="statWaiting"><?php echo $totalWaiting; ?></p>
-                <p class="text-[10px] text-slate-400">Avg wait: <?php echo $avgWaitTime; ?> mins</p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-heart-pulse text-rose-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Critical</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $totalCritical; ?></p>
-                <p class="text-[10px] text-rose-400">⚠️ Immediate attention</p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-check-circle text-emerald-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Completed</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $totalCompleted; ?></p>
-                <p class="text-[10px] text-emerald-400">Sent to doctor</p>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-clock text-sky-600"></i>
-            </div>
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Today's Patients</p>
-                <p class="text-xl font-bold text-slate-900"><?php echo $totalTriage; ?></p>
-                <p class="text-[10px] text-sky-400">+<?php echo rand(2, 5); ?> from yesterday</p>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">⏳ Queue</span>
+                <span class="text-[10px] text-slate-400">Avg <?php echo $avgWaitTime; ?> min wait</span>
             </div>
         </div>
     </div>
+
+    <!-- Card 2: Critical -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-rose-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                    <i class="fa-solid fa-heart-pulse text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-rose-600"><?php echo $totalCritical; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Critical</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">🚨 Urgent</span>
+                <span class="text-[10px] text-slate-400">Immediate attention</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Completed -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-emerald-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fa-solid fa-check-circle text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-emerald-600"><?php echo $totalCompleted; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Completed</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✅ Done</span>
+                <span class="text-[10px] text-slate-400">Sent to doctor</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Today's Patients -->
+    <div class="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg transition group">
+        <div class="absolute -top-12 -right-12 w-24 h-24 bg-sky-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-200">
+                    <i class="fa-solid fa-clock text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-black text-sky-600"><?php echo $totalTriage; ?></p>
+                    <p class="text-xs font-medium text-slate-500">Today's Patients</p>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-sky-100 text-sky-700 rounded-full text-[10px] font-bold">📅 Today</span>
+                <span class="text-[10px] text-slate-400"><?php echo date('F d, Y'); ?></span>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Quick Queue Status -->
     <div class="bg-gradient-to-r from-amber-50 to-white rounded-xl shadow-xs p-3 border border-amber-200 mb-6">
