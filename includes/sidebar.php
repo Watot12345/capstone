@@ -405,87 +405,36 @@ function site_url($path) {
 
       <!-- User Management -->
       <div class="space-y-1">
-        <button onclick="toggleDropdown('userMgmtDropdown', 'userMgmtChevron')" 
-                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-users-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-            <span class="sidebar-text truncate">User Management</span>
-          </div>
-          <div class="dropdown-right">
-            <i id="userMgmtChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
-          </div>
-        </button>
-        <div id="userMgmtDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('create_staff.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-user-plus text-[10px] opacity-50"></i> <span>User Registration</span>
-          </a>
-          <a href="<?= site_url('manage_users.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-user-pen text-[10px] opacity-50"></i> <span>Role Assignment</span>
-          </a>
-          <a href="<?= site_url('rbac_permissions.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-key text-[10px] opacity-50"></i> <span>Permission Management</span>
-          </a>
-          <a href="<?= site_url('user_activity.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> <span>User Activity</span>
-          </a>
-        </div>
-      </div>
+  <a href="<?= site_url('management/user_management.php') ?>"
+     class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600">
+    <div class="flex items-center space-x-3">
+      <i class="fa-solid fa-users-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+      <span class="sidebar-text truncate">User Management</span>
+    </div>
+  </a>
+</div>
 
       <!-- System Logs -->
       <div class="space-y-1">
-        <button onclick="toggleDropdown('sysLogsDropdown', 'sysLogsChevron')" 
-                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-clock-rotate-left text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-            <span class="sidebar-text truncate">System Logs</span>
-          </div>
-          <div class="dropdown-right">
-            <i id="sysLogsChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
-          </div>
-        </button>
-        <div id="sysLogsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('audit_trail.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-list-check text-[10px] opacity-50"></i> <span>Audit Trail</span>
-          </a>
-          <a href="<?= site_url('activity_logs.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-chart-line text-[10px] opacity-50"></i> <span>Activity Logs</span>
-          </a>
-          <a href="<?= site_url('error_logs.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-bug text-[10px] opacity-50"></i> <span>Error Logs</span>
-          </a>
-          <a href="<?= site_url('log_search.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-search text-[10px] opacity-50"></i> <span>Log Search</span>
-          </a>
-        </div>
-      </div>
+  <a href="<?= site_url('management/system_logs.php') ?>"
+     class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600">
+    <div class="flex items-center space-x-3">
+      <i class="fa-solid fa-clock-rotate-left text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+      <span class="sidebar-text truncate">System Logs</span>
+    </div>
+  </a>
+</div>
 
       <!-- Settings -->
       <div class="space-y-1">
-        <button onclick="toggleDropdown('settingsDropdown', 'settingsChevron')" 
-                class="dropdown-btn w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600 cursor-pointer">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
-            <span class="sidebar-text truncate">Settings</span>
-          </div>
-          <div class="dropdown-right">
-            <i id="settingsChevron" class="fa-solid fa-chevron-down text-[10px] opacity-60 dropdown-chevron transition-transform duration-200"></i>
-          </div>
-        </button>
-        <div id="settingsDropdown" class="hidden pl-8 pr-2 space-y-0.5 font-medium sidebar-text">
-          <a href="<?= site_url('system_config.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-sliders text-[10px] opacity-50"></i> <span>System Configuration</span>
-          </a>
-          <a href="<?= site_url('module_settings.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-puzzle-piece text-[10px] opacity-50"></i> <span>Module Settings</span>
-          </a>
-          <a href="<?= site_url('notification_settings.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-bell text-[10px] opacity-50"></i> <span>Notification Settings</span>
-          </a>
-          <a href="<?= site_url('backup_recovery.php') ?>" class="flex items-center space-x-2 px-3 py-2 text-[11px] text-slate-500 hover:text-brand-dark rounded-md transition">
-            <i class="fa-solid fa-database text-[10px] opacity-50"></i> <span>Backup & Recovery</span>
-          </a>
-        </div>
-      </div>
+  <a href="<?= site_url('management/settings.php') ?>"
+     class="w-full flex items-center px-3 py-2.5 hover:bg-white/60 hover:text-brand-dark rounded-xl text-xs font-semibold tracking-wide transition group text-slate-600">
+    <div class="flex items-center space-x-3">
+      <i class="fa-solid fa-gear text-sm text-slate-400 group-hover:text-brand-medium transition"></i>
+      <span class="sidebar-text truncate">Settings</span>
+    </div>
+  </a>
+</div>
 
     </nav>
     
