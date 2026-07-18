@@ -90,7 +90,6 @@ function getActionBadge($status) {
 ?>
 
 <main class="flex-1 m-5 overflow-hidden rounded-2xl font-sans scrollbar-track-transparent">
-    <div>
 
         <!-- ============================================================
              ROW 1: KPI STATS CARDS
