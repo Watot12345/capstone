@@ -1,6 +1,6 @@
 <?php include '../includes/header.php'; ?>
 <?php include '../includes/sidebar.php'; ?>
-
+<!-- UPDATED -->
 <main class="flex-1 bg-dash-bg h-screen flex flex-col m-5 overflow-y-auto overflow-x-hidden rounded-2xl font-sans scrollbar-track-transparent">
     <div>
         <!-- ====== SYSTEM STATUS (GLASS MORPHISM) ====== -->

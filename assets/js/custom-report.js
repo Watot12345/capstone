@@ -1,4 +1,5 @@
 // ─── CHARTS ───
+// UPDATED
     let barChart, doughnutChart, lineChart;
 
     function initCharts() {

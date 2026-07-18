@@ -1,4 +1,5 @@
 // ─── TOPBAR DATE ───────────────────────────────────────────────
+// UPDATED
 (function () {
   const el = document.getElementById('topbar-date');
   const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };

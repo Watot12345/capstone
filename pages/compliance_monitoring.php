@@ -1,6 +1,6 @@
 <?php include '../includes/header.php'; ?>
 <?php include '../includes/sidebar.php'; ?>
-
+<!-- UPDATED -->
 <?php
 /* ============================================================
    DUMMY DATA (simulates database records, avoids undefined errors)

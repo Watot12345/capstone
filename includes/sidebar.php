@@ -1,4 +1,4 @@
-<!-- admin/includes/sidebar.php -->
+<!-- admin/includes/sidebar.php UPDATED -->
 <aside id="sidebar" class="bg-brand-light text-slate-600 w-72 min-h-[calc(100vh-5rem)] flex flex-col justify-between transition-all duration-300 border-r border-brand-border/60 sticky top-20 h-[calc(100vh-5rem)] z-30 shrink-0 shadow-sm">
   
   <div class="flex flex-col h-full overflow-hidden">

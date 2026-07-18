@@ -1,4 +1,5 @@
 // ===== DATA =====
+// UPDATED
 let templates = [
   { id: 1, name: 'Food Establishment Inspection', type: 'inspection', status: 'active', description: 'Standard inspection for restaurants.', updated: '2026-07-15' },
   { id: 2, name: 'Water Quality Audit', type: 'water', status: 'active', description: 'Comprehensive water testing.', updated: '2026-07-12' },

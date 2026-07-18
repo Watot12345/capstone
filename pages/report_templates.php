@@ -5,7 +5,7 @@
 include '../includes/header.php';
 include '../includes/sidebar.php';
 ?>
-
+<!-- UPDATED -->
 <main class="flex-1 bg-dash-bg h-screen m-5  rounded-2xl font-sans">
 
     <!-- ===== PAGE HEADER ===== -->

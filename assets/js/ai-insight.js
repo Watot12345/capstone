@@ -2,6 +2,7 @@
   // =====================================================
   // SERVICE REQUESTS TREND - Line Chart
   // =====================================================
+  // UPDATED
   const serviceMonths = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
   const serviceData = {
     appointments: [6, 8, 10, 11, 9, 7],
