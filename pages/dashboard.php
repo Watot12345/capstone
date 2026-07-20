@@ -397,7 +397,7 @@
                         <i class="fas fa-rotate text-[10px]" aria-hidden="true"></i>
                     </button>
                 </div>
-                <a href="analytics.php" 
+                <a href="ai_insights.php" 
                    class="flex items-center gap-1.5 px-3 py-2 bg-c3 text-white rounded-xl text-xs font-semibold hover:bg-c3d transition shadow-sm"
                    aria-label="View detailed analytics">
                     <i class="fas fa-chart-line text-[11px]" aria-hidden="true"></i> View Analytics
@@ -635,7 +635,7 @@
                     <div class="flex items-center gap-1.5 text-xs font-semibold text-c3">
                         <i class="fas fa-puzzle-piece" aria-hidden="true"></i> Module Activity Summary
                     </div>
-                    <a href="modules.php" 
+                    <a href="module_activity.php" 
                        class="text-[10px] text-c2 font-semibold hover:underline"
                        aria-label="View all modules">
                         <i class="fas fa-arrow-right text-[8px] mr-1" aria-hidden="true"></i> View All

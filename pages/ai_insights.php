@@ -1,7 +1,46 @@
 <?php include '../includes/header.php'; ?>
 <?php include '../includes/sidebar.php'; ?>
 
+<!-- ADD FONT AWESOME CDN (If not already in header.php) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<!-- ADD APEXCHARTS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
 <style>
+    /* ===== CSS VARIABLES (From System Overview) ===== */
+    :root {
+        --color-primary: #176B87;
+        --color-primary-dark: #0F4A5E;
+        --color-secondary: #86B6F6;
+        --color-success: #10B981;
+        --color-warning: #F59E0B;
+        --color-danger: #EF4444;
+        --color-info: #3B82F6;
+        
+        --module-health: #176B87;
+        --module-sanitation: #D97706;
+        --module-immunization: #2563EB;
+        --module-wastewater: #9333EA;
+        --module-surveillance: #E11D48;
+        
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        
+        --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+        --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        --transition-slow: 0.35s ease;
+        
+        --glass-bg: rgba(255,255,255,0.7);
+        --glass-border: rgba(255,255,255,0.2);
+    }
+
     @media print {
         .no-print { display: none !important; }
     }
@@ -19,7 +58,7 @@
         border-radius: 10px;
     }
     .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-        background: #d4d4d8;
+        background: var(--color-primary);
     }
 
     /* Advanced Fade-in Stagger */
@@ -65,9 +104,9 @@
     }
 
     .pulse-dot {
-        animation: pulse 2.5s infinite;
+        animation: pulse2 2.5s infinite;
     }
-    @keyframes pulse {
+    @keyframes pulse2 {
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.4; transform: scale(0.9); }
     }
@@ -102,48 +141,71 @@
         100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
-    /* KPI Card Animations */
+    /* ===== KPI CARDS (Applied from System Overview) ===== */
     .kpi-card {
         position: relative;
-        overflow: visible;
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        cursor: default;
+        overflow: hidden;
+        transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), 
+                    box-shadow 0.22s ease, 
+                    border-color 0.22s ease;
     }
-    
-    .kpi-card .kpi-icon {
-        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .kpi-card:hover {
+        transform: translateY(-4px) scale(1.015);
     }
-    
-    .kpi-card:hover .kpi-icon {
-        transform: scale(1.15) rotate(-5deg);
+    .kpi-card:active {
+        transform: translateY(-1px) scale(0.985);
+    }
+    .kpi-shine {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
+        opacity: 0;
+        pointer-events: none;
+    }
+    .kpi-card:hover .kpi-shine {
+        opacity: 1;
+        animation: shine 0.85s ease forwards;
+    }
+    @keyframes shine {
+        0% { transform: translateX(-120%) skewX(-20deg); }
+        100% { transform: translateX(220%) skewX(-20deg); }
     }
     
     .kpi-value {
+        transition: transform 0.22s ease;
+        display: inline-block;
         background: linear-gradient(135deg, #09090b 0%, #52525b 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        transition: all 0.3s ease;
+    }
+    .kpi-card:hover .kpi-value {
+        transform: scale(1.06);
     }
     
-    .kpi-progress-bar {
-        position: relative;
-        height: 5px;
-        background: #f4f4f5;
-        border-radius: 9999px;
-        overflow: hidden;
-        margin-top: 10px;
+    .kpi-watermark {
+        transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .kpi-card:hover .kpi-watermark {
+        transform: scale(1.12) rotate(-3deg);
     }
     
-    .kpi-progress-bar .progress-fill {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        border-radius: 9999px;
-        transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-        background-size: 200% 100%;
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    .kpi-ring-progress {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: ringFill 1s cubic-bezier(0.65,0,0.35,1) forwards;
+    }
+    @keyframes ringFill {
+        to { stroke-dashoffset: var(--offset, 0); }
+    }
+    .kpi-ring {
+        transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .kpi-card:hover .kpi-ring {
+        transform: scale(1.08);
     }
     
     .kpi-card .kpi-change {
@@ -163,16 +225,48 @@
     .kpi-card .kpi-change.positive { background: #ecfdf5; color: #059669; }
     .kpi-card .kpi-change.negative { background: #fef2f2; color: #dc2626; }
 
+    /* Glow effects */
+    .kpi-card.glow-green { border-color: rgba(16, 185, 129, 0.1); }
+    .kpi-card.glow-green:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 15px 40px -10px rgba(16, 185, 129, 0.15); }
+    .kpi-card.glow-blue { border-color: rgba(59, 130, 246, 0.1); }
+    .kpi-card.glow-blue:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 15px 40px -10px rgba(59, 130, 246, 0.15); }
+    .kpi-card.glow-purple { border-color: rgba(139, 92, 246, 0.1); }
+    .kpi-card.glow-purple:hover { border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 15px 40px -10px rgba(139, 92, 246, 0.15); }
+    .kpi-card.glow-amber { border-color: rgba(245, 158, 11, 0.1); }
+    .kpi-card.glow-amber:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 15px 40px -10px rgba(245, 158, 11, 0.15); }
+    .kpi-card.glow-teal { border-color: rgba(20, 184, 166, 0.1); }
+    .kpi-card.glow-teal:hover { border-color: rgba(20, 184, 166, 0.4); box-shadow: 0 15px 40px -10px rgba(20, 184, 166, 0.15); }
+
+    /* Staggered entrance for metrics */
+    .metrics-grid > div {
+        opacity: 0;
+        animation: slideUp 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(36px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .metrics-grid > div:nth-child(1) { animation-delay: 0.05s; }
+    .metrics-grid > div:nth-child(1) .kpi-ring-progress { animation-delay: 0.35s; }
+    .metrics-grid > div:nth-child(2) { animation-delay: 0.12s; }
+    .metrics-grid > div:nth-child(2) .kpi-ring-progress { animation-delay: 0.42s; }
+    .metrics-grid > div:nth-child(3) { animation-delay: 0.19s; }
+    .metrics-grid > div:nth-child(3) .kpi-ring-progress { animation-delay: 0.49s; }
+    .metrics-grid > div:nth-child(4) { animation-delay: 0.26s; }
+    .metrics-grid > div:nth-child(4) .kpi-ring-progress { animation-delay: 0.56s; }
+    .metrics-grid > div:nth-child(5) { animation-delay: 0.33s; }
+    .metrics-grid > div:nth-child(5) .kpi-ring-progress { animation-delay: 0.63s; }
+
     /* Modern Glassmorphic Tooltip */
     .kpi-tooltip {
         position: fixed;
         z-index: 1000;
-        background: rgba(255, 255, 255, 0.85);
+        background: var(--glass-bg);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-radius: 16px;
         box-shadow: 0 20px 50px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.5) inset;
-        border: 1px solid rgba(228, 228, 231, 0.5);
+        border: 1px solid var(--glass-border);
         padding: 18px;
         min-width: 320px;
         max-width: 360px;
@@ -227,7 +321,7 @@
         position: absolute;
         width: 12px;
         height: 12px;
-        background: rgba(255, 255, 255, 0.85);
+        background: var(--glass-bg);
         transform: rotate(45deg);
     }
     
@@ -240,18 +334,6 @@
     }
     .kpi-tooltip .tooltip-pie-legend span { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #52525b; }
     .kpi-tooltip .tooltip-pie-legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
-
-    /* Glow effects */
-    .kpi-card.glow-green { border-color: rgba(16, 185, 129, 0.1); }
-    .kpi-card.glow-green:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 15px 40px -10px rgba(16, 185, 129, 0.15); }
-    .kpi-card.glow-blue { border-color: rgba(59, 130, 246, 0.1); }
-    .kpi-card.glow-blue:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 15px 40px -10px rgba(59, 130, 246, 0.15); }
-    .kpi-card.glow-purple { border-color: rgba(139, 92, 246, 0.1); }
-    .kpi-card.glow-purple:hover { border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 15px 40px -10px rgba(139, 92, 246, 0.15); }
-    .kpi-card.glow-amber { border-color: rgba(245, 158, 11, 0.1); }
-    .kpi-card.glow-amber:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 15px 40px -10px rgba(245, 158, 11, 0.15); }
-    .kpi-card.glow-teal { border-color: rgba(20, 184, 166, 0.1); }
-    .kpi-card.glow-teal:hover { border-color: rgba(20, 184, 166, 0.4); box-shadow: 0 15px 40px -10px rgba(20, 184, 166, 0.15); }
 
     /* AI Icon Animation */
     .ai-icon {
@@ -275,7 +357,6 @@
         0%, 100% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
     }
-    .ai-icon svg { stroke: #3b82f6 !important; }
 
     /* AI Loading Skeleton */
     .ai-skeleton {
@@ -330,11 +411,11 @@
 
     .module-tooltip {
         position: fixed; z-index: 999;
-        background: rgba(255, 255, 255, 0.85);
+        background: var(--glass-bg);
         backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         border-radius: 12px;
         box-shadow: 0 20px 40px -10px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.5) inset;
-        border: 1px solid rgba(228, 228, 231, 0.5);
+        border: 1px solid var(--glass-border);
         padding: 16px; min-width: 220px; max-width: 280px;
         opacity: 0; visibility: hidden;
         transform: translateY(8px) scale(0.95);
@@ -527,27 +608,25 @@
             </div>
         </div>
 
-        <!-- Performance Metrics -->
+        <!-- Performance Metrics (Restyled to match System Overview KPIs) -->
         <div class="rounded-2xl border border-zinc-200 bg-white/80 backdrop-blur-md p-6 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.02)] hover-lift fade-in delay-4">
-    <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-2.5">
-            <!-- Changed wrapper background to blue-50 and border to blue-100 -->
-            <div class="p-1.5 bg-blue-50 border border-blue-100 rounded-lg transition-all">
-                <!-- Changed icon color to text-blue-600 -->
-                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-1.5 bg-blue-50 border border-blue-100 rounded-lg transition-all">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-500">Performance Metrics</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-semibold text-zinc-400">vs last month</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Hover for details</span>
+                </div>
             </div>
-            <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-500">Performance Metrics</h2>
+            <div class="metrics-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" id="metricsGrid"></div>
         </div>
-        <div class="flex items-center gap-2">
-            <span class="text-[10px] font-semibold text-zinc-400">vs last month</span>
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-            <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Hover for details</span>
-        </div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" id="metricsGrid"></div>
-</div>
 
         <!-- Staff Performance -->
         <div class="mt-8 rounded-2xl border border-zinc-200 bg-white/80 backdrop-blur-md p-6 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.02)] hover-lift fade-in delay-4">
@@ -756,6 +835,7 @@ document.addEventListener('DOMContentLoaded', function() {
             changeColor: 'emerald', 
             progress: 78, 
             glow: 'glow-green',
+            watermark: 'fa-file-signature',
             details: [
                 {label: 'Current Average', value: '2.3 Days'},
                 {label: 'Previous Month', value: '2.9 Days'},
@@ -777,6 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
             changeColor: 'blue', 
             progress: 96, 
             glow: 'glow-blue',
+            watermark: 'fa-robot',
             details: [
                 {label: 'Current Accuracy', value: '96%'},
                 {label: 'Previous Month', value: '91%'},
@@ -798,6 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
             changeColor: 'teal', 
             progress: 92, 
             glow: 'glow-teal',
+            watermark: 'fa-server',
             details: [
                 {label: 'Current Avg.', value: '0.4 sec'},
                 {label: 'Previous Month', value: '0.6 sec'},
@@ -819,6 +901,7 @@ document.addEventListener('DOMContentLoaded', function() {
             changeColor: 'purple', 
             progress: 85, 
             glow: 'glow-purple',
+            watermark: 'fa-users',
             details: [
                 {label: 'Current Users', value: '1,248'},
                 {label: 'Previous Month', value: '1,094'},
@@ -840,6 +923,7 @@ document.addEventListener('DOMContentLoaded', function() {
             changeColor: 'amber', 
             progress: 94, 
             glow: 'glow-amber',
+            watermark: 'fa-face-smile',
             details: [
                 {label: 'Current Satisfaction', value: '94%'},
                 {label: 'Previous Month', value: '91%'},
@@ -1135,7 +1219,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tooltip) tooltip.classList.remove('active');
     };
 
-       function renderMetrics() {
+    function renderMetrics() {
         const grid = document.getElementById('metricsGrid');
         if (!grid) return;
         
@@ -1148,30 +1232,48 @@ document.addEventListener('DOMContentLoaded', function() {
             'amber': 'text-amber-600 bg-amber-50 border-amber-100'
         };
 
+        const ringColorMap = {
+            'emerald': '#10b981',
+            'blue': '#3b82f6',
+            'teal': '#14b8a6',
+            'purple': '#8b5cf6',
+            'amber': '#f59e0b'
+        };
+
+        // Calculating stroke-dashoffset for SVG Ring
+        // 100 - progress = offset
         grid.innerHTML = MetricsData.map(function(m) {
             const isPositive = m.change.includes('↑');
             const changeClass = isPositive ? 'positive' : 'negative';
             const changeIcon = isPositive ? '↑' : '↓';
             const iconColors = iconColorMap[m.changeColor] || 'text-zinc-600 bg-zinc-50 border-zinc-200';
+            const ringColor = ringColorMap[m.changeColor] || '#3b82f6';
+            const ringOffset = 100 - m.progress;
             
-            return '<div class="kpi-card rounded-xl border border-zinc-200 bg-white p-5 transition-all duration-300 cursor-pointer group ' + m.glow + '" ' +
+            return '<div class="kpi-card rounded-2xl border border-slate-100 bg-white p-3 cursor-pointer group ' + m.glow + '" ' +
                    'onmouseenter="showMetricTooltip(event, \'' + m.label + '\', ' + JSON.stringify(m.details).replace(/"/g, '&quot;') + ', ' + JSON.stringify(m.pieData).replace(/"/g, '&quot;') + ')" ' +
                    'onmouseleave="hideMetricTooltip()">' +
-                '<div class="flex items-start justify-between">' +
-                    '<div class="kpi-icon p-1.5 rounded-lg w-fit transition-all border ' + iconColors + '">' +
-                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>' +
-                        '</svg>' +
+                    '<div class="kpi-shine"></div>' +
+                    '<div class="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-' + m.changeColor + '-400 to-' + m.changeColor + '-600"></div>' +
+                    '<i class="fas ' + m.watermark + ' kpi-watermark absolute -bottom-3 -right-2 text-[58px] text-' + m.changeColor + '-500/10 rotate-[-8deg] pointer-events-none"></i>' +
+                    '<div class="relative p-1">' +
+                        '<div class="flex items-start justify-between gap-2">' +
+                            '<div>' +
+                                '<p class="text-[8px] font-bold uppercase tracking-wider text-' + m.changeColor + '-600">' + m.label + '</p>' +
+                                '<p class="kpi-value text-xl font-black mt-1 leading-none" data-target="' + m.value + '">0' + (m.unit ? '<span class="text-xs font-semibold text-slate-400"> ' + m.unit + '</span>' : '') + '</p>' +
+                            '</div>' +
+                            '<svg viewBox="0 0 36 36" class="kpi-ring w-10 h-10 flex-shrink-0">' +
+                                '<circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="3"/>' +
+                                '<circle cx="18" cy="18" r="15.5" fill="none" stroke="' + ringColor + '" stroke-width="3" stroke-linecap="round" pathLength="100" class="kpi-ring-progress" style="--offset:' + ringOffset + '" transform="rotate(-90 18 18)"/>' +
+                                '<text x="18" y="20.5" text-anchor="middle" font-size="8" font-weight="700" fill="' + ringColor + '">' + m.progress + '%</text>' +
+                            '</svg>' +
+                        '</div>' +
+                        '<div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">' +
+                            '<span class="kpi-change ' + changeClass + '">' + changeIcon + ' ' + m.change.replace(/[↑↓]\s*/, '') + '</span>' +
+                            '<span class="text-[8px] text-slate-400">vs last month</span>' +
+                        '</div>' +
                     '</div>' +
-                    '<span class="kpi-change ' + changeClass + '">' + changeIcon + ' ' + m.change.replace(/[↑↓]\s*/, '') + '</span>' +
-                '</div>' +
-                '<p class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-4">' + m.label + '</p>' +
-                '<p class="mt-1 text-2xl font-extrabold kpi-value tracking-tight" data-target="' + m.value + '">0' + (m.unit ? '<span class="text-sm font-semibold text-zinc-400"> ' + m.unit + '</span>' : '') + '</p>' +
-                '<div class="kpi-progress-bar">' +
-                    '<div class="progress-fill bg-gradient-to-r from-' + m.changeColor + '-400 to-' + m.changeColor + '-600" style="width: 0%;" data-width="' + m.progress + '%"></div>' +
-                '</div>' +
-                '<p class="text-[9px] text-blue-500 font-bold uppercase tracking-wider mt-3 text-center opacity-0 group-hover:opacity-100 transition duration-200">Hover for details</p>' +
-            '</div>';
+                '</div>';
         }).join('');
 
         // Animate Counters
@@ -1193,13 +1295,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             requestAnimationFrame(updateNumber);
         });
-
-        // Animate Progress Bars
-        setTimeout(() => {
-            document.querySelectorAll('.progress-fill').forEach(el => {
-                el.style.width = el.getAttribute('data-width');
-            });
-        }, 100);
     }
 
     window.showMetricTooltip = function(event, title, details, pieData) { showTooltip(event, title, { details, pieData }, true); };

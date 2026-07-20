@@ -1,10 +1,160 @@
 <?php include '../includes/header.php'; ?>
 <?php include '../includes/sidebar.php'; ?>
+
+<!-- ADD FONT AWESOME CDN (If not already in header.php) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+    /* ===== CSS VARIABLES (From System Overview) ===== */
+    :root {
+        --color-primary: #176B87;
+        --color-primary-dark: #0F4A5E;
+        --color-secondary: #86B6F6;
+        --color-success: #10B981;
+        --color-warning: #F59E0B;
+        --color-danger: #EF4444;
+        --color-info: #3B82F6;
+        
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        
+        --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+        --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        --transition-slow: 0.35s ease;
+        
+        --glass-bg: rgba(255,255,255,0.7);
+        --glass-border: rgba(255,255,255,0.2);
+    }
+
+    /* ===== BASE CARD STYLES ===== */
+    .report-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(180, 212, 255, 0.3);
+        box-shadow: 0 10px 40px -10px rgba(23, 107, 135, 0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+    .report-card:hover {
+        box-shadow: 0 15px 40px -10px rgba(23, 107, 135, 0.15);
+    }
+
+    /* ===== KPI CARDS (Applied from System Overview) ===== */
+    .kpi-card {
+        position: relative;
+        overflow: hidden;
+        background: white;
+        border: 1px solid slate-100;
+        transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), 
+                    box-shadow 0.22s ease, 
+                    border-color 0.22s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-4px) scale(1.015);
+    }
+    .kpi-card:active {
+        transform: translateY(-1px) scale(0.985);
+    }
+    .kpi-shine {
+        position: absolute;
+        top: 0; left: 0;
+        width: 40%; height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
+        opacity: 0;
+        pointer-events: none;
+    }
+    .kpi-card:hover .kpi-shine {
+        opacity: 1;
+        animation: shine 0.85s ease forwards;
+    }
+    @keyframes shine {
+        0% { transform: translateX(-120%) skewX(-20deg); }
+        100% { transform: translateX(220%) skewX(-20deg); }
+    }
+    
+    .kpi-value {
+        transition: transform 0.22s ease;
+        display: inline-block;
+    }
+    .kpi-card:hover .kpi-value {
+        transform: scale(1.06);
+    }
+    
+    .kpi-watermark {
+        transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .kpi-card:hover .kpi-watermark {
+        transform: scale(1.12) rotate(-3deg);
+    }
+    
+    .kpi-ring-progress {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: ringFill 1s cubic-bezier(0.65,0,0.35,1) forwards;
+    }
+    @keyframes ringFill {
+        to { stroke-dashoffset: var(--offset, 0); }
+    }
+    .kpi-ring {
+        transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .kpi-card:hover .kpi-ring {
+        transform: scale(1.08);
+    }
+
+    /* Staggered entrance */
+    .kpi-grid > a {
+        opacity: 0;
+        animation: slideUp 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(36px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .kpi-grid > a:nth-child(1) { animation-delay: 0.05s; }
+    .kpi-grid > a:nth-child(1) .kpi-ring-progress { animation-delay: 0.35s; }
+    .kpi-grid > a:nth-child(2) { animation-delay: 0.12s; }
+    .kpi-grid > a:nth-child(2) .kpi-ring-progress { animation-delay: 0.42s; }
+    .kpi-grid > a:nth-child(3) { animation-delay: 0.19s; }
+    .kpi-grid > a:nth-child(3) .kpi-ring-progress { animation-delay: 0.49s; }
+    .kpi-grid > a:nth-child(4) { animation-delay: 0.26s; }
+    .kpi-grid > a:nth-child(4) .kpi-ring-progress { animation-delay: 0.56s; }
+
+    /* Glow effects */
+    .glow-blue { border-color: rgba(59, 130, 246, 0.1); }
+    .glow-blue:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 15px 40px -10px rgba(59, 130, 246, 0.15); }
+    .glow-emerald { border-color: rgba(16, 185, 129, 0.1); }
+    .glow-emerald:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 15px 40px -10px rgba(16, 185, 129, 0.15); }
+    .glow-amber { border-color: rgba(245, 158, 11, 0.1); }
+    .glow-amber:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 15px 40px -10px rgba(245, 158, 11, 0.15); }
+    .glow-purple { border-color: rgba(139, 92, 246, 0.1); }
+    .glow-purple:hover { border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 15px 40px -10px rgba(139, 92, 246, 0.15); }
+
+    /* Form Inputs */
+    select, input[type="date"], input[type="time"], input[type="text"] {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(180, 212, 255, 0.5);
+        transition: all 0.2s ease;
+    }
+    select:focus, input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(23, 107, 135, 0.1);
+        background: #fff;
+    }
+</style>
+
 <main class="p-6 bg-[#EEF5FF] min-h-screen font-sans">
   <link rel="stylesheet" href="../css/modAct.css" />
-<!-- UPDATED -->
+
   <!-- ===== CASE FLOW PIPELINE ===== -->
-  <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-md hover:shadow-xl transition-all duration-300 animate-fade-up card-accent">
+  <div class="report-card rounded-2xl p-6 mb-6">
     <div class="flex items-start justify-between gap-6 mb-6 flex-wrap">
       <div>
         <p class="text-[11px] font-semibold tracking-widest text-slate-400 uppercase mb-1.5">Case flow pipeline — intake through resolution</p>
@@ -55,28 +205,137 @@
     </div>
   </div>
 
-  <!-- ===== ADMIN SUMMARY CARDS ===== -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-gradient-to-br from-white to-[#EEF5FF] border-l-4 border-[#176B87] rounded-2xl p-4 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-up card-accent" style="animation-delay:0.05s">
-      <p class="text-xs text-slate-400 uppercase tracking-wider">Total Cases</p>
-      <p class="text-2xl font-bold text-[#176B87]">312</p>
-    </div>
-    <div class="bg-gradient-to-br from-white to-[#EEF5FF] border-l-4 border-emerald-500 rounded-2xl p-4 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-up card-accent" style="animation-delay:0.1s">
-      <p class="text-xs text-slate-400 uppercase tracking-wider">Resolved</p>
-      <p class="text-2xl font-bold text-emerald-600">198</p>
-    </div>
-    <div class="bg-gradient-to-br from-white to-[#EEF5FF] border-l-4 border-[#176B87] rounded-2xl p-4 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-up card-accent" style="animation-delay:0.15s">
-      <p class="text-xs text-slate-400 uppercase tracking-wider">In Progress</p>
-      <p class="text-2xl font-bold text-[#176B87]">67</p>
-    </div>
-    <div class="bg-gradient-to-br from-white to-[#EEF5FF] border-l-4 border-amber-500 rounded-2xl p-4 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-up card-accent" style="animation-delay:0.2s">
-      <p class="text-xs text-slate-400 uppercase tracking-wider">Flagged</p>
-      <p class="text-2xl font-bold text-amber-600">23</p>
-    </div>
+  <!-- ===== ADMIN SUMMARY CARDS (Restyled to match System Overview KPIs) ===== -->
+  <div class="kpi-grid grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    
+    <!-- KPI 1: Total Cases -->
+    <a href="#" class="kpi-card glow-blue relative overflow-hidden rounded-2xl shadow-sm cursor-pointer group block">
+      <div class="kpi-shine"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-transparent to-transparent pointer-events-none"></div>
+      <i class="fas fa-folder-open kpi-watermark absolute -bottom-3 -right-2 text-[58px] text-blue-500/10 rotate-[-8deg] pointer-events-none"></i>
+      <div class="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-blue-400 to-blue-600"></div>
+      <div class="relative p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <p class="text-[8px] font-bold uppercase tracking-wider text-blue-600">Total Cases</p>
+            <p class="kpi-value text-xl font-black text-slate-900 mt-1 leading-none">312</p>
+            <p class="text-[8px] font-medium text-slate-400 mt-0.5">All time</p>
+          </div>
+          <svg viewBox="0 0 36 36" class="kpi-ring w-10 h-10 flex-shrink-0">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" pathLength="100" class="kpi-ring-progress" style="--offset:0" transform="rotate(-90 18 18)"/>
+            <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#3b82f6">100%</text>
+          </svg>
+        </div>
+        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+          <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[7px] font-bold">
+            <i class="fas fa-layer-group text-[5px] mr-0.5"></i> Active
+          </span>
+          <span class="text-[7px] text-slate-400">Pipeline view</span>
+          <svg viewBox="0 0 60 20" class="w-8 h-3 opacity-70">
+            <polyline points="0,16 10,14 20,15 30,10 40,11 50,4 60,3" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- KPI 2: Resolved -->
+    <a href="#" class="kpi-card glow-emerald relative overflow-hidden rounded-2xl shadow-sm cursor-pointer group block">
+      <div class="kpi-shine"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 via-transparent to-transparent pointer-events-none"></div>
+      <i class="fas fa-circle-check kpi-watermark absolute -bottom-3 -right-2 text-[58px] text-emerald-500/10 rotate-[-8deg] pointer-events-none"></i>
+      <div class="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-emerald-400 to-emerald-600"></div>
+      <div class="relative p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <p class="text-[8px] font-bold uppercase tracking-wider text-emerald-600">Resolved</p>
+            <p class="kpi-value text-xl font-black text-slate-900 mt-1 leading-none">198</p>
+            <p class="text-[8px] font-medium text-slate-400 mt-0.5">Closed & verified</p>
+          </div>
+          <svg viewBox="0 0 36 36" class="kpi-ring w-10 h-10 flex-shrink-0">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" pathLength="100" class="kpi-ring-progress" style="--offset:37" transform="rotate(-90 18 18)"/>
+            <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#10b981">63%</text>
+          </svg>
+        </div>
+        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+          <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[7px] font-bold">
+            <i class="fas fa-arrow-up text-[5px] mr-0.5"></i> High
+          </span>
+          <span class="text-[7px] text-slate-400">Resolution rate</span>
+          <svg viewBox="0 0 60 20" class="w-8 h-3 opacity-70">
+            <polyline points="0,12 10,11 20,9 30,8 40,5 50,4 60,2" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- KPI 3: In Progress -->
+    <a href="#" class="kpi-card glow-purple relative overflow-hidden rounded-2xl shadow-sm cursor-pointer group block">
+      <div class="kpi-shine"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-purple-50 via-transparent to-transparent pointer-events-none"></div>
+      <i class="fas fa-spinner kpi-watermark absolute -bottom-3 -right-2 text-[58px] text-purple-500/10 rotate-[-8deg] pointer-events-none"></i>
+      <div class="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-purple-400 to-purple-600"></div>
+      <div class="relative p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <p class="text-[8px] font-bold uppercase tracking-wider text-purple-600">In Progress</p>
+            <p class="kpi-value text-xl font-black text-slate-900 mt-1 leading-none">67</p>
+            <p class="text-[8px] font-medium text-slate-400 mt-0.5">Currently active</p>
+          </div>
+          <svg viewBox="0 0 36 36" class="kpi-ring w-10 h-10 flex-shrink-0">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#9333ea" stroke-width="3" stroke-linecap="round" pathLength="100" class="kpi-ring-progress" style="--offset:79" transform="rotate(-90 18 18)"/>
+            <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#9333ea">21%</text>
+          </svg>
+        </div>
+        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+          <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[7px] font-bold">
+            <i class="fas fa-bolt text-[5px] mr-0.5"></i> Working
+          </span>
+          <span class="text-[7px] text-slate-400">In pipeline</span>
+          <svg viewBox="0 0 60 20" class="w-8 h-3 opacity-70">
+            <polyline points="0,14 10,13 20,15 30,10 40,12 50,8 60,9" fill="none" stroke="#9333ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- KPI 4: Flagged -->
+    <a href="#" class="kpi-card glow-amber relative overflow-hidden rounded-2xl shadow-sm cursor-pointer group block">
+      <div class="kpi-shine"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-amber-50 via-transparent to-transparent pointer-events-none"></div>
+      <i class="fas fa-flag kpi-watermark absolute -bottom-3 -right-2 text-[58px] text-amber-500/10 rotate-[-8deg] pointer-events-none"></i>
+      <div class="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-amber-400 to-amber-600"></div>
+      <div class="relative p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <p class="text-[8px] font-bold uppercase tracking-wider text-amber-600">Flagged</p>
+            <p class="kpi-value text-xl font-black text-slate-900 mt-1 leading-none">23</p>
+            <p class="text-[8px] font-medium text-slate-400 mt-0.5">Needs review</p>
+          </div>
+          <svg viewBox="0 0 36 36" class="kpi-ring w-10 h-10 flex-shrink-0">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" pathLength="100" class="kpi-ring-progress" style="--offset:93" transform="rotate(-90 18 18)"/>
+            <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#f59e0b">7%</text>
+          </svg>
+        </div>
+        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+          <span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[7px] font-bold">
+            <i class="fas fa-exclamation text-[5px] mr-0.5"></i> Review
+          </span>
+          <span class="text-[7px] text-slate-400">Pending check</span>
+          <svg viewBox="0 0 60 20" class="w-8 h-3 opacity-70">
+            <polyline points="0,6 10,9 20,7 30,12 40,10 50,15 60,17" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
   </div>
 
   <!-- ===== CHART + FILTERS ===== -->
-  <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 mb-6 animate-fade-up card-accent" style="animation-delay:0.25s">
+  <div class="report-card rounded-2xl p-6 mb-6">
     <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
       <h2 class="font-semibold text-slate-800">Module Activity Trends</h2>
       <div class="flex items-center gap-3 flex-wrap">
@@ -93,7 +352,7 @@
   <!-- ===== ENHANCED MODULE ACTIVITY SUMMARY ===== -->
   <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 mb-6">
     <!-- Module list -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 animate-fade-up card-accent" style="animation-delay:0.3s">
+    <div class="report-card rounded-2xl p-6">
       <div class="flex items-center justify-between mb-1">
         <h2 class="font-semibold text-slate-800">Module Activity Summary</h2>
         <span class="text-[11px] font-semibold text-slate-400 tracking-wider">7-DAY VOLUME</span>
@@ -274,7 +533,7 @@
     </div>
 
     <!-- ===== CASE STATUS ===== -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 animate-fade-up card-accent" style="animation-delay:0.35s">
+    <div class="report-card rounded-2xl p-6">
       <div class="flex items-center justify-between mb-1">
         <h2 class="font-semibold text-slate-800">Case status</h2>
         <span class="text-[11px] font-semibold text-slate-400 tracking-wider">CURRENT</span>
@@ -303,7 +562,7 @@
   </div>
 
   <!-- ===== RECENT ACTIVITY ===== -->
-  <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 animate-fade-up card-accent" style="animation-delay:0.4s">
+  <div class="report-card rounded-2xl p-6">
     <div class="flex items-center justify-between mb-4">
       <h2 class="font-semibold text-slate-800">Recent activity</h2>
       <div class="flex items-center gap-2">
