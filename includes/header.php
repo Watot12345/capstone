@@ -11,6 +11,7 @@ $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF'
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   
   <!-- Font Awesome 6 (Latest) - Loaded in head for priority -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
