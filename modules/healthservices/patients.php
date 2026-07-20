@@ -364,46 +364,38 @@ $title = 'Patient Management';
     </div>
 </div>
 
-    <!-- Distribution Panels -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <div class="bg-white rounded-xl shadow-xs p-5 border border-slate-200">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-chart-simple text-brand-medium"></i> Age Group Distribution
+   <!-- Distribution Panels -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <!-- Age Distribution - Line Graph -->
+    <div class="bg-white rounded-xl shadow-xs p-5 border border-slate-200">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-brand-medium"></i> Age Group Distribution
             </h3>
-            <div class="space-y-3">
-                <?php foreach ($ageGroups as $label => $count): ?>
-                <div>
-                    <div class="flex justify-between text-xs mb-1">
-                        <span class="text-slate-600 font-medium"><?php echo $label; ?></span>
-                        <span class="text-slate-400"><?php echo $count; ?> patient<?php echo $count === 1 ? '' : 's'; ?></span>
-                    </div>
-                    <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-brand-medium rounded-full" style="width: <?php echo ($count / $maxAgeGroup) * 100; ?>%"></div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
+            <div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-slate-400 font-medium">Age</span>
+                <div class="w-3 h-3 rounded-full bg-brand-medium"></div>
+                <span class="text-[10px] text-slate-400 font-medium">Patients</span>
             </div>
         </div>
-
-        <div class="bg-white rounded-xl shadow-xs p-5 border border-slate-200">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-map-location-dot text-brand-medium"></i> Barangay Distribution
-            </h3>
-            <div class="space-y-3">
-                <?php foreach ($barangayCounts as $barangay => $count): ?>
-                <div>
-                    <div class="flex justify-between text-xs mb-1">
-                        <span class="text-slate-600 font-medium"><?php echo str_replace('Barangay ', '', $barangay); ?></span>
-                        <span class="text-slate-400"><?php echo $count; ?> patient<?php echo $count === 1 ? '' : 's'; ?></span>
-                    </div>
-                    <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-brand-dark rounded-full" style="width: <?php echo ($count / $maxBarangay) * 100; ?>%"></div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
+        <div class="h-52">
+            <canvas id="ageLineChart"></canvas>
         </div>
     </div>
+
+    <!-- Barangay Distribution - Pie Chart -->
+    <div class="bg-white rounded-xl shadow-xs p-5 border border-slate-200">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-brand-medium"></i> Barangay Distribution
+            </h3>
+            <span class="text-[10px] text-slate-400 font-medium">By barangay</span>
+        </div>
+        <div class="h-52">
+            <canvas id="barangayPieChart"></canvas>
+        </div>
+    </div>
+</div>
 
     <!-- Search & Filter -->
     <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 mb-6">
@@ -952,7 +944,163 @@ $title = 'Patient Management';
 <!-- ============================================================ -->
 <!-- 5. JAVASCRIPT                                                -->
 <!-- ============================================================ -->
+ <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
+
+    (function () {
+    'use strict';
+
+    // ---- Brand colours (matches your Tailwind palette) ----
+    const BRAND = {
+        dark:   '#0B4F4A',
+        medium: '#14807A',
+        light:  '#E6F5F3',
+        border: '#B8E0DC',
+    };
+
+    // ---- Complementary palette for pie chart ----
+    const PALETTE = [
+        '#0B4F4A', '#14807A', '#2EB8A0', '#5CCFBB',
+        '#8FE3D6', '#B8E0DC', '#D4A853', '#E07B54',
+    ];
+
+    // ---- Data from PHP ----
+    const ageLabels   = <?php echo json_encode(array_keys($ageGroups)); ?>;
+    const ageValues   = <?php echo json_encode(array_values($ageGroups)); ?>;
+
+    const barangayRaw = <?php echo json_encode($barangayCounts); ?>;
+    const bLabels     = Object.keys(barangayRaw).map(b => b.replace('Barangay ', ''));
+    const bValues     = Object.values(barangayRaw);
+
+    // ---- Shared chart defaults ----
+    Chart.defaults.font.family = "'Inter', 'Segoe UI', system-ui, sans-serif";
+    Chart.defaults.font.size   = 11;
+    Chart.defaults.color       = '#64748B';
+
+    const TOOLTIP_STYLE = {
+        backgroundColor: '#1E293B',
+        titleFont:  { weight: '600', size: 12 },
+        bodyFont:   { size: 11 },
+        padding:    10,
+        cornerRadius: 8,
+        displayColors: true,
+        boxPadding: 4,
+    };
+
+    // ==========================
+    //  AGE GROUP — LINE CHART
+    // ==========================
+    const ageLineCtx = document.getElementById('ageLineChart').getContext('2d');
+    const ageLine = new Chart(ageLineCtx, {
+        type: 'line',
+        data: {
+            labels: ageLabels,
+            datasets: [{
+                label: 'Patients',
+                data: ageValues,
+                borderColor: BRAND.medium,
+                backgroundColor: BRAND.medium + '20',
+                borderWidth: 3,
+                pointBackgroundColor: BRAND.dark,
+                pointBorderColor: '#FFFFFF',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                fill: true,
+                tension: 0.4,
+                spanGaps: false,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    ...TOOLTIP_STYLE,
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.y} patient${ctx.parsed.y !== 1 ? 's' : ''}`,
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: { 
+                        font: { weight: '600', size: 11 },
+                        maxRotation: 0,
+                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: { size: 10 },
+                    },
+                    grid: { color: '#F1F5F9' },
+                    border: { display: false },
+                },
+            },
+            animation: {
+                duration: 800,
+                easing: 'easeOutQuart',
+            },
+        },
+    });
+
+    // ==============================
+    //  BARANGAY — PIE CHART
+    // ==============================
+    const bPieCtx = document.getElementById('barangayPieChart').getContext('2d');
+    const bPie = new Chart(bPieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: bLabels,
+            datasets: [{
+                data: bValues,
+                backgroundColor: PALETTE.slice(0, bLabels.length),
+                borderWidth: 2,
+                borderColor: '#FFFFFF',
+                hoverOffset: 8,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '52%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 14,
+                        font: { size: 11, weight: '500' },
+                        boxWidth: 12,
+                        boxHeight: 12,
+                    },
+                },
+                tooltip: {
+                    ...TOOLTIP_STYLE,
+                    callbacks: {
+                        label: ctx => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                        },
+                    },
+                },
+            },
+            animation: {
+                animateRotate: true,
+                duration: 700,
+                easing: 'easeOutQuart',
+            },
+        },
+    });
+
+})();
     // Real patient data from PHP, keyed by id
     const PATIENTS = <?php echo json_encode(array_column($patients, null, 'id'), JSON_PRETTY_PRINT); ?>;
 

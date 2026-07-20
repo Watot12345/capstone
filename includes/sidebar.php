@@ -53,7 +53,7 @@ if (strpos($currentPath, 'modules/healthservices') !== false) {
            <?php echo (strpos($currentPath, 'dashboard.php') !== false || strpos($currentPath, 'module_activity.php') !== false || strpos($currentPath, 'alerts.php') !== false || strpos($currentPath, 'system_health.php') !== false) ? 'bg-white/60 text-brand-dark' : 'text-slate-600 hover:bg-white/60 hover:text-brand-dark'; ?>">
           <div class="flex items-center space-x-3">
             <i class="fa-solid fa-table-columns text-sm <?php echo (strpos($currentPath, 'dashboard.php') !== false || strpos($currentPath, 'module_activity.php') !== false || strpos($currentPath, 'alerts.php') !== false || strpos($currentPath, 'system_health.php') !== false) ? 'text-brand-medium' : 'text-slate-400 group-hover:text-brand-medium'; ?> transition"></i>
-            <span class="sidebar-text truncate">Executive Dashboard</span>
+            <span class="sidebar-text truncate">System Overview</span>
           </div>
         </a>
       </div>
