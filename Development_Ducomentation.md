@@ -229,6 +229,71 @@ REGULAR STAFF
 └── 📊 Support Staff
     └── Focus: Daily Operations
 
+
+Is everything connected?
+
+Yes. Here's how I see the flow:
+
+Citizen
+   │
+   ▼
+Health Center Services
+   │
+   ├── creates patient records
+   ├── generates prescriptions
+   ├── referrals
+   └── consultation history
+          │
+          ▼
+Immunization & Nutrition
+   │
+   ├── uses patient records
+   ├── vaccination history
+   └── growth monitoring
+          │
+          ▼
+Health Surveillance
+   │
+   ├── receives disease reports
+   ├── detects outbreaks
+   ├── creates heatmaps
+   └── sends alerts
+
+Another flow:
+
+Business Owner
+       │
+       ▼
+Sanitation Permit
+       │
+       ├── inspection
+       ├── compliance
+       ├── violations
+       └── renewal
+
+And:
+
+Citizen
+      │
+      ▼
+Wastewater Service
+      │
+      ├── request
+      ├── desludging
+      ├── inspection
+      └── billing
+
+Then all five modules feed into:
+
+Dashboard
+      │
+Analytics
+      │
+Reports
+      │
+Compliance
+
+
                       SIDEBAR ALIGNMENT
 ADMIN SIDE 
 
@@ -262,7 +327,7 @@ MAIN CONTROLS
 ///////
 OPERATIONAL MODULES
 
-MODULE 1: HEALTH CENTER SERVICES (7 Sub-features)
+MODULE 1:   (7 Sub-features)
 HEALTH CENTER SERVICES ▼  (MODULE)
 │
 ├── PATIENT MANAGEMENT ▼      (FEATURES)
@@ -480,302 +545,256 @@ SYSTEM MANAGEMENT (TITLE PAGE)
     └── Backup & Recovery
 
 
-    COMPLETE ROLE-MODULE MAPPING TABLE
-Staff Roles(26)	&         Module                         Features They Access
 
-Health Center Director	Health Center	               All Features (Full Access)
-Doctor	                Health Center	               Consultations, Prescriptions, Referrals, Records
-Nurse	                Health Center	               Triage, Appointments, Records (Read), Vital Signs
-Dentist	                Health Center	               Dental Consultations
-Lab Technician	        Health Center	               Lab Testing, Results
-Pharmacist	            Health Center	               Pharmacy, Prescriptions
-Medical Records Clerk	Health Center	               Patient Records (Create/Update)
-Appointment Clerk	    Health Center	                   Appointments
-Sanitation Officer	     Sanitation	                    All Features (Full Access)
-Sanitation Inspector	Sanitation	                   Inspections, Reports, Compliance
-Permits Clerk	          Sanitation	               Applications, Documents, Renewals
-Cashier	                  Sanitation	                        Payments
-Immunization Coordinator	Immunization	                All Features (Full Access)
-Midwife/Nurse	            Immunization	                Vaccinations, Growth, Child Records
-Nutritionist	             Immunization	                 Nutrition Assessment, Plans
-Nutrition Educator	       Immunization	                   Basic Nutrition, Education
-Vaccine Manager	            Immunization	                             Inventory
-Wastewater Officer	        Wastewater	                   All Features (Full Access)
-Field Technician	         Wastewater	                       Services, Maintenance
-Service Clerk	             Wastewater                       	Requests
-Billing Clerk	             Wastewater	                             Billing
-Surveillance Officer	     Surveillance	                  All Features (Full Access)
-Surveillance Coordinator	Surveillance	                    Cases, Alerts, Response
-Contact Tracer	              Surveillance	                          Tracing, Quarantine
-Field Investigator	          Surveillance	                        Investigation
-System Admin	          All	Technical Full Access
+THE 10 OPTIMIZED ROLES
+
+Optimized Role
+Replaces (Original 26)
+Primary Module
+1	Health Center Director	Health Center Director	Module 1
+2	Medical Practitioner	Doctor, Nurse, Dentist, Lab Tech	Module 1
+3	Health Center Staff	Med Records Clerk, Appt Clerk	Module 1
+4	Sanitation Director	Sanitation Officer	Module 2
+5	Sanitation officer	Inspector, Permits Clerk, Cashier	Module 2
+6	Immunization Lead	Immunization Coordinator, Midwife	Module 3
+7	Nutrition Staff	Nutritionist, Nutrition Educator	Module 3
+8	Wastewater Lead	Wastewater Officer	Module 4
+9	Surveillance Lead	Surveillance Officer, Coordinator	Module 5
+10	System Admin	System Admin	All Modules
 
 
+COMPLETE ROLE-MODULE MAPPING TABLE
+MODULE 1: HEALTH CENTER SERVICES (7 Sub-features)
+Sub-Feature
+Health Center Director
+Medical Practitioner
+Health Center Staff
+PATIENT MANAGEMENT			
+└ Patient Registration	✅ Full	✅ Create	✅ Full
+└ Patient Records	✅ Full	✅ Read	✅ Full
+└ Search & Filter	✅ Full	✅ Full	✅ Full
+└ Patient Dashboard	✅ Full	✅ Read	✅ Read
+└ Patient History	✅ Full	✅ Read	✅ Read
+CONSULTATIONS			
+└ Physical Examination	✅ Read	✅ Full	❌
+└ Diagnosis (ICD-10)	✅ Read	✅ Full	❌
+└ Treatment Plan	✅ Read	✅ Full	❌
+└ Consultation Notes	✅ Read	✅ Full	❌
+MEDICAL RECORDS			
+└ Electronic Health Record	✅ Full	✅ Read	✅ Update
+└ Documentation	✅ Full	✅ Create	✅ Full
+└ Record Sharing	✅ Full	❌	❌
+└ Reporting	✅ Full	✅ Read	❌
+APPOINTMENTS ⭐			
+└ Schedule Appointments	✅ Full	✅ Read	✅ Full
+└ Manage Appointments	✅ Full	✅ Update	✅ Full
+└ Reminders (SMS/Email)	✅ Full	❌	✅ Full
+└ Doctor Schedule	✅ Full	✅ Read	✅ Full
+TRIAGE ⭐			
+└ Vital Signs Recording	✅ Read	✅ Full	✅ Full
+└ Priority Classification	✅ Read	✅ Full	✅ Full
+└ Queue Management	✅ Full	✅ Read	✅ Full
+└ Symptom Checker	✅ Read	✅ Full	✅ Full
+PRESCRIPTIONS ⭐			
+└ Electronic Prescription	✅ Read	✅ Full	❌
+└ Drug Selection	✅ Read	✅ Full	❌
+└ Dosage Management	✅ Read	✅ Full	❌
+└ Prescription History	✅ Read	✅ Read	✅ Read
+REFERRALS ⭐			
+└ Specialist Referral	✅ Read	✅ Full	❌
+└ Referral Tracking	✅ Full	✅ Read	❌
+└ Hospital Referral	✅ Read	✅ Full	❌
+└ Follow-up Management	✅ Full	✅ Full	❌
+
+MODULE 2: SANITATION PERMITS (6 Sub-features)
+Sub-Feature
+Sanitation Director
+Sanitation Processor
+PERMIT APPLICATIONS		
+└ New Application	✅ Full	✅ Full
+└ Application Review	✅ Full	✅ Full
+└ Status Tracking	✅ Full	✅ Full
+└ Application History	✅ Full	✅ Read
+INSPECTIONS		
+└ Schedule Inspection	✅ Full	✅ Full
+└ Conduct Inspection	✅ Full	✅ Full
+└ Inspection Reports	✅ Full	✅ Create
+└ Follow-up Inspections	✅ Full	✅ Full
+PERMIT RECORDS		
+└ Permit History	✅ Full	✅ Read
+└ Active Permits	✅ Full	✅ Read
+└ Expired Permits	✅ Full	❌
+└ Search & Filter	✅ Full	✅ Full
+PAYMENTS ⭐		
+└ Fee Structure	✅ Full	✅ Read
+└ Payment Processing	✅ Full	✅ Full
+└ Receipt Generation	✅ Full	✅ Full
+└ Payment History	✅ Full	✅ Read
+DOCUMENTS ⭐		
+└ Document Upload	✅ Full	✅ Full
+└ Digital Permits	✅ Full	✅ Read
+└ QR Code Verification	✅ Full	✅ Full
+└ Document Expiry	✅ Full	✅ Read
+RENEWALS ⭐		
+└ Renewal Applications	✅ Full	✅ Full
+└ Auto-Reminders	✅ Full	✅ Read
+└ Renewal History	✅ Full	✅ Read
+└ Grace Period Management	✅ Full	❌
+
+MODULE 3: IMMUNIZATION & NUTRITION (5 Sub-features)
+Sub-Feature
+Immunization Lead
+Nutrition Staff
+CHILD RECORDS		
+└ Child Registration	✅ Full	✅ Full
+└ Demographics	✅ Full	✅ Read
+└ Family History	✅ Full	✅ Read
+└ Health Records	✅ Full	✅ Read
+VACCINATION TRACKING		
+└ Vaccine Schedule	✅ Full	❌
+└ Record Vaccination	✅ Full	❌
+└ Missed Vaccines	✅ Full	❌
+└ Due Date Alerts	✅ Full	❌
+└ Immunization History	✅ Full	✅ Read
+GROWTH CHARTS		
+└ Growth Charts	✅ Full	✅ Read
+└ Percentile Tracking	✅ Full	✅ Read
+└ Growth Alerts	✅ Full	✅ Read
+└ Weight/Height Tracking	✅ Full	✅ Full
+VACCINE INVENTORY ⭐		
+└ Stock Management	✅ Full	❌
+└ Expiry Tracking	✅ Full	❌
+└ Cold Chain Monitoring	✅ Full	❌
+└ Stock Alerts	✅ Full	❌
+NUTRITION ASSESSMENT ⭐		
+└ Nutrition Screening	✅ Read	✅ Full
+└ Malnutrition Detection	✅ Read	✅ Full
+└ Nutrition Plans	✅ Read	✅ Full
+└ Supplement Tracking	✅ Read	✅ Full
+
+MODULE 4: WASTEWATER SERVICES (5 Sub-features)
+Sub-Feature
+Wastewater Lead
+SEPTIC TANK REGISTRY	
+└ Tank Registration	✅ Full
+└ Tank Details	✅ Full
+└ Location Mapping	✅ Full
+└ Tank History	✅ Full
+MAINTENANCE & DESLUDGING	
+└ Schedule Services	✅ Full
+└ Service Records	✅ Full
+└ Route Planning	✅ Full
+└ Completion Reports	✅ Full
+SERVICE REQUESTS	
+└ New Request	✅ Full
+└ Request Tracking	✅ Full
+└ Status Updates	✅ Full
+└ Customer Feedback	✅ Full
+SERVICE PROVIDERS ⭐	
+└ Provider Registration	✅ Full
+└ Provider Assignment	✅ Full
+└ Performance Tracking	✅ Full
+└ Equipment Management	✅ Full
+BILLING ⭐	
+└ Fee Structure	✅ Full
+└ Quotation Generation	✅ Full
+└ Payment Processing	✅ Full
+└ Invoice Management	✅ Full
+
+MODULE 5: HEALTH SURVEILLANCE (6 Sub-features)
+Sub-Feature
+Surveillance Lead
+CASE REPORTS	
+└ Case Reporting	✅ Full
+└ Case Management	✅ Full
+└ Case Tracking	✅ Full
+└ Case Investigation	✅ Full
+MAPPING & CLUSTERING	
+└ Geographic Mapping	✅ Full
+└ Cluster Analysis	✅ Full
+└ Risk Heatmaps	✅ Full
+└ Trend Visualization	✅ Full
+OUTBREAK DETECTION	
+└ Automated Detection	✅ Full
+└ Pattern Recognition	✅ Full
+└ Threshold Monitoring	✅ Full
+└ Alert Generation	✅ Full
+REAL-TIME ALERTS ⭐	
+└ Automated Alerts	✅ Full
+└ Escalation Protocol	✅ Full
+└ Emergency Response	✅ Full
+CONTACT TRACING ⭐	
+└ Contact Identification	✅ Full
+└ Exposure Assessment	✅ Full
+└ Contact Monitoring	✅ Full
+└ Quarantine Management	✅ Full
+RESPONSE MANAGEMENT ⭐	
+└ Team Activation	✅ Full
+└ Resource Allocation	✅ Full
+└ Intervention Tracking	✅ Full
+└ Effectiveness Reports	✅ Full
+
+SYSTEM ADMIN (Cross-Module)
+Access Level
+System Admin
+Modules 1–5 All Features	✅ Full
+User Management	✅ Full
+Role Assignment	✅ Full
+System Settings	✅ Full
+Audit Logs	✅ Full
+AI Analytics Access	✅ Ful
 
 
-MODULE 1: HEALTH CENTER SERVICES
-Your Features → Staff Roles
-Your Feature	             Staff Roles Created
-Patient Management        	Medical Records Clerk, Appointment Clerk, Nurse
-Consultations	            Doctor, Dentist, Nurse
-Medical Records	           Medical Records Clerk, Doctor, Nurse
-Appointments            	Appointment Clerk, Nurse, Doctor
-Triage 	                 Nurse, Medical Records Clerk
-Prescriptions         	Doctor, Pharmacist
-Referrals 	          Doctor, Health Center Director
-Detailed Mapping:
-text
-YOUR SYSTEM: PATIENT MANAGEMENT
-│
-├── Patient Registration    → Medical Records Clerk
-├── Patient Records         → Medical Records Clerk, Doctor
-├── Search & Filter         → All Staff
-├── Patient Dashboard       → Doctor, Nurse, Director
-└── Patient History         → Doctor, Nurse
+<?php
+// includes/check_permission.php
 
-YOUR SYSTEM: CONSULTATIONS
-│
-├── Physical Examination    → Doctor
-├── Diagnosis (ICD-10)      → Doctor
-├── Treatment Plan          → Doctor, Nurse
-└── Consultation Notes      → Doctor, Nurse
+function hasPermission($userId, $featureSlug, $requiredLevel = 'read') {
+    global $pdo;
+    
+    // Hierarchy: full > create > update > read > none
+    $hierarchy = ['none' => 0, 'read' => 1, 'update' => 2, 'create' => 3, 'full' => 4];
+    $required = $hierarchy[$requiredLevel] ?? 1;
+    
+    $stmt = $pdo->prepare("
+        SELECT rsp.permission 
+        FROM role_subfeature_permissions rsp
+        JOIN users u ON u.role_id = rsp.role_id
+        JOIN sub_features sf ON sf.id = rsp.subfeature_id
+        WHERE u.id = ? AND sf.slug = ?
+    ");
+    $stmt->execute([$userId, $featureSlug]);
+    $result = $stmt->fetch();
+    
+    if (!$result) return false;
+    
+    return ($hierarchy[$result['permission']] ?? 0) >= $required;
+}
 
-YOUR SYSTEM: MEDICAL RECORDS
-│
-├── Electronic Health Record (EHR) → Doctor, Nurse, Records Clerk
-├── Documentation                  → Doctor, Nurse
-├── Record Sharing                 → Health Center Director
-└── Reporting                      → Data Analyst, Director
+// Usage examples in your module pages:
 
-YOUR SYSTEM: APPOINTMENTS ⭐
-│
-├── Schedule Appointments   → Appointment Clerk, Nurse
-├── Manage Appointments     → Appointment Clerk
-├── Reminders (SMS/Email)   → Appointment Clerk
-└── Doctor Schedule         → Health Center Director, Doctor
+// In consultations.php
+if (!hasPermission($_SESSION['user_id'], 'consultations', 'create')) {
+    die('Access Denied: You cannot create consultations.');
+}
 
-YOUR SYSTEM: TRIAGE ⭐
-│
-├── Vital Signs Recording   → Nurse
-├── Priority Classification → Nurse, Doctor
-├── Queue Management        → Nurse, Appointment Clerk
-└── Symptom Checker         → Nurse
+// In patient_records.php  
+if (!hasPermission($_SESSION['user_id'], 'patient_records', 'update')) {
+    // Hide the Edit button, show read-only view
+    $readonly = true;
+}
 
-YOUR SYSTEM: PRESCRIPTIONS ⭐
-│
-├── Electronic Prescription → Doctor
-├── Drug Selection          → Doctor, Pharmacist
-├── Dosage Management       → Doctor, Pharmacist
-└── Prescription History    → Doctor, Pharmacist
-
-YOUR SYSTEM: REFERRALS ⭐
-│
-├── Specialist Referral     → Doctor
-├── Referral Tracking       → Doctor, Director
-├── Hospital Referral       → Doctor
-└── Follow-up Management    → Nurse, Doctor
+// In sidebar.php — show/hide menu items
+ $modules = $pdo->query("
+    SELECT m.module_name, m.slug, m.icon,
+           (SELECT COUNT(*) FROM role_subfeature_permissions rsp
+            JOIN sub_features sf ON sf.id = rsp.subfeature_id
+            WHERE sf.module_id = m.id AND rsp.role_id = ? AND rsp.permission != 'none'
+           ) > 0 AS has_access
+    FROM modules m
+    ORDER BY m.sort_order
+")->fetchAll(PDO::FETCH_ASSOC);
 
 
-MODULE 2: SANITATION PERMITS
-Your Features → Staff Roles
-Your Feature	Staff Roles Created
-Permit Applications	Permits Clerk, Sanitation Officer
-Inspections	Sanitation Inspector, Sanitation Officer
-Permit Records	Permits Clerk, Sanitation Officer
-Payments ⭐	Cashier, Permits Clerk
-Documents ⭐	Permits Clerk, Sanitation Inspector
-Renewals ⭐	Permits Clerk, Cashier
-Detailed Mapping:
-text
-YOUR SYSTEM: PERMIT APPLICATIONS
-│
-├── New Application         → Permits Clerk
-├── Application Review      → Sanitation Officer
-├── Status Tracking         → Permits Clerk
-└── Application History     → Permits Clerk, Sanitation Officer
-
-YOUR SYSTEM: INSPECTIONS
-│
-├── Schedule Inspection     → Sanitation Inspector
-├── Conduct Inspection      → Sanitation Inspector
-├── Inspection Reports      → Sanitation Inspector
-└── Follow-up Inspections   → Sanitation Inspector
-
-YOUR SYSTEM: PERMIT RECORDS
-│
-├── Permit History          → Permits Clerk
-├── Active Permits          → Permits Clerk
-├── Expired Permits         → Permits Clerk
-└── Search & Filter         → All Staff
-
-YOUR SYSTEM: PAYMENTS ⭐
-│
-├── Fee Structure           → Sanitation Officer, Cashier
-├── Payment Processing      → Cashier
-├── Receipt Generation      → Cashier
-└── Payment History         → Cashier, Permits Clerk
-
-YOUR SYSTEM: DOCUMENTS ⭐
-│
-├── Document Upload         → Permits Clerk
-├── Digital Permits         → Permits Clerk
-├── QR Code Verification    → Permits Clerk, Inspector
-└── Document Expiry         → Permits Clerk
-
-YOUR SYSTEM: RENEWALS ⭐
-│
-├── Renewal Applications    → Permits Clerk
-├── Auto-Reminders          → Permits Clerk
-├── Renewal History         → Permits Clerk
-└── Grace Period Management → Sanitation Officer
-
-
-
-MODULE 3: IMMUNIZATION & NUTRITION
-Your Features → Staff Roles
-Your Feature	Staff Roles Created
-Child Records	Midwife/Nurse, Nutritionist
-Vaccination Tracking	Midwife/Nurse, Immunization Coordinator
-Growth Charts	Midwife/Nurse, Nutritionist
-Vaccine Inventory ⭐	Vaccine Inventory Manager
-Nutrition Assessment ⭐	Nutritionist, Nutrition Educator
-Detailed Mapping:
-text
-YOUR SYSTEM: CHILD RECORDS
-│
-├── Child Registration      → Midwife/Nurse
-├── Demographics            → Midwife/Nurse
-├── Family History          → Midwife/Nurse
-└── Health Records          → Midwife/Nurse, Nutritionist
-
-YOUR SYSTEM: VACCINATION TRACKING
-│
-├── Vaccine Schedule        → Midwife/Nurse
-├── Record Vaccination      → Midwife/Nurse
-├── Missed Vaccines         → Midwife/Nurse
-├── Due Date Alerts         → Midwife/Nurse
-└── Immunization History    → Midwife/Nurse, Coordinator
-
-YOUR SYSTEM: GROWTH CHARTS
-│
-├── Growth Charts           → Midwife/Nurse
-├── Percentile Tracking     → Midwife/Nurse
-├── Growth Alerts           → Midwife/Nurse, Nutritionist
-└── Weight/Height Tracking  → Midwife/Nurse
-
-YOUR SYSTEM: VACCINE INVENTORY ⭐
-│
-├── Stock Management        → Vaccine Inventory Manager
-├── Expiry Tracking         → Vaccine Inventory Manager
-├── Cold Chain Monitoring   → Vaccine Inventory Manager
-└── Stock Alerts            → Vaccine Inventory Manager
-
-YOUR SYSTEM: NUTRITION ASSESSMENT ⭐
-│
-├── Nutrition Screening     → Nutritionist
-├── Malnutrition Detection  → Nutritionist
-├── Nutrition Plans         → Nutritionist
-└── Supplement Tracking     → Nutritionist, Midwife
-
-
-MODULE 4: WASTEWATER SERVICES
-Your Features → Staff Roles
-Your Feature	Staff Roles Created
-Septic Tank Registry	Wastewater Officer, Service Clerk
-Maintenance & Desludging	Field Technician, Wastewater Officer
-Service Requests	Service Clerk, Wastewater Officer
-Service Providers ⭐	Wastewater Officer, Service Clerk
-Billing ⭐	Billing Clerk, Wastewater Officer
-Detailed Mapping:
-text
-YOUR SYSTEM: SEPTIC TANK REGISTRY
-│
-├── Tank Registration       → Wastewater Officer
-├── Tank Details            → Wastewater Officer
-├── Location Mapping        → Wastewater Officer
-└── Tank History            → Wastewater Officer
-
-YOUR SYSTEM: MAINTENANCE & DESLUDGING
-│
-├── Schedule Services       → Field Technician
-├── Service Records         → Field Technician
-├── Route Planning          → Wastewater Officer
-└── Completion Reports      → Field Technician
-
-YOUR SYSTEM: SERVICE REQUESTS
-│
-├── New Request             → Service Clerk
-├── Request Tracking        → Service Clerk
-├── Status Updates          → Service Clerk
-└── Customer Feedback       → Service Clerk
-
-YOUR SYSTEM: SERVICE PROVIDERS ⭐
-│
-├── Provider Registration   → Wastewater Officer
-├── Provider Assignment     → Wastewater Officer
-├── Performance Tracking    → Wastewater Officer
-└── Equipment Management    → Wastewater Officer
-
-YOUR SYSTEM: BILLING ⭐
-│
-├── Fee Structure           → Wastewater Officer
-├── Quotation Generation    → Billing Clerk
-├── Payment Processing      → Billing Clerk
-└── Invoice Management      → Billing Clerk
-
-
-
-MODULE 5: HEALTH SURVEILLANCE
-Your Features → Staff Roles
-Your Feature	Staff Roles Created
-Case Reports	Surveillance Officer, Field Investigator
-Mapping & Clustering	Surveillance Officer, Data Analyst
-Outbreak Detection	Surveillance Officer, Surveillance Coordinator
-Real-time Alerts ⭐	Surveillance Coordinator, Surveillance Officer
-Contact Tracing ⭐	Contact Tracer, Field Investigator
-Response Management ⭐	Surveillance Officer, Surveillance Coordinator
-Detailed Mapping:
-text
-YOUR SYSTEM: CASE REPORTS
-│
-├── Case Reporting          → Field Investigator
-├── Case Management         → Surveillance Officer
-├── Case Tracking           → Surveillance Officer
-└── Case Investigation      → Field Investigator
-
-YOUR SYSTEM: MAPPING & CLUSTERING
-│
-├── Geographic Mapping      → Surveillance Officer, Data Analyst
-├── Cluster Analysis        → Surveillance Officer
-├── Risk Heatmaps           → Surveillance Officer
-└── Trend Visualization     → Data Analyst
-
-YOUR SYSTEM: OUTBREAK DETECTION
-│
-├── Automated Detection     → Surveillance Officer
-├── Pattern Recognition     → Surveillance Officer
-├── Threshold Monitoring    → Surveillance Officer
-└── Alert Generation        → Surveillance Officer
-
-YOUR SYSTEM: REAL-TIME ALERTS ⭐
-│
-├── Automated Alerts        → Surveillance Coordinator
-├── Escalation Protocol     → Surveillance Coordinator
-└── Emergency Response      → Surveillance Officer
-
-YOUR SYSTEM: CONTACT TRACING ⭐
-│
-├── Contact Identification  → Contact Tracer
-├── Exposure Assessment     → Contact Tracer
-├── Contact Monitoring      → Contact Tracer
-└── Quarantine Management   → Contact Tracer
-
-YOUR SYSTEM: RESPONSE MANAGEMENT ⭐
-│
-├── Team Activation         → Surveillance Officer
-├── Resource Allocation     → Surveillance Officer
-├── Intervention Tracking   → Surveillance Officer
-└── Effectiveness Reports   → Surveillance Officer
 
 
 
