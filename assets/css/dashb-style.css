@@ -1,9 +1,7 @@
 /* UPDATED */
 body {
-  background-color: #EEF5FF;
-  height: 100vh;
-  overflow: hidden;
-  /* Lock the main viewport */
+  background-color: #FFFFFF;
+  min-height: 100vh;
 }
 
 .stat-card::after {
