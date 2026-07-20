@@ -1,4 +1,27 @@
 <?php
+// dashboard.php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
+
+// Get user data from session
+$fullName = $_SESSION['full_name'] ?? 'Joshua Sierra';
+$role = $_SESSION['role'] ?? 'admin';
+
+// Generate initials from full name
+$initials = '';
+$nameParts = explode(' ', $fullName);
+foreach ($nameParts as $part) {
+    if (!empty($part)) {
+        $initials .= strtoupper($part[0]);
+    }
+}
+$initials = substr($initials, 0, 2); // Get first 2 initials
+
 $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF']), '/'), '/'));
 ?>
 <!DOCTYPE html>
@@ -67,14 +90,15 @@ $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF'
 
       <div class="flex items-center space-x-2 p-1.5 rounded-lg text-left select-none">
         <div class="h-8 w-8 rounded-lg bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-extrabold text-xs">
-          JS
+          <?php echo htmlspecialchars($initials); ?>
         </div>
         <div class="hidden sm:flex flex-col">
-          <span class="text-xs font-bold text-slate-700 leading-none">Joshua Sierra</span>
-          <span class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-wider">admin</span>
+          <span class="text-xs font-bold text-slate-700 leading-none"><?php echo htmlspecialchars($fullName); ?></span>
+          <span class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-wider"><?php echo htmlspecialchars($role); ?></span>
         </div>
       </div>
     </div>
   </header>
 
   <div class="flex-1 flex relative">
+
