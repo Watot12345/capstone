@@ -1,6 +1,18 @@
-<?php include '../includes/header.php'; ?>
-<?php include '../includes/sidebar.php'; ?>
 
+<?php
+session_start();
+$sessionId = session_id();
+
+// Redirect to include session ID if not present
+if (!isset($_GET['session']) || $_GET['session'] !== $sessionId) {
+    $url = $_SERVER['REQUEST_URI'];
+    $separator = (strpos($url, '?') === false) ? '?' : '&';
+    header('Location: ' . $url . $separator . 'session=' . $sessionId);
+    exit;
+}
+ include '../includes/header.php';
+ include '../includes/sidebar.php'; 
+?>
 <!-- ADD FONT AWESOME CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
@@ -1379,6 +1391,7 @@
     <!-- ===== TOAST CONTAINER ===== -->
     <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
 <script>
+    
     // ===== TOAST SYSTEM =====
     function showToast(message, type = 'info', duration = 3000) {
         const container = document.getElementById('toast-container');
