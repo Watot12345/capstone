@@ -28,177 +28,51 @@ require_once '../../includes/header.php';
 require_once '../../includes/sidebar.php';
 
 
-// Sample Patient Data (In production, this comes from database)
-$patients = [
-    [
-        'id' => 1,
-        'patient_id' => 'P-1001',
-        'first_name' => 'Maria',
-        'last_name' => 'Santos',
-        'middle_name' => 'Cruz',
-        'gender' => 'Female',
-        'birth_date' => '1985-03-15',
-        'age' => 41,
-        'blood_type' => 'O+',
-        'contact' => '09123456789',
-        'email' => 'maria.santos@email.com',
-        'address' => '123 Rizal St., Barangay San Jose',
-        'barangay' => 'Barangay San Jose',
-        'emergency_contact' => 'Juan Santos - 09176543210',
-        'registration_date' => '2024-01-15',
-        'status' => 'active',
-        'last_visit' => '2026-07-10',
-        'allergies' => 'Penicillin',
-        'conditions' => 'Hypertension'
-    ],
-    [
-        'id' => 2,
-        'patient_id' => 'P-1002',
-        'first_name' => 'Juan',
-        'last_name' => 'Dela Cruz',
-        'middle_name' => 'Garcia',
-        'gender' => 'Male',
-        'birth_date' => '1990-08-20',
-        'age' => 35,
-        'blood_type' => 'A+',
-        'contact' => '09123456788',
-        'email' => 'juan.delacruz@email.com',
-        'address' => '456 Mabini Ave., Barangay Poblacion',
-        'barangay' => 'Barangay Poblacion',
-        'emergency_contact' => 'Ana Dela Cruz - 09176543211',
-        'registration_date' => '2024-02-10',
-        'status' => 'active',
-        'last_visit' => '2026-07-12',
-        'allergies' => 'None',
-        'conditions' => 'Diabetes Type 2'
-    ],
-    [
-        'id' => 3,
-        'patient_id' => 'P-1003',
-        'first_name' => 'Rosa',
-        'last_name' => 'Mendoza',
-        'middle_name' => 'Lopez',
-        'gender' => 'Female',
-        'birth_date' => '1998-06-01',
-        'age' => 28,
-        'blood_type' => 'B+',
-        'contact' => '09123456787',
-        'email' => 'rosa.mendoza@email.com',
-        'address' => '789 Bonifacio Rd., Barangay Riverside',
-        'barangay' => 'Barangay Riverside',
-        'emergency_contact' => 'Carlos Mendoza - 09176543212',
-        'registration_date' => '2024-03-05',
-        'status' => 'active',
-        'last_visit' => '2026-07-08',
-        'allergies' => 'Sulfa',
-        'conditions' => 'Asthma'
-    ],
-    [
-        'id' => 4,
-        'patient_id' => 'P-1004',
-        'first_name' => 'Carlos',
-        'last_name' => 'Lim',
-        'middle_name' => 'Tan',
-        'gender' => 'Male',
-        'birth_date' => '1978-11-12',
-        'age' => 47,
-        'blood_type' => 'AB+',
-        'contact' => '09123456786',
-        'email' => 'carlos.lim@email.com',
-        'address' => '101 Luna St., Barangay San Roque',
-        'barangay' => 'Barangay San Roque',
-        'emergency_contact' => 'Elena Lim - 09176543213',
-        'registration_date' => '2024-04-20',
-        'status' => 'active',
-        'last_visit' => '2026-07-05',
-        'allergies' => 'None',
-        'conditions' => 'Heart Disease'
-    ],
-    [
-        'id' => 5,
-        'patient_id' => 'P-1005',
-        'first_name' => 'Elena',
-        'last_name' => 'Torres',
-        'middle_name' => 'Rivera',
-        'gender' => 'Female',
-        'birth_date' => '1995-09-25',
-        'age' => 30,
-        'blood_type' => 'O-',
-        'contact' => '09123456785',
-        'email' => 'elena.torres@email.com',
-        'address' => '202 Santos St., Barangay Sta. Cruz',
-        'barangay' => 'Barangay Sta. Cruz',
-        'emergency_contact' => 'Ramon Torres - 09176543214',
-        'registration_date' => '2024-05-12',
-        'status' => 'active',
-        'last_visit' => '2026-07-15',
-        'allergies' => 'Peanuts',
-        'conditions' => 'None'
-    ],
-    [
-        'id' => 6,
-        'patient_id' => 'P-1006',
-        'first_name' => 'Miguel',
-        'last_name' => 'Reyes',
-        'middle_name' => 'Dizon',
-        'gender' => 'Male',
-        'birth_date' => '1982-02-28',
-        'age' => 44,
-        'blood_type' => 'A-',
-        'contact' => '09123456784',
-        'email' => 'miguel.reyes@email.com',
-        'address' => '303 Rizal St., Barangay San Jose',
-        'barangay' => 'Barangay San Jose',
-        'emergency_contact' => 'Liza Reyes - 09176543215',
-        'registration_date' => '2024-06-01',
-        'status' => 'inactive',
-        'last_visit' => '2026-06-28',
-        'allergies' => 'None',
-        'conditions' => 'Hypertension'
-    ],
-    [
-        'id' => 7,
-        'patient_id' => 'P-1007',
-        'first_name' => 'Ana',
-        'last_name' => 'Cruz',
-        'middle_name' => 'Gomez',
-        'gender' => 'Female',
-        'birth_date' => '2000-12-01',
-        'age' => 25,
-        'blood_type' => 'B-',
-        'contact' => '09123456783',
-        'email' => 'ana.cruz@email.com',
-        'address' => '404 Mabini Ave., Barangay Poblacion',
-        'barangay' => 'Barangay Poblacion',
-        'emergency_contact' => 'Jose Cruz - 09176543216',
-        'registration_date' => '2024-07-15',
-        'status' => 'active',
-        'last_visit' => '2026-07-14',
-        'allergies' => 'None',
-        'conditions' => 'None'
-    ],
-    [
-        'id' => 8,
-        'patient_id' => 'P-1008',
-        'first_name' => 'Ramon',
-        'last_name' => 'Garcia',
-        'middle_name' => 'Santos',
-        'gender' => 'Male',
-        'birth_date' => '1975-04-18',
-        'age' => 51,
-        'blood_type' => 'O+',
-        'contact' => '09123456782',
-        'email' => 'ramon.garcia@email.com',
-        'address' => '505 Bonifacio Rd., Barangay Riverside',
-        'barangay' => 'Barangay Riverside',
-        'emergency_contact' => 'Mila Garcia - 09176543217',
-        'registration_date' => '2024-08-22',
-        'status' => 'active',
-        'last_visit' => '2026-07-01',
-        'allergies' => 'Aspirin',
-        'conditions' => 'Arthritis'
-    ]
-];
+// Load Data from Database
+require_once __DIR__ . '/../../app/Models/Patient.php';
+$patientModel = new Patient();
+$dbPatients = $patientModel->all(['order' => 'created_at.desc']);
+
+$patients = [];
+foreach ($dbPatients as $p) {
+    // Map db structure to the structure expected by the HTML view
+    $age = 0;
+    if (!empty($p['birth_date'])) {
+        $dob = new DateTime($p['birth_date']);
+        $now = new DateTime();
+        $age = $now->diff($dob)->y;
+    }
+    
+    $conditions = 'None';
+    if (!empty($p['medical_history'])) {
+        $history = is_string($p['medical_history']) 
+            ? json_decode($p['medical_history'], true) 
+            : $p['medical_history'];
+        $conditions = $history['conditions'] ?? 'None';
+    }
+
+    $patients[] = [
+        'id' => $p['id'] ?? '',
+        'patient_id' => $p['patient_id'] ?? '',
+        'first_name' => $p['first_name'] ?? '',
+        'last_name' => $p['last_name'] ?? '',
+        'middle_name' => $p['middle_name'] ?? '',
+        'gender' => $p['gender'] ?? '',
+        'birth_date' => $p['birth_date'] ?? '',
+        'age' => $age,
+        'blood_type' => $p['blood_type'] ?? '',
+        'contact' => $p['contact'] ?? '',
+        'email' => $p['email'] ?? '',
+        'address' => $p['address'] ?? '',
+        'barangay' => $p['barangay'] ?? '',
+        'emergency_contact' => $p['emergency_contact'] ?? '',
+        'registration_date' => $p['registration_date'] ?? '',
+        'status' => $p['status'] ?? 'active',
+        'last_visit' => !empty($p['updated_at']) ? substr($p['updated_at'], 0, 10) : date('Y-m-d'),
+        'allergies' => $p['allergies'] ?? 'None',
+        'conditions' => $conditions
+    ];
+}
 
 // Pagination
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
