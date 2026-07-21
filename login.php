@@ -4,6 +4,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 
+require_once __DIR__ . '/Core/Env.php';
+require_once __DIR__ . '/config/database.php';
+
+
 // Handle AJAX login request - MUST come before ANY HTML output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once 'config/database.php';
@@ -17,9 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Content-Type: application/json');
         
         try {
-            $db = new SupabaseDB();
-            $result = $db->select('employees', ['employee_id' => $employeeId]);
-            
+            $db = Database::getInstance();
+             $result = $db->select('employees', ['employee_id' => $employeeId]);
             if (empty($result) || !is_array($result)) {
                 echo json_encode(['success' => false, 'message' => 'Invalid employee ID or password.']);
                 exit;

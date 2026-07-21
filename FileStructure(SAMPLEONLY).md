@@ -269,7 +269,79 @@ hsms/
 ├── webpack.config.js                  # Webpack configuration
 └── README.md                          # Project documentation
 
+
+
+capstone/
+├── app/                          ← Core application logic
+│   ├── Models/                  ← Database models
+│   │   ├── Patient.php
+│   │   ├── Employee.php
+│   │   ├── Appointment.php
+│   │   └── BaseModel.php
+│   ├── Controllers/              ← Business logic
+│   │   ├── PatientController.php
+│   │   ├── AuthController.php
+│   │   └── DashboardController.php
+│   ├── Services/                 ← External services
+│   │   ├── DatabaseService.php
+│   │   └── SupabaseService.php
+│   └── Utils/                    ← Helpers
+│       ├── Auth.php
+│       ├── Validation.php
+│       └── Response.php
+├── config/                       ← Configuration
+│   ├── database.php
+│   ├── routes.php                ← URL routing
+│   └── .env                      ← Environment variables
+├── public/                       ← Web root
+│   ├── index.php                 ← Front controller
+│   ├── login.php
+│   ├── assets/
+│   └── .htaccess
+├── modules/                      ← Your current feature modules
+│   ├── healthservices/
+│   │   ├── views/               ← Move UI to views/
+│   │   └── controllers/         ← Module-specific controllers
+│   └── sanitation/
+├── includes/                     ← Keep as shared partials
+├── management/                   ← Admin modules
+├── api/                          ← JSON API endpoints
+│   ├── patients.php
+│   ├── auth.php
+│   └── dashboard.php
+├── docs/                         ← Move all .md files here
+└── vendor/                       ← Composer dependencies
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .htaccess (URL Rewriting)
+
 apache
 RewriteEngine On
 
