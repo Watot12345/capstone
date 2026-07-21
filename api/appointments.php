@@ -1,0 +1,81 @@
+<?php
+// api/appointments.php
+
+require_once __DIR__ . '/../Core/Env.php';
+require_once __DIR__ . '/../Core/Response.php';
+require_once __DIR__ . '/../app/Controllers/AppointmentController.php';
+
+// Handle CORS
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
+header('Content-Type: application/json');
+
+try {
+    $controller = new AppointmentController();
+    $method = $_SERVER['REQUEST_METHOD'];
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $parts = explode('/', trim($path, '/'));
+
+    // Get appointment ID from URL if exists (e.g. /api/appointments.php/123)
+    $appointmentId = null;
+    if (count($parts) >= 3 && is_numeric($parts[2])) {
+        $appointmentId = $parts[2];
+    }
+
+    // Also support ?id=...
+    if (!$appointmentId && isset($_GET['id']) && is_numeric($_GET['id'])) {
+        $appointmentId = $_GET['id'];
+    }
+
+    $isStatusUpdate = isset($_GET['action']) && $_GET['action'] === 'status';
+
+    switch ($method) {
+        case 'GET':
+            if ($appointmentId) {
+                $controller->show($appointmentId);
+            } elseif (isset($_GET['q'])) {
+                $controller->search();
+            } else {
+                $controller->index();
+            }
+            break;
+
+        case 'POST':
+            $controller->store();
+            break;
+
+        case 'PUT':
+        case 'PATCH':
+            if ($appointmentId) {
+                if ($isStatusUpdate) {
+                    $controller->updateStatus($appointmentId);
+                } else {
+                    $controller->update($appointmentId);
+                }
+            } else {
+                Response::error('Appointment ID is required for update', 400);
+            }
+            break;
+
+        case 'DELETE':
+            if ($appointmentId) {
+                $controller->destroy($appointmentId);
+            } else {
+                Response::error('Appointment ID is required for deletion', 400);
+            }
+            break;
+
+        default:
+            Response::error('Method not allowed', 405);
+    }
+} catch (Exception $e) {
+    error_log('API Error in appointments.php: ' . $e->getMessage());
+    Response::error('Internal server error: ' . $e->getMessage(), 500);
+}

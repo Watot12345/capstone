@@ -75,11 +75,23 @@ foreach ($dbPatients as $p) {
 }
 
 // Pagination
+$targetPatientId = $_GET['patient'] ?? $_GET['id'] ?? null;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 5;
+
+if ($targetPatientId && !isset($_GET['page'])) {
+    foreach ($patients as $idx => $p) {
+        if ((string)($p['id'] ?? '') === (string)$targetPatientId || (string)($p['patient_id'] ?? '') === (string)$targetPatientId) {
+            $page = (int)floor($idx / $limit) + 1;
+            break;
+        }
+    }
+}
+
 $offset = ($page - 1) * $limit;
 $totalPatients = count($patients);
 $totalPages = ceil($totalPatients / $limit);
+if ($totalPages < 1) $totalPages = 1;
 $paginatedPatients = array_slice($patients, $offset, $limit);
 
 $title = 'Patient Management';
@@ -1579,7 +1591,7 @@ $title = 'Patient Management';
     // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const patientId = urlParams.get('patient');
+        const patientId = urlParams.get('patient') || urlParams.get('id');
         
         if (patientId) {
             const rows = document.querySelectorAll('.patient-row');
@@ -1587,7 +1599,8 @@ $title = 'Patient Management';
             
             rows.forEach(row => {
                 const rowId = row.dataset.rowId;
-                if (rowId == patientId) {
+                const patientCode = row.dataset.id;
+                if (rowId == patientId || (patientCode && patientCode.toLowerCase() === patientId.toLowerCase())) {
                     found = true;
                     row.style.backgroundColor = '#E6F5F3';
                     row.style.borderLeft = '4px solid #14807A';
