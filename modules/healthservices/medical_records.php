@@ -169,7 +169,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
             <p class="text-sm text-slate-500 mt-0.5">Electronic Health Record (EHR) - Documentation & Reporting</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="openModal('addRecordModal')"
+            <button onclick="ModalSystem.open('addRecordModal')"
                     class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-plus text-xs"></i> Add Record
             </button>
@@ -431,7 +431,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Medical Record Details</h3>
-            <button onclick="closeModal('viewRecordModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('viewRecordModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -450,7 +450,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Add Medical Record</h3>
-            <button onclick="closeModal('addRecordModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('addRecordModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -509,7 +509,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('addRecordModal')"
+                <button type="button" onclick="ModalSystem.close('addRecordModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -529,7 +529,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
             <h3 class="font-bold text-slate-900">Share Medical Record</h3>
-            <button onclick="closeModal('shareRecordModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('shareRecordModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -560,7 +560,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
             </p>
         </div>
         <div class="flex justify-end gap-2 px-6 pb-6">
-            <button type="button" onclick="closeModal('shareRecordModal')"
+            <button type="button" onclick="ModalSystem.close('shareRecordModal')"
                     class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                 Cancel
             </button>
@@ -570,12 +570,6 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
             </button>
         </div>
     </div>
-</div>
-
-<!-- Toast notification -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMessage"></span>
 </div>
 
 <!-- ============================================================ -->
@@ -592,38 +586,11 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
 
 <script>
     const RECORDS = <?php echo json_encode(array_column($medicalRecords, null, 'id'), JSON_PRETTY_PRINT); ?>;
-
-    // ============================================================
-    // MODAL FUNCTIONS
-    // ============================================================
-    function openModal(id) {
-        document.getElementById(id).classList.remove('hidden');
-        document.getElementById(id).classList.add('flex');
-        document.body.classList.add('overflow-hidden');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-        document.getElementById(id).classList.remove('flex');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    // Close modal on backdrop click
-    document.querySelectorAll('.fixed.inset-0').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-                this.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            }
-        });
-    });
-
     // ============================================================
     // VIEW RECORD
     // ============================================================
     function viewRecord(id) {
-        openModal('viewRecordModal');
+        ModalSystem.open('viewRecordModal');
         const r = RECORDS[id];
         if (!r) return;
 
@@ -690,11 +657,11 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
                         <div class="space-y-2">${attachmentsHtml}</div>
                     </div>
                     <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-                        <button onclick="closeModal('viewRecordModal')" 
+                        <button onclick="ModalSystem.close('viewRecordModal')" 
                                 class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                             Close
                         </button>
-                        <button onclick="closeModal('viewRecordModal'); editRecord(${r.id})"
+                        <button onclick="ModalSystem.close('viewRecordModal'); editRecord(${r.id})"
                                 class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold">
                             <i class="fa-solid fa-pen mr-1.5"></i> Edit Record
                         </button>
@@ -708,7 +675,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
     // EDIT RECORD
     // ============================================================
     function editRecord(id) {
-        showToast('Edit record ID: ' + id + ' (Edit modal coming soon)', 'info');
+        ModalSystem.toast.info('Edit record ID: ' + id + ' (Edit modal coming soon)');
     }
 
     // ============================================================
@@ -738,7 +705,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
             list.innerHTML = '<span class="text-xs text-slate-400">No doctors added yet</span>';
         }
 
-        openModal('shareRecordModal');
+        ModalSystem.open('shareRecordModal');
     }
 
     function addShareDoctor() {
@@ -749,7 +716,7 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
         const list = document.getElementById('shareDoctorsList');
         const existing = list.textContent;
         if (existing.includes(name)) {
-            showToast('Doctor already added', 'warning');
+            ModalSystem.toast.warning('Doctor already added');
             return;
         }
 
@@ -781,17 +748,17 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
         });
 
         if (doctors.length === 0) {
-            showToast('Please add at least one doctor to share with', 'warning');
+            ModalSystem.toast.warning('Please add at least one doctor to share with');
             return;
         }
 
         const r = RECORDS[shareRecordId];
         if (r) {
             r.shared_with = doctors;
-            showToast('Record shared with ' + doctors.length + ' doctor(s)', 'success');
+            ModalSystem.toast.success('Record shared with ' + doctors.length + ' doctor(s)');
         }
 
-        closeModal('shareRecordModal');
+        ModalSystem.close('shareRecordModal');
     }
 
     // ============================================================
@@ -799,36 +766,8 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
     // ============================================================
     function saveNewRecord(event) {
         event.preventDefault();
-        showToast('Medical record added successfully!', 'success');
-        closeModal('addRecordModal');
-    }
-
-    // ============================================================
-    // TOAST NOTIFICATIONS
-    // ============================================================
-    let toastTimer = null;
-
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const colors = {
-            success: 'bg-brand-dark',
-            danger: 'bg-rose-600',
-            info: 'bg-blue-600',
-            warning: 'bg-amber-600'
-        };
-        const icons = {
-            success: 'fa-circle-check',
-            danger: 'fa-circle-check',
-            info: 'fa-circle-info',
-            warning: 'fa-triangle-exclamation'
-        };
-        toast.className = 'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 ' + (colors[type] || colors.success);
-        toast.querySelector('i').className = 'fa-solid ' + (icons[type] || icons.success);
-        document.getElementById('toastMessage').textContent = message;
-        toast.classList.remove('hidden');
-
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
+        ModalSystem.toast.success('Medical record added successfully!');
+        ModalSystem.close('addRecordModal');
     }
 
     // ============================================================
@@ -878,17 +817,6 @@ $totalShared = count(array_filter($medicalRecords, fn($r) => count($r['shared_wi
         if (page < 1 || page > <?php echo $totalPages; ?>) return;
         window.location.href = '?page=' + page;
     }
-
-    // ESC to close modals
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            });
-        }
-    });
 </script>
 
 <?php include_once '../../includes/footer.php'; ?>

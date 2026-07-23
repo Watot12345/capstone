@@ -678,8 +678,8 @@
     <div id="moduleTooltipContent"></div>
 </div>
 
-<!-- Toast -->
-<div id="toast" class="no-print hidden fixed bottom-6 right-6 z-50 items-center gap-2.5 bg-zinc-900 text-white text-xs font-bold px-4 py-3.5 rounded-xl shadow-xl border border-zinc-800 fade-in"></div>
+<!-- bypass datamask for non data masking -->
+<p class="kpi-number text-xl font-black text-slate-900 mt-1 leading-none"></p>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

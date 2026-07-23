@@ -1388,10 +1388,19 @@ if (!isset($_GET['session']) || $_GET['session'] !== $sessionId) {
     </div>
 </div>     
        
-    <!-- ===== TOAST CONTAINER ===== -->
-    <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+ <!-- bypass datamask for non data masking -->
+<p class="kpi-number text-xl font-black text-slate-900 mt-1 leading-none"></p>
 <script>
-    
+    // Press Ctrl+Shift+R to toggle real/masked
+document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        document.querySelectorAll('[data-real]').forEach(el => {
+            const real = el.dataset.real;
+            const current = el.textContent;
+            el.textContent = current === real ? '••••' : real;
+        });
+    }
+});
     // ===== TOAST SYSTEM =====
     function showToast(message, type = 'info', duration = 3000) {
         const container = document.getElementById('toast-container');

@@ -34,8 +34,6 @@ class Database
 
     /**
      * Executes a request against PostgREST.
-     * $useServiceKey should only be true for trusted server-side operations
-     * that must bypass RLS (e.g. system-level writes). Default is anon key.
      */
     public function query(
         string $table,
@@ -48,8 +46,14 @@ class Database
         $endpoint = "{$this->url}/rest/v1/{$table}";
 
         $queryParams = [];
+        
+        // Handle filters with different operators
         foreach ($filters as $key => $value) {
-            $queryParams[] = "{$key}=eq." . rawurlencode((string) $value);
+            if (is_string($value) && preg_match('/^(eq|gt|gte|lt|lte|neq|like|ilike|in|is)\..*/', $value)) {
+                $queryParams[] = $key . '=' . rawurlencode($value);
+            } else {
+                $queryParams[] = $key . '=eq.' . rawurlencode((string) $value);
+            }
         }
 
         if (!empty($options['select'])) {
@@ -58,11 +62,17 @@ class Database
         if (!empty($options['order'])) {
             $queryParams[] = 'order=' . rawurlencode($options['order']);
         }
-        if (!empty($options['limit'])) {
+        
+        // ONLY add limit and offset if they are explicitly set
+        if (isset($options['limit']) && $options['limit'] !== null) {
             $queryParams[] = 'limit=' . (int) $options['limit'];
         }
-        if (!empty($options['offset'])) {
+        if (isset($options['offset']) && $options['offset'] !== null) {
             $queryParams[] = 'offset=' . (int) $options['offset'];
+        }
+        
+        if (!empty($options['or'])) {
+            $queryParams[] = 'or=' . rawurlencode($options['or']);
         }
 
         if (!empty($queryParams)) {
@@ -102,7 +112,6 @@ class Database
         }
 
         if ($httpCode >= 400) {
-            // Log full detail server-side, never expose raw response to the client
             error_log("Supabase error [{$httpCode}] on {$table}: {$response}");
             throw new RuntimeException("Database request failed with status {$httpCode}.");
         }
@@ -129,5 +138,27 @@ class Database
     public function delete(string $table, array $filters, bool $useServiceKey = false): array
     {
         return $this->query($table, 'DELETE', null, $filters, [], $useServiceKey);
+    }
+    
+    /**
+     * Get count of records - removes limit/offset for accurate counting
+     */
+    public function count(string $table, array $filters = [], array $options = []): int
+    {
+        try {
+            // IMPORTANT: Remove limit and offset for counting
+            unset($options['limit']);
+            unset($options['offset']);
+            unset($options['order']);
+            
+            // Only select 'id' to reduce data transfer
+            $options['select'] = 'id';
+            
+            $results = $this->select($table, $filters, $options);
+            return count($results);
+        } catch (\Exception $e) {
+            error_log("Database count error: " . $e->getMessage());
+            return 0;
+        }
     }
 }

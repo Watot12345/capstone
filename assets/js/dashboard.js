@@ -209,8 +209,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Open the dropdown
                 dropdown.classList.remove('hidden');
 
-                // Rotate its chevron
-                const parentBtn = dropdown.closest('.space-y-1')?.previousElementSibling;
+                // The dropdown-btn is a direct previous sibling of the
+                // dropdown panel (both live inside the same .space-y-1 wrapper),
+                // so we grab it directly instead of using .closest() which
+                // was matching the wrapper div itself, not the button.
+                const parentBtn = dropdown.previousElementSibling;
                 if (parentBtn && parentBtn.classList.contains('dropdown-btn')) {
                     const chevron = parentBtn.querySelector('.dropdown-chevron');
                     if (chevron) {
@@ -223,24 +226,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ============================================================
-// 7. CLOSE DROPDOWNS WHEN CLICKING OUTSIDE
-// ============================================================
-document.addEventListener('click', function(event) {
-    const sidebar = document.getElementById('sidebar');
-    if (!sidebar) return;
-
-    if (!sidebar.contains(event.target) && !isCollapsed) {
-        ALL_DROPDOWN_IDS.forEach(id => {
-            const dropdown = document.getElementById(id);
-            if (dropdown) {
-                dropdown.classList.add('hidden');
-            }
-        });
-
-        document.querySelectorAll('.dropdown-chevron').forEach(chv => {
-            chv.classList.remove('rotate-180');
-            chv.style.transform = 'rotate(0deg)';
-        });
-    }
-});

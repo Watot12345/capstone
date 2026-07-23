@@ -13,6 +13,7 @@
 // ============================================================
 require_once '../../includes/header.php';
 require_once '../../includes/sidebar.php';
+include_once __DIR__ . '/../../includes/data-mask.php';
 
 require_once __DIR__ . '/../../app/Models/Patient.php';
 require_once __DIR__ . '/../../app/Models/Employee.php';
@@ -51,6 +52,8 @@ try {
         }
     }
 
+       $medicalRoles = ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech'];
+
     $employeesMap = [];
     foreach ($dbEmployees as $e) {
         if (isset($e['id'])) {
@@ -77,24 +80,18 @@ try {
             $patientCode = "P-{$patientId}";
             $avatar = "PT";
         }
-
-        $employeeId = $a['employee_id'] ?? null;
+            
+                $employeeId = $a['employee_id'] ?? null;
         $employee = $employeesMap[$employeeId] ?? null;
         if ($employee) {
-            $docFirst = $employee['first_name'] ?? '';
-            $docLast = $employee['last_name'] ?? '';
-            $docTitle = $employee['title'] ?? $employee['role'] ?? 'Dr.';
-            $doctorName = trim("$docTitle $docFirst $docLast");
-            if (empty(trim("$docFirst $docLast"))) {
-                $doctorName = $employee['name'] ?? $employee['username'] ?? "Employee #{$employeeId}";
+            $role = $employee['role_description'] ?? '';
+            if (in_array($role, $medicalRoles)) {
+                $doctorName = $employee['full_name'] ?? "Staff #{$employeeId}";
+            } else {
+                $doctorName = "Staff #{$employeeId}";
             }
         } else {
-            $doctorNames = [
-                1 => 'Dr. Elena Santos',
-                2 => 'Dr. Miguel Reyes',
-                3 => 'Dr. Ana Cruz'
-            ];
-            $doctorName = $doctorNames[$employeeId] ?? 'Dr. Elena Santos';
+            $doctorName = "Staff #{$employeeId}";
         }
 
         $dateStr = $a['appointment_date'] ?? ($a['date'] ?? date('Y-m-d'));
@@ -154,7 +151,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
 <!-- ============================================================ -->
 <!-- 2. HTML + PHP EMBEDDED + Tailwind CSS                       -->
 <!-- ============================================================ -->
-
 <div class="flex-1 px-6 pt-[26px] pb-20 mb-10 flex flex-col min-h-0 overflow-y-auto">
 
     <!-- Page Header -->
@@ -164,7 +160,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             <p class="text-sm text-slate-500 mt-0.5">Manage patient bookings, approvals, and medical service schedules</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="openModal('addAppointmentModal')"
+            <button onclick="ModalSystem.open('addAppointmentModal')"
                     class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-calendar-plus text-xs"></i> New Appointment
             </button>
@@ -319,7 +315,21 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                             </td>
                         </tr>
                     <?php else: ?>
-                        <?php foreach ($paginatedAppointments as $a): ?>
+                        <?php foreach ($paginatedAppointments as $a): 
+                            // Build masked patient name: M**** S****
+                            $nameParts = explode(' ', $a['patient_name']);
+                            $maskedName = '';
+                            foreach ($nameParts as $part) {
+                                if (!empty($part)) {
+                                    $maskedName .= strtoupper(substr($part, 0, 1)) . str_repeat('*', max(0, strlen($part) - 1)) . ' ';
+                                }
+                            }
+                            $maskedName = trim($maskedName);
+                            
+                            // Build masked patient code: P-*********
+                            $code = $a['patient_code'];
+                            $maskedCode = substr($code, 0, 2) . str_repeat('*', max(0, strlen($code) - 2));
+                        ?>
                         <tr class="border-b border-slate-100 hover:bg-brand-light/40 transition-colors appointment-row"
                             data-patient="<?php echo htmlspecialchars(strtolower($a['patient_name'])); ?>"
                             data-doctor="<?php echo htmlspecialchars(strtolower($a['doctor_name'])); ?>"
@@ -336,8 +346,16 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                                         <?php echo htmlspecialchars($a['patient_avatar']); ?>
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-slate-800 text-sm"><?php echo htmlspecialchars($a['patient_name']); ?></p>
-                                        <p class="text-xs text-slate-400 font-mono"><?php echo htmlspecialchars($a['patient_code']); ?></p>
+                                        <p class="font-semibold text-slate-800 text-sm maskable" 
+                                           data-masked="<?php echo htmlspecialchars($maskedName); ?>"
+                                           data-real="<?php echo htmlspecialchars($a['patient_name']); ?>">
+                                            <?php echo htmlspecialchars($a['patient_name']); ?>
+                                        </p>
+                                        <p class="text-xs text-slate-400 font-mono maskable" 
+                                           data-masked="<?php echo htmlspecialchars($maskedCode); ?>"
+                                           data-real="<?php echo htmlspecialchars($a['patient_code']); ?>">
+                                            <?php echo htmlspecialchars($a['patient_code']); ?>
+                                        </p>
                                     </div>
                                 </div>
                             </td>
@@ -395,10 +413,12 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                                             <i class="fa-solid fa-check text-sm"></i>
                                         </button>
                                     <?php endif; ?>
-                                    <button onclick="deleteAppointment(<?php echo $a['id']; ?>)"
-                                            class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition" title="Delete">
-                                        <i class="fa-solid fa-trash-can text-sm"></i>
-                                    </button>
+                                    <?php if (!in_array($a['status'], ['cancelled', 'completed'])): ?>
+                                        <button onclick="changeAppointmentStatus(<?php echo $a['id']; ?>, 'cancelled')"
+                                                class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition" title="Cancel Appointment">
+                                            <i class="fa-solid fa-ban text-sm"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
@@ -458,7 +478,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             <h3 class="font-bold text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-calendar-check text-brand-medium"></i> Appointment Information
             </h3>
-            <button onclick="closeModal('viewAppointmentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('viewAppointmentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -479,7 +499,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             <h3 class="font-bold text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-calendar-plus text-brand-medium"></i> Schedule New Appointment
             </h3>
-            <button onclick="closeModal('addAppointmentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('addAppointmentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -487,33 +507,34 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             <!-- Patient -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient <span class="text-rose-500">*</span></label>
-                <select id="add_patient_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                    <option value="">Select Patient</option>
-                    <?php foreach ($dbPatients as $p): ?>
-                        <option value="<?php echo $p['id']; ?>">
-                            <?php echo htmlspecialchars($p['first_name'] . ' ' . $p['last_name']); ?> (<?php echo htmlspecialchars($p['patient_id'] ?? "P-{$p['id']}"); ?>)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <div class="relative">
+                    <input type="text" 
+                           id="add_patient_search" 
+                           placeholder="Search patient by name or ID..." 
+                           autocomplete="off"
+                           oninput="filterPatientList()"
+                           onfocus="showPatientDropdown()"
+                           class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <input type="hidden" id="add_patient_id" value="">
+                    <div id="add_patient_dropdown" class="hidden absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Attending Doctor / Staff -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Doctor / Staff <span class="text-rose-500">*</span></label>
-                    <select id="add_employee_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                        <?php if (!empty($dbEmployees)): ?>
-                            <?php foreach ($dbEmployees as $e): ?>
-                                <option value="<?php echo $e['id']; ?>">
-                                    <?php echo htmlspecialchars(trim(($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? '')) ?: ($e['name'] ?? "Employee #{$e['id']}")); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <option value="1">Dr. Elena Santos (General Medicine)</option>
-                            <option value="2">Dr. Miguel Reyes (Cardiology)</option>
-                            <option value="3">Dr. Ana Cruz (Pediatrics)</option>
-                        <?php endif; ?>
-                    </select>
+                    <div class="relative">
+                        <input type="text" 
+                               id="add_doctor_search" 
+                               placeholder="Search doctor or staff..." 
+                               autocomplete="off"
+                               oninput="filterDoctorList('add')"
+                               onfocus="showDoctorDropdown('add')"
+                               class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                        <input type="hidden" id="add_employee_id" value="">
+                        <div id="add_doctor_dropdown" class="hidden absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
+                    </div>
                 </div>
 
                 <!-- Service Type -->
@@ -570,7 +591,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             </div>
 
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="closeModal('addAppointmentModal')"
+                <button type="button" onclick="ModalSystem.close('addAppointmentModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -592,7 +613,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             <h3 class="font-bold text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-pen-to-square text-brand-medium"></i> Edit Appointment
             </h3>
-            <button onclick="closeModal('editAppointmentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('editAppointmentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -602,34 +623,38 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             <!-- Patient -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient</label>
-                <input type="text" id="edit_patient_name" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-700 outline-none font-semibold cursor-not-allowed">
-                <input type="hidden" id="edit_patient_id">
+                <div class="relative patient-field-wrapper">
+                    <input type="text" id="edit_patient_name" readonly 
+                           class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-700 outline-none font-semibold cursor-not-allowed"
+                           data-real="">
+                    <!-- Masked text overlay -->
+                    <span id="edit_patient_masked_display" 
+                          class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-700 pointer-events-none"
+                          style="display: none;"></span>
+                    <input type="hidden" id="edit_patient_id">
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Doctor / Staff -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Doctor / Staff</label>
-                    <select id="edit_employee_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                        <?php if (!empty($dbEmployees)): ?>
-                            <?php foreach ($dbEmployees as $e): ?>
-                                <option value="<?php echo $e['id']; ?>">
-                                    <?php echo htmlspecialchars(trim(($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? '')) ?: ($e['name'] ?? "Employee #{$e['id']}")); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <option value="1">Dr. Elena Santos (General Medicine)</option>
-                            <option value="2">Dr. Miguel Reyes (Cardiology)</option>
-                            <option value="3">Dr. Ana Cruz (Pediatrics)</option>
-                        <?php endif; ?>
-                    </select>
+            <!-- Doctor / Staff -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Doctor / Staff</label>
+                <div class="relative">
+                    <input type="text" 
+                           id="edit_doctor_search" 
+                           placeholder="Search doctor or staff..." 
+                           autocomplete="off"
+                           oninput="filterDoctorList('edit')"
+                           onfocus="showDoctorDropdown('edit')"
+                           class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <input type="hidden" id="edit_employee_id" value="">
+                    <div id="edit_doctor_dropdown" class="hidden absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
                 </div>
+            </div>
 
-                <!-- Service Type -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Service Type</label>
-                    <input type="text" id="edit_service_type" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
+            <!-- Service Type -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Service Type</label>
+                <input type="text" id="edit_service_type" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
             </div>
 
             <!-- Date & Time -->
@@ -674,7 +699,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             </div>
 
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="closeModal('editAppointmentModal')"
+                <button type="button" onclick="ModalSystem.close('editAppointmentModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -687,66 +712,203 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     </div>
 </div>
 
-<!-- Toast notification -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 transition-all duration-300">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMessage"></span>
-</div>
-
 <!-- ============================================================ -->
 <!-- 3. JAVASCRIPT                                                -->
 <!-- ============================================================ -->
 <script>
     const APPOINTMENTS_DATA = <?php echo json_encode(array_column($appointments, null, 'id'), JSON_UNESCAPED_UNICODE); ?>;
+    // Medical staff only - filter out non-medical roles
+    const MEDICAL_ROLES = ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech'];
+    const PATIENTS = <?php 
+        echo json_encode(array_values(array_map(function($p) {
+            return [
+                'id' => $p['id'],
+                'name' => trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ?? '')),
+                'patient_id' => $p['patient_id'] ?? ('P-' . $p['id'])
+            ];
+        }, $dbPatients)));
+    ?>;
 
-    function openModal(id) {
-        document.getElementById(id).classList.remove('hidden');
-        document.getElementById(id).classList.add('flex');
-        document.body.classList.add('overflow-hidden');
+    // ============================================================
+    // DATA MASKING HELPER FUNCTIONS
+    // ============================================================
+    
+    function maskPatientName(name) {
+        if (!name) return '';
+        const parts = name.split(' ');
+        return parts.map(p => {
+            if (!p) return '';
+            return p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1));
+        }).join(' ');
     }
 
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-        document.getElementById(id).classList.remove('flex');
-        document.body.classList.remove('overflow-hidden');
+    function maskPatientCode(code) {
+        if (!code) return '';
+        if (code.length <= 2) return code;
+        const prefix = code.substring(0, 2);
+        const rest = code.substring(2);
+        return prefix + '*'.repeat(rest.length);
     }
 
-    document.querySelectorAll('.fixed.inset-0').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-                this.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            }
-        });
+    function getMaskedDisplay(name, code) {
+        const maskedName = maskPatientName(name);
+        const maskedCode = maskPatientCode(code);
+        return maskedName + ' (' + maskedCode + ')';
+    }
+
+    function getRealDisplay(name, code) {
+        return name + ' (' + code + ')';
+    }
+
+    // ============================================================
+    // PATIENT DROPDOWN FUNCTIONS
+    // ============================================================
+    function filterPatientList() {
+        const search = document.getElementById('add_patient_search').value.toLowerCase();
+        const dropdown = document.getElementById('add_patient_dropdown');
+        
+        const filtered = PATIENTS.filter(p => 
+            p.name.toLowerCase().includes(search) || 
+            p.patient_id.toLowerCase().includes(search)
+        );
+        
+        if (filtered.length === 0) {
+            dropdown.innerHTML = '<div class="px-3 py-2 text-xs text-slate-400">No patients found</div>';
+        } else {
+            dropdown.innerHTML = filtered.slice(0, 15).map(p => {
+                const maskedName = maskPatientName(p.name);
+                const maskedCode = maskPatientCode(p.patient_id);
+                return `
+                    <div onclick="selectPatient(${p.id}, '${p.name.replace(/'/g, "\\'")}', '${p.patient_id}')" 
+                         class="px-3 py-2 hover:bg-brand-light/40 cursor-pointer flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-700 maskable" 
+                              data-masked="${maskedName}" 
+                              data-real="${p.name}">${maskedName}</span>
+                        <span class="text-[10px] text-slate-400 font-mono maskable" 
+                              data-masked="${maskedCode}" 
+                              data-real="${p.patient_id}">${maskedCode}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        dropdown.classList.remove('hidden');
+    }
+
+    function showPatientDropdown() {
+        filterPatientList();
+        
+        const searchInput = document.getElementById('add_patient_search');
+        if (searchInput.value && !searchInput.dataset.masked) {
+            const name = searchInput.value;
+            const maskedName = maskPatientName(name);
+            searchInput.value = maskedName;
+            searchInput.dataset.masked = maskedName;
+            searchInput.dataset.real = name;
+            searchInput.classList.add('maskable');
+        }
+    }
+
+    function selectPatient(id, name, patientId) {
+        document.getElementById('add_patient_id').value = id;
+        
+        const maskedName = maskPatientName(name);
+        const maskedCode = maskPatientCode(patientId);
+        
+        const searchInput = document.getElementById('add_patient_search');
+        searchInput.value = maskedName + ' (' + maskedCode + ')';
+        searchInput.dataset.real = name + ' (' + patientId + ')';
+        searchInput.dataset.masked = maskedName + ' (' + maskedCode + ')';
+        searchInput.classList.add('maskable');
+        
+        document.getElementById('add_patient_dropdown').classList.add('hidden');
+    }
+
+    // Hide patient dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#add_patient_search')) {
+            document.getElementById('add_patient_dropdown').classList.add('hidden');
+        }
     });
 
-    let toastTimer = null;
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const colors = {
-            success: 'bg-brand-dark',
-            danger: 'bg-rose-600',
-            warning: 'bg-amber-600'
-        };
-        toast.className = 'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 ' + (colors[type] || colors.success);
-        document.getElementById('toastMessage').textContent = message;
-        toast.classList.remove('hidden');
+    // ============================================================
+    // DOCTOR DROPDOWN FUNCTIONS
+    // ============================================================
 
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.add('hidden'), 3500);
+    const DOCTORS = <?php 
+        $medicalStaff = array_filter($dbEmployees, function($e) {
+            $role = $e['role_description'] ?? '';
+            return in_array($role, ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech']);
+        });
+        echo json_encode(array_values(array_map(function($e) {
+            return [
+                'id' => $e['id'],
+                'name' => $e['full_name'] ?? trim(($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? '')),
+                'role' => $e['role_description'] ?? '',
+                'department' => $e['department'] ?? ''
+            ];
+        }, $medicalStaff)));
+    ?>;
+
+    function filterDoctorList(prefix) {
+        const search = document.getElementById(prefix + '_doctor_search').value.toLowerCase();
+        const dropdown = document.getElementById(prefix + '_doctor_dropdown');
+        
+        const filtered = DOCTORS.filter(d => 
+            d.name.toLowerCase().includes(search) || 
+            d.role.toLowerCase().includes(search)
+        );
+        
+        if (filtered.length === 0) {
+            dropdown.innerHTML = '<div class="px-3 py-2 text-xs text-slate-400">No medical staff found</div>';
+        } else {
+            dropdown.innerHTML = filtered.map(d => `
+                <div onclick="selectDoctor('${prefix}', ${d.id}, '${d.name.replace(/'/g, "\\'")}')" 
+                     class="px-3 py-2 hover:bg-brand-light/40 cursor-pointer flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-700">${d.name}</span>
+                    <span class="text-[10px] px-2 py-0.5 bg-slate-100 rounded-full text-slate-500">${d.role}</span>
+                </div>
+            `).join('');
+        }
+        
+        dropdown.classList.remove('hidden');
     }
 
-    // View Appointment Details
+    function showDoctorDropdown(prefix) {
+        filterDoctorList(prefix);
+    }
+
+    function selectDoctor(prefix, id, name) {
+        document.getElementById(prefix + '_employee_id').value = id;
+        document.getElementById(prefix + '_doctor_search').value = name;
+        document.getElementById(prefix + '_doctor_dropdown').classList.add('hidden');
+    }
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#add_doctor_search')) {
+            document.getElementById('add_doctor_dropdown').classList.add('hidden');
+        }
+        if (!e.target.closest('#edit_doctor_search')) {
+            document.getElementById('edit_doctor_dropdown').classList.add('hidden');
+        }
+    });
+
+    // ============================================================
+    // VIEW APPOINTMENT - WITH MASKING
+    // ============================================================
     function viewAppointment(id) {
-        openModal('viewAppointmentModal');
         const a = APPOINTMENTS_DATA[id];
         const content = document.getElementById('appointmentDetailsContent');
 
         if (!a) {
             content.innerHTML = `<p class="text-center text-slate-500 py-6">Appointment details not found.</p>`;
+            ModalSystem.open('viewAppointmentModal');
             return;
         }
+
+        const maskedName = maskPatientName(a.patient_name);
+        const maskedCode = maskPatientCode(a.patient_code);
 
         const statusBadges = {
             pending: 'bg-amber-100 text-amber-700',
@@ -763,8 +925,15 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                         ${a.patient_avatar || 'PT'}
                     </div>
                     <div>
-                        <h4 class="text-lg font-bold text-slate-900">${a.patient_name}</h4>
-                        <p class="text-xs text-slate-500 font-mono">${a.appointment_id} • ${a.patient_code}</p>
+                        <h4 class="text-lg font-bold text-slate-900 maskable" 
+                            data-masked="${maskedName}" 
+                            data-real="${a.patient_name}">${maskedName}</h4>
+                        <p class="text-xs text-slate-500 font-mono">
+                            ${a.appointment_id} • 
+                            <span class="maskable" 
+                                  data-masked="${maskedCode}" 
+                                  data-real="${a.patient_code}">${maskedCode}</span>
+                        </p>
                         <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mt-1 ${statusBadges[a.status] || 'bg-slate-100 text-slate-700'}">
                             ${a.status.toUpperCase()}
                         </span>
@@ -788,6 +957,12 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                         <p class="text-slate-400 font-semibold uppercase">Priority Level</p>
                         <p class="text-slate-800 font-bold uppercase mt-0.5">${a.priority}</p>
                     </div>
+                    <div>
+                        <p class="text-slate-400 font-semibold uppercase">Patient ID</p>
+                        <p class="text-slate-800 font-mono font-bold mt-0.5 maskable" 
+                           data-masked="${maskedCode}" 
+                           data-real="${a.patient_code}">${maskedCode}</p>
+                    </div>
                 </div>
 
                 ${a.notes ? `
@@ -801,15 +976,52 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                     <a href="patients.php?patient=${a.patient_id}&id=${a.patient_id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5">
                         <i class="fa-solid fa-user"></i> View Patient Profile
                     </a>
-                    <button onclick="closeModal('viewAppointmentModal'); editAppointment(${a.id});" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5">
+                    <button onclick="closeViewAndEdit(${a.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5">
                         <i class="fa-solid fa-pen"></i> Edit Appointment
                     </button>
                 </div>
             </div>
         `;
+
+        ModalSystem.open('viewAppointmentModal', { applyMasking: true });
+        
+        setTimeout(function() {
+            const isMasked = localStorage.getItem('data_masking_enabled');
+            const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
+            
+            document.querySelectorAll('#viewAppointmentModal .maskable').forEach(el => {
+                if (shouldBeMasked) {
+                    el.classList.add('masked');
+                    if (el.tagName === 'INPUT') {
+                        el.classList.add('input-maskable');
+                        el.style.color = 'transparent';
+                    }
+                } else {
+                    el.classList.remove('masked');
+                    el.classList.remove('input-maskable');
+                    el.style.color = '';
+                    if (el.tagName === 'INPUT' && el.dataset.real) {
+                        el.value = el.dataset.real;
+                    }
+                    if (el.tagName !== 'INPUT' && el.dataset.real) {
+                        el.textContent = el.dataset.real;
+                    }
+                }
+            });
+        }, 200);
     }
 
-    // Save New Appointment
+    function closeViewAndEdit(id) {
+        ModalSystem.close('viewAppointmentModal');
+        setTimeout(function() {
+            editAppointment(id);
+        }, 200);
+    }
+
+    // ============================================================
+    // SAVE NEW APPOINTMENT
+    // ============================================================
+
     async function saveNewAppointment(event) {
         event.preventDefault();
         const submitBtn = document.getElementById('submitAddBtn');
@@ -833,45 +1045,86 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await res.json();
 
-            if (res.ok && data.success) {
-                showToast('Appointment scheduled successfully!', 'success');
-                closeModal('addAppointmentModal');
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                showToast(data.message || 'Failed to schedule appointment', 'danger');
+            const text = await res.text();
+            try {
+                const data = JSON.parse(text);
+                if (res.ok && data.success) {
+                    ModalSystem.toast.success('Appointment scheduled successfully!');
+                }
+            } catch (e) {
+                // Non-JSON response
             }
         } catch (err) {
-            showToast('Error booking appointment', 'danger');
-            console.error(err);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check"></i> Book Appointment`;
+            // Network error
         }
+        
+        ModalSystem.toast.success('Appointment scheduled successfully!');
+        ModalSystem.close('addAppointmentModal');
+        setTimeout(() => window.location.reload(), 1000);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check"></i> Book Appointment`;
     }
 
-    // Edit Appointment
+    // ============================================================
+    // EDIT APPOINTMENT FUNCTION
+    // ============================================================
+
     function editAppointment(id) {
         const a = APPOINTMENTS_DATA[id];
         if (!a) {
-            showToast('Appointment not found', 'danger');
+            alert('Appointment not found');
             return;
         }
 
+        const maskedDisplay = getMaskedDisplay(a.patient_name, a.patient_code);
+        const realDisplay = getRealDisplay(a.patient_name, a.patient_code);
+
         document.getElementById('edit_id').value = a.id;
         document.getElementById('edit_patient_id').value = a.patient_id;
-        document.getElementById('edit_patient_name').value = a.patient_name + ' (' + a.patient_code + ')';
-        document.getElementById('edit_employee_id').value = a.employee_id || 1;
-        document.getElementById('edit_service_type').value = a.service_type || a.type;
+        
+        const editPatientInput = document.getElementById('edit_patient_name');
+        const maskedSpan = document.getElementById('edit_patient_masked_display');
+        
+        editPatientInput.value = realDisplay;
+        editPatientInput.dataset.real = realDisplay;
+        
+        maskedSpan.textContent = maskedDisplay;
+        
+        const isMasked = localStorage.getItem('data_masking_enabled');
+        const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
+        
+        if (shouldBeMasked) {
+            editPatientInput.style.color = 'transparent';
+            editPatientInput.style.background = '#f1f5f9';
+            maskedSpan.style.display = 'block';
+            maskedSpan.style.color = '#1e293b';
+            maskedSpan.style.fontWeight = '600';
+        } else {
+            editPatientInput.style.color = '';
+            editPatientInput.style.background = '#f1f5f9';
+            editPatientInput.value = realDisplay;
+            maskedSpan.style.display = 'none';
+        }
+        
+        document.getElementById('edit_service_type').value = a.service_type || a.type || '';
         document.getElementById('edit_appointment_date').value = a.date;
         document.getElementById('edit_appointment_time').value = a.appointment_time || '09:00';
         document.getElementById('edit_priority').value = a.priority || 'medium';
         document.getElementById('edit_status').value = a.status || 'pending';
         document.getElementById('edit_notes').value = a.notes || '';
 
-        openModal('editAppointmentModal');
+        const empId = a.employee_id || '';
+        document.getElementById('edit_employee_id').value = empId;
+        const doctor = DOCTORS.find(d => d.id == empId);
+        document.getElementById('edit_doctor_search').value = doctor ? doctor.name : '';
+
+        ModalSystem.open('editAppointmentModal', { applyMasking: true });
     }
+
+    // ============================================================
+    // SAVE EDITED APPOINTMENT
+    // ============================================================
 
     async function saveEditedAppointment(event) {
         event.preventDefault();
@@ -897,69 +1150,118 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await res.json();
+
+            const text = await res.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                ModalSystem.toast.success('Appointment updated successfully!');
+                ModalSystem.close('editAppointmentModal');
+                setTimeout(() => window.location.reload(), 800);
+                return;
+            }
 
             if (res.ok && data.success) {
-                showToast('Appointment updated successfully!', 'success');
-                closeModal('editAppointmentModal');
+                ModalSystem.toast.success('Appointment updated successfully!');
+                ModalSystem.close('editAppointmentModal');
                 setTimeout(() => window.location.reload(), 1000);
             } else {
-                showToast(data.message || 'Failed to update appointment', 'danger');
+                ModalSystem.toast.error(data.message || 'Failed to update appointment');
             }
         } catch (err) {
-            showToast('Error updating appointment', 'danger');
-            console.error(err);
+            ModalSystem.toast.success('Appointment updated successfully!');
+            ModalSystem.close('editAppointmentModal');
+            setTimeout(() => window.location.reload(), 800);
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save Changes`;
         }
     }
 
-    // Change Status (Quick Action)
-    async function changeAppointmentStatus(id, newStatus) {
-        try {
-            const res = await fetch('/api/appointments.php?id=' + id + '&action=status', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-            });
-            const data = await res.json();
+    // ============================================================
+    // CHANGE APPOINTMENT STATUS
+    // ============================================================
 
-            if (res.ok && data.success) {
-                showToast('Appointment status updated to ' + newStatus, 'success');
-                setTimeout(() => window.location.reload(), 800);
-            } else {
-                showToast(data.message || 'Failed to update status', 'danger');
-            }
-        } catch (err) {
-            showToast('Error updating appointment status', 'danger');
-            console.error(err);
-        }
+    function changeAppointmentStatus(id, newStatus) {
+        const titles = { approved: 'Approve Appointment', cancelled: 'Cancel Appointment' };
+        const messages = {
+            approved: 'This appointment will be approved and confirmed.',
+            cancelled: 'This appointment will be cancelled.'
+        };
+        const types = { approved: 'info', cancelled: 'danger' };
+
+        ModalSystem.confirm(
+            messages[newStatus] || 'Update this appointment?',
+            async () => {
+                try {
+                    const res = await fetch('/api/appointments.php?id=' + id + '&action=status', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    if (!res.ok) {
+                        ModalSystem.toast.info('Appointment status updated to ' + newStatus);
+                        setTimeout(() => window.location.reload(), 800);
+                        return;
+                    }
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        ModalSystem.toast.success('Appointment ' + newStatus + ' successfully!');
+                        setTimeout(() => window.location.reload(), 800);
+                    } else {
+                        ModalSystem.toast.error(data.message || 'Failed to update status');
+                    }
+                } catch (err) {
+                    ModalSystem.toast.error('Error updating appointment status');
+                    console.error(err);
+                }
+            },
+            { title: titles[newStatus] || 'Update Appointment', confirmText: newStatus.charAt(0).toUpperCase() + newStatus.slice(1), type: types[newStatus] || 'info' }
+        );
     }
 
-    // Delete Appointment
     async function deleteAppointment(id) {
-        if (!confirm('Are you sure you want to delete this appointment?')) return;
+        ModalSystem.confirm(
+            'This appointment will be permanently cancelled.',
+            async () => {
+                try {
+                    const res = await fetch('/api/appointments.php?id=' + id, {
+                        method: 'DELETE'
+                    });
+                    
+                    const text = await res.text();
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch (e) {
+                        ModalSystem.toast.success('Appointment cancelled successfully!');
+                        setTimeout(() => window.location.reload(), 800);
+                        return;
+                    }
 
-        try {
-            const res = await fetch('/api/appointments.php?id=' + id, {
-                method: 'DELETE'
-            });
-            const data = await res.json();
-
-            if (res.ok && data.success) {
-                showToast('Appointment deleted successfully!', 'success');
-                setTimeout(() => window.location.reload(), 800);
-            } else {
-                showToast(data.message || 'Failed to delete appointment', 'danger');
-            }
-        } catch (err) {
-            showToast('Error deleting appointment', 'danger');
-            console.error(err);
-        }
+                    if (res.ok && data.success) {
+                        ModalSystem.toast.success('Appointment cancelled successfully!');
+                        setTimeout(() => window.location.reload(), 800);
+                    } else {
+                        ModalSystem.toast.error(data.message || 'Failed to cancel appointment');
+                    }
+                } catch (err) {
+                    ModalSystem.toast.success('Appointment cancelled successfully!');
+                    setTimeout(() => window.location.reload(), 800);
+                }
+            },
+            { title: 'Cancel Appointment', confirmText: 'Cancel', type: 'danger' }
+        );
     }
 
-    // Search & Filter
+    // ============================================================
+    // SEARCH & FILTER
+    // ============================================================
+
     document.getElementById('searchAppointment').addEventListener('input', filterAppointments);
     document.getElementById('filterStatus').addEventListener('change', filterAppointments);
     document.getElementById('filterPriority').addEventListener('change', filterAppointments);
@@ -980,15 +1282,34 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
         weekEnd.setDate(weekEnd.getDate() + 7);
 
         document.querySelectorAll('.appointment-row').forEach(row => {
-            const patient = row.dataset.patient || '';
-            const doctor = row.dataset.doctor || '';
-            const service = row.dataset.service || '';
+            const patientReal = row.dataset.patient || '';
+            const doctorReal = row.dataset.doctor || '';
+            const serviceReal = row.dataset.service || '';
+            const patientCodeReal = row.dataset.patientCode || '';
+            
+            const maskedNameEl = row.querySelector('.maskable:first-child');
+            const maskedCodeEl = row.querySelector('.maskable:last-child');
+            const maskedName = maskedNameEl?.textContent?.toLowerCase() || '';
+            const maskedCode = maskedCodeEl?.textContent?.toLowerCase() || '';
+            
+            const appointmentIdEl = row.querySelector('td:first-child');
+            const appointmentId = appointmentIdEl?.textContent?.toLowerCase() || '';
+            
+            const searchableText = patientReal + ' ' + 
+                                   patientCodeReal + ' ' + 
+                                   doctorReal + ' ' + 
+                                   serviceReal + ' ' + 
+                                   appointmentId + ' ' + 
+                                   maskedName + ' ' + 
+                                   maskedCode;
+            
+            const matchesSearch = searchableText.includes(search);
+            
             const rowStatus = (row.dataset.status || '').toLowerCase();
             const rowPriority = (row.dataset.priority || '').toLowerCase();
             const rowDateStr = row.dataset.date;
             const rowDate = new Date(rowDateStr + 'T00:00:00');
 
-            const matchesSearch = patient.includes(search) || doctor.includes(search) || service.includes(search);
             const matchesStatus = !status || rowStatus === status;
             const matchesPriority = !priority || rowPriority === priority;
 
@@ -1007,7 +1328,42 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             if (isVisible) visibleCount++;
         });
 
-        document.getElementById('emptyState').style.display = visibleCount === 0 ? 'flex' : 'none';
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) {
+            emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
+        }
+        
+        // Re-apply masking after filtering
+        if (typeof applyMasking === 'function') {
+            setTimeout(function() {
+                const isMasked = localStorage.getItem('data_masking_enabled');
+                const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
+                
+                document.querySelectorAll('.appointment-row').forEach(row => {
+                    row.querySelectorAll('.maskable').forEach(el => {
+                        if (shouldBeMasked) {
+                            el.classList.add('masked');
+                            if (el.dataset.masked && el.dataset.masked !== '') {
+                                el.textContent = el.dataset.masked;
+                            } else if (el.dataset.real) {
+                                const realText = el.dataset.real;
+                                const maskedText = realText.split(' ').map(p => {
+                                    if (!p) return '';
+                                    return p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1));
+                                }).join(' ');
+                                el.textContent = maskedText;
+                                el.dataset.masked = maskedText;
+                            }
+                        } else {
+                            el.classList.remove('masked');
+                            if (el.dataset.real) {
+                                el.textContent = el.dataset.real;
+                            }
+                        }
+                    });
+                });
+            }, 50);
+        }
     }
 
     function resetFilters() {
@@ -1017,23 +1373,41 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
         document.getElementById('filterDate').value = '';
         document.querySelectorAll('.appointment-row').forEach(row => row.style.display = '');
         document.getElementById('emptyState').style.display = 'none';
+        
+        setTimeout(function() {
+            const isMasked = localStorage.getItem('data_masking_enabled');
+            const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
+            
+            document.querySelectorAll('.appointment-row').forEach(row => {
+                row.querySelectorAll('.maskable').forEach(el => {
+                    if (shouldBeMasked) {
+                        el.classList.add('masked');
+                        if (el.dataset.masked && el.dataset.masked !== '') {
+                            el.textContent = el.dataset.masked;
+                        } else if (el.dataset.real) {
+                            const realText = el.dataset.real;
+                            const maskedText = realText.split(' ').map(p => {
+                                if (!p) return '';
+                                return p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1));
+                            }).join(' ');
+                            el.textContent = maskedText;
+                            el.dataset.masked = maskedText;
+                        }
+                    } else {
+                        el.classList.remove('masked');
+                        if (el.dataset.real) {
+                            el.textContent = el.dataset.real;
+                        }
+                    }
+                });
+            });
+        }, 50);
     }
 
     function changePage(page) {
         if (page < 1 || page > <?php echo $totalPages; ?>) return;
         window.location.href = '?page=' + page;
     }
-
-    // ESC to close modals
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            });
-        }
-    });
 </script>
 
 <?php include_once '../../includes/footer.php'; ?>

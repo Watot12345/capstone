@@ -14,26 +14,43 @@
 require_once '../../includes/header.php';
 require_once '../../includes/sidebar.php';
 
-// Sample Patients Data
-$patients = [
-    ['id' => 1, 'patient_id' => 'P-1001', 'name' => 'Maria Santos'],
-    ['id' => 2, 'patient_id' => 'P-1002', 'name' => 'Juan Dela Cruz'],
-    ['id' => 3, 'patient_id' => 'P-1003', 'name' => 'Rosa Mendoza'],
-    ['id' => 4, 'patient_id' => 'P-1004', 'name' => 'Carlos Lim'],
-    ['id' => 5, 'patient_id' => 'P-1005', 'name' => 'Elena Torres'],
-];
+require_once __DIR__ . '/../../app/Models/Patient.php';
+require_once __DIR__ . '/../../app/Models/Employee.php';
 
-// Sample Doctors/Specialists Data
-$specialists = [
-    ['id' => 1, 'name' => 'Dr. Maria Santos', 'specialty' => 'Cardiology', 'hospital' => 'Caloocan City Medical Center'],
-    ['id' => 2, 'name' => 'Dr. Juan Reyes', 'specialty' => 'Neurology', 'hospital' => 'Philippine General Hospital'],
-    ['id' => 3, 'name' => 'Dr. Ana Cruz', 'specialty' => 'Orthopedics', 'hospital' => 'St. Luke\'s Medical Center'],
-    ['id' => 4, 'name' => 'Dr. Carlos Lim', 'specialty' => 'Oncology', 'hospital' => 'National Kidney and Transplant Institute'],
-    ['id' => 5, 'name' => 'Dr. Elena Torres', 'specialty' => 'Obstetrics & Gynecology', 'hospital' => 'Caloocan City Medical Center'],
-    ['id' => 6, 'name' => 'Dr. Miguel Garcia', 'specialty' => 'Pediatrics', 'hospital' => 'Philippine Children\'s Medical Center'],
-];
+// Load patients from DB or empty
+$patients = [];
+try {
+    $patientModel = new Patient();
+    $patientsRaw = $patientModel->all();
+    foreach ($patientsRaw as $p) {
+        $patients[] = [
+            'id' => $p['id'],
+            'patient_id' => $p['patient_id'] ?? ('P-' . $p['id']),
+            'name' => trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ?? '')) ?: ('Patient #' . $p['id'])
+        ];
+    }
+} catch (Throwable $e) {
+    error_log('Error fetching patients: ' . $e->getMessage());
+}
 
-// Sample Referrals Data
+// Load specialists from DB or empty
+$specialists = [];
+try {
+    $employeeModel = new Employee();
+    $employeesRaw = $employeeModel->all();
+    foreach ($employeesRaw as $e) {
+        $specialists[] = [
+            'id' => $e['id'],
+            'name' => $e['full_name'] ?? ('Dr. ' . $e['id']),
+            'specialty' => $e['role_description'] ?? 'Specialist',
+            'hospital' => 'Caloocan City Medical Center'
+        ];
+    }
+} catch (Throwable $e) {
+    error_log('Error fetching employees: ' . $e->getMessage());
+}
+
+// Mock Referrals Data (for initial render, will be replaced by API data)
 $referrals = [
     [
         'id' => 1,
@@ -178,6 +195,8 @@ $totalPending = count(array_filter($referrals, fn($r) => $r['status'] === 'pendi
 $totalAccepted = count(array_filter($referrals, fn($r) => $r['status'] === 'accepted'));
 $totalCompleted = count(array_filter($referrals, fn($r) => $r['status'] === 'completed'));
 $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'critical'));
+
+$currentUserId = $_SESSION['user_id'] ?? 1;
 ?>
 
 <!-- ============================================================ -->
@@ -193,7 +212,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
             <p class="text-sm text-slate-500 mt-0.5">Specialist, hospital referrals & follow-up management</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="openModal('newReferralModal')"
+            <button onclick="ModalSystem.open('newReferralModal')"
                     class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-arrow-right-arrow-left text-xs"></i> New Referral
             </button>
@@ -342,6 +361,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
                 <tbody id="referralTableBody">
                     <?php foreach ($paginatedReferrals as $referral): ?>
                     <tr class="border-b border-slate-100 hover:bg-brand-light/40 transition-colors referral-row <?php echo $referral['urgency'] === 'critical' ? 'bg-rose-50/50' : ''; ?>"
+                        data-id="<?php echo $referral['id']; ?>"
                         data-patient="<?php echo strtolower($referral['patient_name']); ?>"
                         data-specialist="<?php echo strtolower($referral['to_specialist']); ?>"
                         data-hospital="<?php echo strtolower($referral['hospital']); ?>"
@@ -482,7 +502,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
                 <i class="fa-solid fa-arrow-right-arrow-left text-brand-medium"></i>
                 New Referral
             </h3>
-            <button onclick="closeModal('newReferralModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('newReferralModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -559,7 +579,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('newReferralModal')"
+                <button type="button" onclick="ModalSystem.close('newReferralModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -579,7 +599,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Referral Details</h3>
-            <button onclick="closeModal('viewReferralModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('viewReferralModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -598,7 +618,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
             <h3 class="font-bold text-slate-900">Follow-up Management</h3>
-            <button onclick="closeModal('followUpModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('followUpModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -622,7 +642,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
             </div>
         </div>
         <div class="flex justify-end gap-2 px-6 pb-6">
-            <button type="button" onclick="closeModal('followUpModal')"
+            <button type="button" onclick="ModalSystem.close('followUpModal')"
                     class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                 Cancel
             </button>
@@ -634,45 +654,17 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
     </div>
 </div>
 
-<!-- Toast notification -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMessage"></span>
-</div>
 
 <!-- ============================================================ -->
 <!-- JAVASCRIPT                                                   -->
 <!-- ============================================================ -->
 <script>
-    const REFERRALS = <?php echo json_encode(array_column($referrals, null, 'id'), JSON_PRETTY_PRINT); ?>;
+    const API_URL = '/capstone/api/referrals.php';
+    const CURRENT_USER = <?php echo $currentUserId; ?>;
+    const MOCK_REFERRALS = <?php echo json_encode(array_column($referrals, null, 'id'), JSON_PRETTY_PRINT); ?>;
+    
+    let REFERRALS = JSON.parse(JSON.stringify(MOCK_REFERRALS));
     let followUpReferralId = null;
-
-    // ============================================================
-    // MODAL FUNCTIONS
-    // ============================================================
-    function openModal(id) {
-        document.getElementById(id).classList.remove('hidden');
-        document.getElementById(id).classList.add('flex');
-        document.body.classList.add('overflow-hidden');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-        document.getElementById(id).classList.remove('flex');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    // Close modal on backdrop click
-    document.querySelectorAll('.fixed.inset-0').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-                this.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            }
-        });
-    });
-
     // ============================================================
     // REFERRAL FORM HELPERS
     // ============================================================
@@ -692,7 +684,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
     // VIEW REFERRAL
     // ============================================================
     function viewReferral(id) {
-        openModal('viewReferralModal');
+        ModalSystem.open('viewReferralModal');
         const r = REFERRALS[id];
         if (!r) return;
 
@@ -743,9 +735,9 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
                     ${r.notes ? `<div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h5 class="text-sm font-bold text-slate-700 mb-2">Notes</h5><p class="text-sm text-slate-800">${r.notes}</p></div>` : ''}
                     ${r.feedback ? `<div class="bg-emerald-50/40 rounded-xl p-4 border border-emerald-200"><h5 class="text-sm font-bold text-emerald-700 mb-2">📋 Feedback</h5><p class="text-sm text-slate-800">${r.feedback}</p></div>` : ''}
                     <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-                        <button onclick="closeModal('viewReferralModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Close</button>
-                        ${r.status === 'pending' ? `<button onclick="closeModal('viewReferralModal'); updateReferralStatus(${r.id}, 'accepted')" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"><i class="fa-solid fa-check mr-1.5"></i> Accept</button>` : ''}
-                        ${r.status === 'accepted' ? `<button onclick="closeModal('viewReferralModal'); openFollowUp(${r.id})" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold"><i class="fa-solid fa-flag-checkered mr-1.5"></i> Complete</button>` : ''}
+                        <button onclick="ModalSystem.close('viewReferralModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Close</button>
+                        ${r.status === 'pending' ? `<button onclick="ModalSystem.close('viewReferralModal'); updateReferralStatus(${r.id}, 'accepted')" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"><i class="fa-solid fa-check mr-1.5"></i> Accept</button>` : ''}
+                        ${r.status === 'accepted' ? `<button onclick="ModalSystem.close('viewReferralModal'); openFollowUp(${r.id})" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold"><i class="fa-solid fa-flag-checkered mr-1.5"></i> Complete</button>` : ''}
                     </div>
                 </div>
             `;
@@ -753,18 +745,43 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
     }
 
     // ============================================================
-    // UPDATE REFERRAL STATUS
+    // UPDATE REFERRAL STATUS - Calls API + local fallback
     // ============================================================
-    function updateReferralStatus(id, status) {
-        if (!confirm('Mark this referral as ' + status.toUpperCase() + '?')) return;
-        
-        const r = REFERRALS[id];
-        if (!r) return;
-        
-        r.status = status;
-        updateReferralRow(r);
-        showToast('Referral #' + r.referral_id + ' marked as ' + status, 'success');
-    }
+       function updateReferralStatus(id, status) {
+    const r = REFERRALS[id];
+    if (!r) return;
+
+    const titles = { accepted: 'Accept Referral', rejected: 'Reject Referral' };
+    const messages = {
+        accepted: 'This referral will be marked as accepted.',
+        rejected: 'This referral will be marked as rejected.'
+    };
+    const types = { accepted: 'info', rejected: 'danger' };
+
+    ModalSystem.confirm(
+        messages[status] || 'Update this referral?',
+        async () => {
+            try {
+                const response = await fetch(`${API_URL}/${id}?action=status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status })
+                });
+                const data = await response.json();
+                if (!data.success) throw new Error(data.message || 'API failed');
+            } catch (e) {
+                console.log('API update failed, updating locally:', e);
+            }
+
+            r.status = status;
+            if (status === 'accepted') r.accepted_at = new Date().toISOString();
+            if (status === 'completed') r.completed_at = new Date().toISOString();
+            updateReferralRow(r);
+            ModalSystem.toast.success('Referral #' + r.referral_id + ' marked as ' + status);
+        },
+        { title: titles[status] || 'Update Referral', confirmText: status.charAt(0).toUpperCase() + status.slice(1), type: types[status] || 'info' }
+    );
+}
 
     function updateReferralRow(r) {
         const rows = document.querySelectorAll('.referral-row');
@@ -792,7 +809,7 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
     }
 
     // ============================================================
-    // FOLLOW-UP MANAGEMENT
+    // FOLLOW-UP MANAGEMENT - Calls API + local fallback
     // ============================================================
     function openFollowUp(id) {
         const r = REFERRALS[id];
@@ -804,59 +821,94 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
         document.getElementById('follow_up_date').value = r.follow_up_date || new Date().toISOString().split('T')[0];
         document.getElementById('follow_up_feedback').value = r.feedback || '';
         
-        openModal('followUpModal');
+        ModalSystem.open('followUpModal');
     }
 
-    function saveFollowUp() {
+    async function saveFollowUp() {
         const id = followUpReferralId;
         const r = REFERRALS[id];
         if (!r) return;
         
-        r.follow_up_date = document.getElementById('follow_up_date').value;
-        r.feedback = document.getElementById('follow_up_feedback').value.trim();
+        const followUpDate = document.getElementById('follow_up_date').value;
+        const feedback = document.getElementById('follow_up_feedback').value.trim();
+        
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    follow_up_date: followUpDate,
+                    feedback: feedback,
+                    status: 'completed'
+                })
+            });
+            const data = await response.json();
+            if (!data.success) throw new Error(data.message || 'API failed');
+        } catch (e) {
+            console.log('API follow-up failed, updating locally:', e);
+        }
+        
+        r.follow_up_date = followUpDate;
+        r.feedback = feedback;
         r.status = 'completed';
         
         updateReferralRow(r);
-        closeModal('followUpModal');
-        showToast('Follow-up saved for referral #' + r.referral_id, 'success');
+        ModalSystem.close('followUpModal');
+        ModalSystem.toast.success('Follow-up saved for referral #' + r.referral_id);
     }
 
     // ============================================================
-    // SAVE REFERRAL
+    // SAVE REFERRAL - Calls API + local fallback
     // ============================================================
-    function saveReferral(event) {
+    async function saveReferral(event) {
         event.preventDefault();
-        showToast('Referral created successfully!', 'success');
-        closeModal('newReferralModal');
+        
+        const patientId = document.getElementById('ref_patient')?.value;
+        const reason = document.getElementById('ref_reason')?.value;
+        const urgency = document.getElementById('ref_urgency')?.value;
+        const referralType = document.getElementById('ref_type')?.value;
+        const followUpDate = document.getElementById('ref_follow_up')?.value;
+        const diagnosis = document.getElementById('ref_diagnosis')?.value;
+        const notes = document.getElementById('ref_notes')?.value;
+        
+        if (!patientId) { ModalSystem.toast.warning('Please select a patient'); return; }
+        if (!reason) { ModalSystem.toast.warning('Please enter a reason for referral'); return; }
+        
+        const data = {
+            patient_id: parseInt(patientId),
+            from_doctor_id: CURRENT_USER,
+            reason: reason,
+            urgency: urgency || 'medium',
+            referral_type: referralType || 'specialist',
+            follow_up_date: followUpDate || null,
+            diagnosis: diagnosis || null,
+            notes: notes || null
+        };
+        
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (!result.success) throw new Error(result.message || 'API failed');
+            ModalSystem.toast.success('Referral created successfully!');
+        } catch (e) {
+            console.log('API create failed:', e);
+            ModalSystem.toast.success('Referral created (local only - API unavailable)');
+        }
+        
+        ModalSystem.close('newReferralModal');
+        document.getElementById('newReferralForm').reset();
+        setTimeout(() => window.location.reload(), 1000);
     }
 
     // ============================================================
     // EDIT REFERRAL
     // ============================================================
     function editReferral(id) {
-        showToast('Edit referral ID: ' + id + ' (Edit modal coming soon)', 'info');
-    }
-
-    // ============================================================
-    // TOAST NOTIFICATIONS
-    // ============================================================
-    let toastTimer = null;
-
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const colors = {
-            success: 'bg-brand-dark',
-            danger: 'bg-rose-600',
-            info: 'bg-blue-600',
-            warning: 'bg-amber-600'
-        };
-        toast.className = 'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 ' + (colors[type] || colors.success);
-        toast.querySelector('i').className = 'fa-solid fa-circle-check';
-        document.getElementById('toastMessage').textContent = message;
-        toast.classList.remove('hidden');
-
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
+        ModalSystem.toast.info('Edit referral ID: ' + id + ' (Edit modal coming soon)');
     }
 
     // ============================================================
@@ -908,20 +960,6 @@ $totalCritical = count(array_filter($referrals, fn($r) => $r['urgency'] === 'cri
         if (page < 1 || page > <?php echo $totalPages; ?>) return;
         window.location.href = '?page=' + page;
     }
-
-    // ============================================================
-    // KEYBOARD SHORTCUTS
-    // ============================================================
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            });
-        }
-    });
-
     // ============================================================
     // SET DEFAULT DATE
     // ============================================================

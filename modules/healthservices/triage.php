@@ -14,155 +14,166 @@
 require_once '../../includes/header.php';
 require_once '../../includes/sidebar.php';
 
-// Sample Patients Data
-$patients = [
-    ['id' => 1, 'patient_id' => 'P-1001', 'name' => 'Maria Santos'],
-    ['id' => 2, 'patient_id' => 'P-1002', 'name' => 'Juan Dela Cruz'],
-    ['id' => 3, 'patient_id' => 'P-1003', 'name' => 'Rosa Mendoza'],
-    ['id' => 4, 'patient_id' => 'P-1004', 'name' => 'Carlos Lim'],
-    ['id' => 5, 'patient_id' => 'P-1005', 'name' => 'Elena Torres'],
-];
+require_once __DIR__ . '/../../app/Models/Patient.php';
+require_once __DIR__ . '/../../app/Models/Employee.php';
+require_once __DIR__ . '/../../app/Models/Triage.php';
 
-// Sample Triage Data
-$triageQueue = [
-    [
-        'id' => 1,
-        'patient_id' => 1,
-        'patient_name' => 'Maria Santos',
-        'patient_avatar' => 'MS',
-        'age' => 41,
-        'gender' => 'Female',
-        'queue_number' => 1,
-        'queue_status' => 'waiting',
-        'arrival_time' => '08:30 AM',
-        'wait_time' => '45 mins',
-        'vital_signs' => [
-            'blood_pressure' => '140/90',
-            'heart_rate' => 82,
-            'temperature' => 36.5,
-            'respiratory_rate' => 18,
-            'oxygen_saturation' => 98,
-            'weight' => 75.5,
-            'height' => 165
-        ],
-        'priority' => 'medium',
-        'symptoms' => ['Headache', 'Dizziness', 'Blurred vision'],
-        'chief_complaint' => 'Severe headache and dizziness since yesterday',
-        'nurse_assigned' => 'Nurse Maria Cruz',
-        'status' => 'in_triage'
-    ],
-    [
-        'id' => 2,
-        'patient_id' => 2,
-        'patient_name' => 'Juan Dela Cruz',
-        'patient_avatar' => 'JD',
-        'age' => 35,
-        'gender' => 'Male',
-        'queue_number' => 2,
-        'queue_status' => 'waiting',
-        'arrival_time' => '09:15 AM',
-        'wait_time' => '30 mins',
-        'vital_signs' => [
-            'blood_pressure' => '180/110',
-            'heart_rate' => 95,
-            'temperature' => 37.2,
-            'respiratory_rate' => 20,
-            'oxygen_saturation' => 97,
-            'weight' => 85.0,
-            'height' => 175
-        ],
-        'priority' => 'critical',
-        'symptoms' => ['Chest pain', 'Shortness of breath', 'Nausea'],
-        'chief_complaint' => 'Severe chest pain radiating to left arm',
-        'nurse_assigned' => 'Nurse Anna Reyes',
-        'status' => 'in_triage'
-    ],
-    [
-        'id' => 3,
-        'patient_id' => 3,
-        'patient_name' => 'Rosa Mendoza',
-        'patient_avatar' => 'RM',
-        'age' => 28,
-        'gender' => 'Female',
-        'queue_number' => 3,
-        'queue_status' => 'waiting',
-        'arrival_time' => '09:45 AM',
+// Fetch Patients
+$patientModel = new Patient();
+$rawPatients = [];
+try {
+    $rawPatients = $patientModel->all();
+} catch (Throwable $e) {
+    error_log('Error fetching patients for triage: ' . $e->getMessage());
+}
+
+$patients = [];
+foreach ($rawPatients as $p) {
+    $firstName = $p['first_name'] ?? '';
+    $lastName = $p['last_name'] ?? '';
+    $name = trim($firstName . ' ' . $lastName);
+    if (empty($name)) {
+        $name = $p['name'] ?? ('Patient #' . ($p['id'] ?? ''));
+    }
+    $patients[] = [
+        'id' => $p['id'],
+        'patient_id' => $p['patient_id'] ?? ('P-' . $p['id']),
+        'name' => $name
+    ];
+}
+
+// Fetch Employees/Nurses
+$employeeModel = new Employee();
+$rawEmployees = [];
+try {
+    $rawEmployees = $employeeModel->all();
+} catch (Throwable $e) {
+    error_log('Error fetching employees for triage: ' . $e->getMessage());
+}
+
+$nurses = [];
+foreach ($rawEmployees as $emp) {
+    $empName = trim(($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? ''));
+    if (empty($empName)) $empName = $emp['name'] ?? ('Nurse #' . $emp['id']);
+    $nurses[] = [
+        'id' => $emp['id'],
+        'name' => 'Nurse ' . $empName
+    ];
+}
+
+
+// Fetch Triage Queue
+$triageModel = new Triage();
+$rawTriage = [];
+try {
+    $rawTriage = $triageModel->all(['order' => 'created_at.desc']);
+} catch (Throwable $e) {
+    error_log('Error fetching triage queue: ' . $e->getMessage());
+}
+
+$patientsMap = [];
+foreach ($rawPatients as $p) {
+    if (isset($p['id'])) $patientsMap[$p['id']] = $p;
+}
+
+$employeesMap = [];
+foreach ($rawEmployees as $emp) {
+    if (isset($emp['id'])) $employeesMap[$emp['id']] = $emp;
+}
+
+$triageQueue = [];
+$qNum = 1;
+foreach ($rawTriage as $t) {
+    $pId = $t['patient_id'] ?? null;
+    $patient = $patientsMap[$pId] ?? null;
+    if ($patient) {
+        $pName = trim(($patient['first_name'] ?? '') . ' ' . ($patient['last_name'] ?? ''));
+        if (empty($pName)) $pName = $patient['name'] ?? ('Patient #' . $pId);
+        $gender = $patient['gender'] ?? 'Unspecified';
+        $age = 'N/A';
+        if (isset($patient['birth_date'])) {
+            try {
+                $dob = new DateTime($patient['birth_date']);
+                $now = new DateTime();
+                $age = $now->diff($dob)->y;
+            } catch (Throwable $ex) {}
+        }
+    } else {
+        $pName = 'Patient #' . ($pId ?? 'N/A');
+        $gender = 'Unspecified';
+        $age = 'N/A';
+    }
+
+    $nId = $t['nurse_id'] ?? null;
+    $nurse = $employeesMap[$nId] ?? null;
+    $nurseName = $nurse ? trim(($nurse['first_name'] ?? '') . ' ' . ($nurse['last_name'] ?? '')) : '';
+    if (empty($nurseName)) $nurseName = 'Nurse Maria Cruz';
+    else $nurseName = 'Nurse ' . $nurseName;
+
+    $parts = explode(' ', $pName);
+    $initials = '';
+    foreach ($parts as $part) {
+        if (!empty($part)) $initials .= strtoupper($part[0]);
+    }
+    $avatar = substr($initials, 0, 2) ?: 'P';
+
+    $symStr = $t['symptoms'] ?? '';
+    $symArr = is_string($symStr) ? array_filter(array_map('trim', explode(',', $symStr))) : (array)$symStr;
+
+    $dbStatus = strtolower($t['status'] ?? 'pending');
+    $status = match($dbStatus) {
+        'pending' => 'waiting',
+        'triaged' => 'in_triage',
+        'consulted' => 'sent_to_doctor',
+        'cancelled' => 'cancelled',
+        default => 'in_triage'
+    };
+
+    $triageQueue[] = [
+        'id' => $t['id'],
+        'triage_id' => $t['triage_id'] ?? ('TRG-' . $t['id']),
+        'patient_id' => $pId,
+        'patient_name' => $pName,
+        'patient_avatar' => $avatar,
+        'age' => $age,
+        'gender' => $gender,
+        'queue_number' => $qNum++,
+        // Calculate BMI if not provided by DB
+        $bmi = isset($t['bmi']) ? $t['bmi'] : (isset($t['weight'], $t['height']) && $t['height'] > 0 ? round($t['weight'] / (($t['height']/100) * ($t['height']/100)), 1) : null),
+        'queue_status' => ($status === 'waiting' || $status === 'in_triage') ? 'waiting' : 'completed',
+        'arrival_time' => isset($t['created_at']) ? date('h:i A', strtotime($t['created_at'])) : date('h:i A'),
         'wait_time' => '15 mins',
         'vital_signs' => [
-            'blood_pressure' => '120/80',
-            'heart_rate' => 75,
-            'temperature' => 37.8,
-            'respiratory_rate' => 16,
-            'oxygen_saturation' => 99,
-            'weight' => 62.0,
-            'height' => 160
+            'blood_pressure' => $t['blood_pressure'] ?? '120/80',
+            'heart_rate' => $t['heart_rate'] ?? 75,
+            'temperature' => $t['temperature'] ?? 36.5,
+            'respiratory_rate' => $t['respiratory_rate'] ?? 18,
+            'oxygen_saturation' => $t['oxygen_saturation'] ?? 98,
+            'weight' => $t['weight'] ?? 65.0,
+            'height' => $t['height'] ?? 165.0,
+            'blood_sugar' => $t['blood_sugar'] ?? 'N/A',
+            'gcs_eye' => $t['gcs_eye'] ?? 0,
+            'gcs_verbal' => $t['gcs_verbal'] ?? 0,
+            'gcs_motor' => $t['gcs_motor'] ?? 0,
+            'gcs_total' => ($t['gcs_eye'] ?? 0) + ($t['gcs_verbal'] ?? 0) + ($t['gcs_motor'] ?? 0),
+            'bmi' => $bmi
         ],
-        'priority' => 'high',
-        'symptoms' => ['Fever', 'Cough', 'Body aches'],
-        'chief_complaint' => 'Fever and cough for 3 days',
-        'nurse_assigned' => 'Nurse Maria Cruz',
-        'status' => 'in_triage'
-    ],
-    [
-        'id' => 4,
-        'patient_id' => 4,
-        'patient_name' => 'Carlos Lim',
-        'patient_avatar' => 'CL',
-        'age' => 47,
-        'gender' => 'Male',
-        'queue_number' => 4,
-        'queue_status' => 'completed',
-        'arrival_time' => '10:00 AM',
-        'wait_time' => '10 mins',
-        'vital_signs' => [
-            'blood_pressure' => '150/95',
-            'heart_rate' => 88,
-            'temperature' => 36.8,
-            'respiratory_rate' => 18,
-            'oxygen_saturation' => 98,
-            'weight' => 78.0,
-            'height' => 170
-        ],
-        'priority' => 'high',
-        'symptoms' => ['Palpitations', 'Fatigue', 'Dizziness'],
-        'chief_complaint' => 'Heart palpitations and fatigue',
-        'nurse_assigned' => 'Nurse Anna Reyes',
-        'status' => 'sent_to_doctor'
-    ],
-    [
-        'id' => 5,
-        'patient_id' => 5,
-        'patient_name' => 'Elena Torres',
-        'patient_avatar' => 'ET',
-        'age' => 30,
-        'gender' => 'Female',
-        'queue_number' => 5,
-        'queue_status' => 'waiting',
-        'arrival_time' => '10:30 AM',
-        'wait_time' => '5 mins',
-        'vital_signs' => [
-            'blood_pressure' => '110/70',
-            'heart_rate' => 72,
-            'temperature' => 36.2,
-            'respiratory_rate' => 14,
-            'oxygen_saturation' => 100,
-            'weight' => 58.0,
-            'height' => 162
-        ],
-        'priority' => 'low',
-        'symptoms' => ['Mild headache', 'No appetite'],
-        'chief_complaint' => 'Mild headache and loss of appetite',
-        'nurse_assigned' => 'Nurse Maria Cruz',
-        'status' => 'completed'
-    ],
-];
+        'priority' => strtolower($t['priority'] ?? 'medium'),
+        'symptoms' => array_values($symArr),
+        'chief_complaint' => $t['notes'] ?? 'General Checkup',
+        'nurse_assigned' => $nurseName,
+        'status' => $status
+    ];
+}
+
+
 
 // Pagination
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 5;
 $offset = ($page - 1) * $limit;
 $totalTriage = count($triageQueue);
-$totalPages = ceil($totalTriage / $limit);
+$totalPages = max(1, ceil($totalTriage / $limit));
 $paginatedTriage = array_slice($triageQueue, $offset, $limit);
 
 $title = 'Triage';
@@ -187,11 +198,11 @@ $avgWaitTime = rand(15, 45);
             <p class="text-sm text-slate-500 mt-0.5">Vital signs recording, priority classification & queue management</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="openModal('symptomCheckerModal')"
+            <button onclick="ModalSystem.open('symptomCheckerModal')"
                     class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-semibold flex items-center gap-2">
                 <i class="fa-solid fa-stethoscope text-xs"></i> Symptom Checker
             </button>
-            <button onclick="openModal('addTriageModal')"
+            <button onclick="ModalSystem.open('addTriageModal')"
                     class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-plus text-xs"></i> Add Patient
             </button>
@@ -498,7 +509,7 @@ $avgWaitTime = rand(15, 45);
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Add Triage Patient</h3>
-            <button onclick="closeModal('addTriageModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('addTriageModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -545,6 +556,31 @@ $avgWaitTime = rand(15, 45);
                         <label class="block text-[10px] font-semibold text-slate-500 mb-1">Height (cm)</label>
                         <input type="text" id="triage_height" placeholder="165" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                     </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Blood Sugar</label>
+                        <input type="text" id="triage_blood_sugar" placeholder="100" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Blood Sugar Type</label>
+                        <select id="triage_blood_sugar_type" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                            <option value="">Select type</option>
+                            <option value="fasting">Fasting</option>
+                            <option value="random">Random</option>
+                            <option value="post_prandial">Post Prandial</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">GCS Eye</label>
+                        <input type="number" id="triage_gcs_eye" min="1" max="4" placeholder="1-4" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">GCS Verbal</label>
+                        <input type="number" id="triage_gcs_verbal" min="1" max="5" placeholder="1-5" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">GCS Motor</label>
+                        <input type="number" id="triage_gcs_motor" min="1" max="6" placeholder="1-6" class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    </div>
                 </div>
             </div>
 
@@ -581,14 +617,14 @@ $avgWaitTime = rand(15, 45);
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Nurse Assigned</label>
                 <select id="triage_nurse" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                    <option value="Nurse Maria Cruz">Nurse Maria Cruz</option>
-                    <option value="Nurse Anna Reyes">Nurse Anna Reyes</option>
-                    <option value="Nurse Jose Santos">Nurse Jose Santos</option>
+                    <?php foreach ($nurses as $n): ?>
+                        <option value="<?php echo $n['id']; ?>"><?php echo htmlspecialchars($n['name']); ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('addTriageModal')"
+                <button type="button" onclick="ModalSystem.close('addTriageModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -608,7 +644,7 @@ $avgWaitTime = rand(15, 45);
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Triage Details</h3>
-            <button onclick="closeModal('viewTriageModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('viewTriageModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -627,7 +663,7 @@ $avgWaitTime = rand(15, 45);
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Symptom Checker</h3>
-            <button onclick="closeModal('symptomCheckerModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('symptomCheckerModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -693,11 +729,7 @@ $avgWaitTime = rand(15, 45);
     </div>
 </div>
 
-<!-- Toast notification -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMessage"></span>
-</div>
+
 
 <!-- ============================================================ -->
 <!-- JAVASCRIPT                                                   -->
@@ -707,36 +739,10 @@ $avgWaitTime = rand(15, 45);
     let selectedSymptoms = [];
 
     // ============================================================
-    // MODAL FUNCTIONS
-    // ============================================================
-    function openModal(id) {
-        document.getElementById(id).classList.remove('hidden');
-        document.getElementById(id).classList.add('flex');
-        document.body.classList.add('overflow-hidden');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-        document.getElementById(id).classList.remove('flex');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    // Close modal on backdrop click
-    document.querySelectorAll('.fixed.inset-0').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-                this.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            }
-        });
-    });
-
-    // ============================================================
     // VIEW TRIAGE
     // ============================================================
     function viewTriage(id) {
-        openModal('viewTriageModal');
+        ModalSystem.open('viewTriageModal');
         const t = TRIAGE_DATA[id];
         if (!t) return;
 
@@ -786,6 +792,9 @@ $avgWaitTime = rand(15, 45);
                             <div><p class="text-[10px] text-slate-400">Respiratory Rate</p><p class="text-sm font-semibold text-slate-800">${t.vital_signs.respiratory_rate}</p></div>
                             <div><p class="text-[10px] text-slate-400">Weight</p><p class="text-sm font-semibold text-slate-800">${t.vital_signs.weight} kg</p></div>
                             <div><p class="text-[10px] text-slate-400">Height</p><p class="text-sm font-semibold text-slate-800">${t.vital_signs.height} cm</p></div>
+                            <div><p class="text-[10px] text-slate-400">Blood Sugar</p><p class="text-sm font-semibold text-slate-800">${t.vital_signs.blood_sugar} mg/dL</p></div>
+                            <div><p class="text-[10px] text-slate-400">GCS</p><p class="text-sm font-semibold text-slate-800">Eye ${t.vital_signs.gcs_eye}, Verbal ${t.vital_signs.gcs_verbal}, Motor ${t.vital_signs.gcs_motor} (Total ${t.vital_signs.gcs_total})</p></div>
+                            <div><p class="text-[10px] text-slate-400">BMI</p><p class="text-sm font-semibold text-slate-800">${t.vital_signs.bmi}</p></div>
                         </div>
                     </div>
                     <div class="bg-brand-light/40 rounded-xl p-4 border border-brand-border">
@@ -797,8 +806,8 @@ $avgWaitTime = rand(15, 45);
                         <p class="text-sm text-slate-800">${t.chief_complaint}</p>
                     </div>
                     <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-                        <button onclick="closeModal('viewTriageModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Close</button>
-                        <button onclick="closeModal('viewTriageModal'); editTriage(${t.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold"><i class="fa-solid fa-pen mr-1.5"></i> Edit</button>
+                        <button onclick="ModalSystem.close('viewTriageModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Close</button>
+                        <button onclick="ModalSystem.close('viewTriageModal'); editTriage(${t.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold"><i class="fa-solid fa-pen mr-1.5"></i> Edit</button>
                     </div>
                 </div>
             `;
@@ -809,47 +818,112 @@ $avgWaitTime = rand(15, 45);
     // EDIT TRIAGE
     // ============================================================
     function editTriage(id) {
-        showToast('Edit triage ID: ' + id + ' (Edit modal coming soon)', 'info');
+        ModalSystem.toast.info('Edit triage ID: ' + id + ' (Edit modal coming soon)');
     }
 
     // ============================================================
     // COMPLETE TRIAGE
     // ============================================================
-    function completeTriage(id) {
-        if (confirm('Mark this patient as complete and send to doctor?')) {
-            const t = TRIAGE_DATA[id];
-            if (t) {
-                t.status = 'sent_to_doctor';
-                t.queue_status = 'completed';
-                showToast(t.patient_name + ' sent to doctor successfully!', 'success');
-                // Update UI
-                const rows = document.querySelectorAll('.triage-row');
-                rows.forEach(row => {
-                    const patientName = row.querySelector('.font-semibold.text-slate-800.text-sm')?.textContent;
-                    if (patientName === t.patient_name) {
-                        const statusBadge = row.querySelector('.px-2.py-1.rounded-full');
-                        statusBadge.className = 'px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700';
-                        statusBadge.textContent = 'Sent to Doctor';
-                    }
+   async function completeTriage(id) {
+    ModalSystem.confirm(
+        'This will mark the patient as complete and send them to the doctor.',
+        async () => {
+            try {
+                const res = await fetch('../../api/triage.php?id=' + id + '&action=status', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'consulted' })
                 });
+                const data = await res.json();
+                if (data.success) {
+                    ModalSystem.toast.success('Patient sent to doctor successfully!');
+                    setTimeout(() => window.location.reload(), 800);
+                } else {
+                    ModalSystem.toast.error(data.message || 'Failed to update triage status');
+                }
+            } catch (err) {
+                ModalSystem.toast.error('Error updating status');
             }
-        }
-    }
+        },
+        { title: 'Complete Triage', confirmText: 'Send to Doctor', type: 'info' }
+    );
+}
 
     // ============================================================
     // ADD TRIAGE
     // ============================================================
-    function saveTriage(event) {
+    async function saveTriage(event) {
         event.preventDefault();
-        showToast('Patient added to triage queue successfully!', 'success');
-        closeModal('addTriageModal');
+
+        const patientId = document.getElementById('triage_patient').value;
+        const bp = document.getElementById('triage_bp').value;
+        const hr = document.getElementById('triage_hr').value;
+        const temp = document.getElementById('triage_temp').value;
+        const o2 = document.getElementById('triage_o2').value;
+        const rr = document.getElementById('triage_rr').value;
+        const weight = document.getElementById('triage_weight').value;
+        const height = document.getElementById('triage_height').value;
+const bloodSugar = document.getElementById('triage_blood_sugar').value;
+const bloodSugarType = document.getElementById('triage_blood_sugar_type').value;
+const gcsEye = document.getElementById('triage_gcs_eye').value;
+const gcsVerbal = document.getElementById('triage_gcs_verbal').value;
+const gcsMotor = document.getElementById('triage_gcs_motor').value;
+
+        const selectedSymptoms = Array.from(document.querySelectorAll('#symptomCheckboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+        const complaint = document.getElementById('triage_complaint').value;
+        const priority = document.getElementById('triage_priority').value;
+        const nurseId = document.getElementById('triage_nurse').value;
+
+        if (!patientId) {
+            ModalSystem.toast.warning('Please select a patient');
+            return;
+        }
+
+        const payload = {
+            patient_id: parseInt(patientId),
+            nurse_id: parseInt(nurseId) || 1,
+            blood_pressure: bp,
+            heart_rate: hr ? parseInt(hr) : null,
+            temperature: temp ? parseFloat(temp) : null,
+            respiratory_rate: rr ? parseInt(rr) : null,
+            oxygen_saturation: o2 ? parseInt(o2) : null,
+            weight: weight ? parseFloat(weight) : null,
+            height: height ? parseFloat(height) : null,
+            blood_sugar: bloodSugar ? parseFloat(bloodSugar) : null,
+            blood_sugar_type: bloodSugarType || null,
+            gcs_eye: gcsEye ? parseInt(gcsEye) : null,
+            gcs_verbal: gcsVerbal ? parseInt(gcsVerbal) : null,
+            gcs_motor: gcsMotor ? parseInt(gcsMotor) : null,
+            symptoms: selectedSymptoms.join(', '),
+            notes: complaint,
+            priority: priority,
+            status: 'pending'
+        };
+
+        try {
+            const res = await fetch('../../api/triage.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                ModalSystem.toast.success('Patient added to triage queue successfully!');
+                ModalSystem.close('addTriageModal');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                ModalSystem.toast.error(data.message || 'Failed to save triage entry');
+            }
+        } catch (err) {
+            ModalSystem.toast.error('Network error while saving triage');
+        }
     }
 
     // ============================================================
     // CALL NEXT PATIENT
     // ============================================================
     function callNextPatient() {
-        showToast('📢 Calling next patient: #' + (<?php echo $triageQueue[0]['queue_number'] ?? '1'; ?>), 'info');
+        ModalSystem.toast.info('📢 Calling next patient: #' + (<?php echo $triageQueue[0]['queue_number'] ?? '1'; ?>));
     }
 
     // ============================================================
@@ -898,7 +972,7 @@ $avgWaitTime = rand(15, 45);
 
     function analyzeSymptoms() {
         if (selectedSymptoms.length === 0) {
-            showToast('Please select at least one symptom', 'warning');
+            ModalSystem.toast.warning('Please select at least one symptom');
             return;
         }
         
@@ -994,27 +1068,7 @@ $avgWaitTime = rand(15, 45);
         document.getElementById('symptomResult').classList.add('hidden');
     }
 
-    // ============================================================
-    // TOAST NOTIFICATIONS
-    // ============================================================
-    let toastTimer = null;
-
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const colors = {
-            success: 'bg-brand-dark',
-            danger: 'bg-rose-600',
-            info: 'bg-blue-600',
-            warning: 'bg-amber-600'
-        };
-        toast.className = 'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 ' + (colors[type] || colors.success);
-        toast.querySelector('i').className = 'fa-solid fa-circle-check';
-        document.getElementById('toastMessage').textContent = message;
-        toast.classList.remove('hidden');
-
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
-    }
+   
 
     // ============================================================
     // SEARCH & FILTER
@@ -1053,22 +1107,209 @@ $avgWaitTime = rand(15, 45);
         document.querySelectorAll('.triage-row').forEach(row => row.style.display = '');
         document.getElementById('emptyState').style.display = 'none';
     }
+    
+    let currentTriagePage = <?php echo $page; ?>;
+const TRIAGE_LIMIT = 5;
 
-    function changePage(page) {
-        if (page < 1 || page > <?php echo $totalPages; ?>) return;
-        window.location.href = '?page=' + page;
-    }
+let isTriageLoading = false; // prevents overlapping requests
 
-    // ESC to close modals
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            });
+async function changePage(page) {
+    if (page < 1 || isTriageLoading) return; // block if already loading
+
+    isTriageLoading = true;
+    showTriageLoading();
+
+    try {
+        const res = await fetch(`../../api/triage.php?page=${page}&limit=${TRIAGE_LIMIT}`);
+        const data = await res.json();
+
+        if (!data.success) {
+            ModalSystem.toast.error(data.message || 'Failed to load triage queue');
+            return;
         }
+
+        const safePage = data.page ?? page;
+        const safeLimit = data.limit ?? TRIAGE_LIMIT;
+        const safeTotal = data.total ?? (data.data ? data.data.length : 0);
+        const safeTotalPages = data.total_pages ?? Math.max(1, Math.ceil(safeTotal / safeLimit));
+
+        currentTriagePage = safePage;
+        renderTriageTable(data.data, (safePage - 1) * safeLimit);
+        renderTriagePagination(safePage, safeTotalPages);
+        updateShowingText(safePage, safeLimit, safeTotal);
+
+        data.data.forEach(t => { TRIAGE_DATA[t.id] = normalizeTriageRecord(t); });
+
+    } catch (err) {
+        console.error(err);
+        ModalSystem.toast.error('Network error while loading triage queue');
+    } finally {
+        isTriageLoading = false;
+        hideTriageLoading();
+    }
+}
+
+// Shows a skeleton/spinner over the table body + disables pagination buttons
+function showTriageLoading() {
+    const tbody = document.getElementById('triageTableBody');
+    if (tbody) {
+        tbody.style.opacity = '0.4';
+        tbody.style.pointerEvents = 'none';
+    }
+    document.querySelectorAll('.px-4.py-3.border-t.border-slate-200 .flex.gap-1 button').forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
     });
+
+    // Optional: small spinner badge near the table
+    let spinner = document.getElementById('triageLoadingSpinner');
+    if (!spinner) {
+        spinner = document.createElement('div');
+        spinner.id = 'triageLoadingSpinner';
+        spinner.className = 'flex items-center justify-center py-2 text-xs text-slate-400';
+        spinner.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading...';
+        tbody.parentElement.parentElement.insertBefore(spinner, tbody.parentElement.nextSibling);
+    }
+    spinner.style.display = 'flex';
+}
+
+function hideTriageLoading() {
+    const tbody = document.getElementById('triageTableBody');
+    if (tbody) {
+        tbody.style.opacity = '1';
+        tbody.style.pointerEvents = 'auto';
+    }
+    const spinner = document.getElementById('triageLoadingSpinner');
+    if (spinner) spinner.style.display = 'none';
+    // Buttons get their disabled state correctly re-applied by renderTriagePagination() anyway
+}
+
+// Converts raw API record (from TriageController::enrichTriage) into the
+// same shape the page's PHP loop originally built, so viewTriage() and
+// renderTriageTable() can use it consistently.
+function normalizeTriageRecord(t, index, offset) {
+    const dbStatus = (t.status || 'pending').toLowerCase();
+    const statusMap = { pending: 'waiting', triaged: 'in_triage', consulted: 'sent_to_doctor', cancelled: 'cancelled' };
+    const status = statusMap[dbStatus] || 'in_triage';
+
+    const weight = parseFloat(t.weight) || 65.0;
+    const height = parseFloat(t.height) || 165.0;
+    const bmi = (t.weight && t.height && height > 0)
+        ? Math.round((weight / ((height / 100) ** 2)) * 10) / 10
+        : null;
+
+    return {
+        id: t.id,
+        triage_id: t.triage_id || ('TRG-' + t.id),
+        patient_name: t.patient_name || 'Unknown',
+        patient_avatar: t.patient_avatar || 'P',
+        age: t.age ?? 'N/A',
+        gender: t.gender || 'Unspecified',
+        queue_number: (offset ?? 0) + (index ?? 0) + 1,
+        vital_signs: {
+            blood_pressure: t.blood_pressure || '120/80',
+            heart_rate: t.heart_rate ?? 75,
+            temperature: t.temperature ?? 36.5,
+            respiratory_rate: t.respiratory_rate ?? 18,
+            oxygen_saturation: t.oxygen_saturation ?? 98,
+            weight: weight,
+            height: height,
+            blood_sugar: t.blood_sugar ?? 'N/A',
+            gcs_eye: t.gcs_eye ?? 0,
+            gcs_verbal: t.gcs_verbal ?? 0,
+            gcs_motor: t.gcs_motor ?? 0,
+            gcs_total: (t.gcs_eye ?? 0) + (t.gcs_verbal ?? 0) + (t.gcs_motor ?? 0),
+            bmi: bmi
+        },
+        priority: (t.priority || 'medium').toLowerCase(),
+        symptoms: t.symptoms_list || [],
+        chief_complaint: t.chief_complaint || t.notes || 'General Checkup',
+        nurse_assigned: t.nurse_name || 'Nurse Maria Cruz',
+        status: status,
+        arrival_time: t.created_at ? new Date(t.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
+        wait_time: '15 mins'
+    };
+}
+
+function renderTriageTable(rawList, offset) {
+    const tbody = document.getElementById('triageTableBody');
+    const priorityColors = {
+        critical: 'bg-rose-100 text-rose-700 border-rose-200',
+        high: 'bg-orange-100 text-orange-700 border-orange-200',
+        medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        low: 'bg-green-100 text-green-700 border-green-200'
+    };
+    const priorityIcons = { critical: '🔴', high: '🟠', medium: '🟡', low: '🟢' };
+    const statusClasses = {
+        in_triage: 'bg-brand-light text-brand-dark border border-brand-border',
+        waiting: 'bg-amber-100 text-amber-700',
+        sent_to_doctor: 'bg-emerald-100 text-emerald-700',
+        completed: 'bg-slate-100 text-slate-500'
+    };
+
+    if (rawList.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('emptyState').style.display = 'flex';
+        return;
+    }
+    document.getElementById('emptyState').style.display = 'none';
+
+    tbody.innerHTML = rawList.map((raw, i) => {
+        const t = normalizeTriageRecord(raw, i, offset);
+        return `
+        <tr class="border-b border-slate-100 hover:bg-brand-light/40 transition-colors triage-row ${t.priority === 'critical' ? 'bg-rose-50/50' : ''}"
+            data-patient="${t.patient_name.toLowerCase()}" data-priority="${t.priority}" data-status="${t.status}">
+            <td class="px-4 py-3 font-mono text-xs font-bold ${t.priority === 'critical' ? 'text-rose-600' : 'text-slate-400'}">#${t.queue_number}</td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-xs flex-shrink-0">${t.patient_avatar}</div>
+                    <div><p class="font-semibold text-slate-800 text-sm">${t.patient_name}</p><p class="text-xs text-slate-400">${t.chief_complaint}</p></div>
+                </div>
+            </td>
+            <td class="px-4 py-3 text-slate-600 text-xs">${t.age} yrs<br>${t.gender}</td>
+            <td class="px-4 py-3">
+                <div class="space-y-0.5">
+                    <div class="flex items-center gap-2 text-xs"><span class="text-slate-400">BP:</span><span class="font-medium text-slate-700">${t.vital_signs.blood_pressure}</span></div>
+                    <div class="flex items-center gap-2 text-xs"><span class="text-slate-400">HR:</span><span class="font-medium text-slate-700">${t.vital_signs.heart_rate}</span><span class="text-slate-400 ml-1">Temp:</span><span class="font-medium text-slate-700">${t.vital_signs.temperature}°C</span></div>
+                    <div class="flex items-center gap-2 text-xs"><span class="text-slate-400">O2:</span><span class="font-medium text-slate-700">${t.vital_signs.oxygen_saturation}%</span></div>
+                </div>
+            </td>
+            <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-semibold border ${priorityColors[t.priority] || priorityColors.medium}">${priorityIcons[t.priority] || ''} ${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}</span></td>
+            <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClasses[t.status] || statusClasses.waiting}">${t.status.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</span></td>
+            <td class="px-4 py-3 text-slate-600 text-xs">${t.wait_time}</td>
+            <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewTriage(${t.id})" class="p-1.5 text-brand-medium hover:bg-brand-light rounded-lg transition" title="View"><i class="fa-solid fa-eye text-sm"></i></button>
+                    <button onclick="editTriage(${t.id})" class="p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition" title="Edit"><i class="fa-solid fa-pen text-sm"></i></button>
+                    ${(t.status === 'in_triage' || t.status === 'waiting') ? `<button onclick="completeTriage(${t.id})" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Complete & Send to Doctor"><i class="fa-solid fa-check text-sm"></i></button>` : ''}
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function renderTriagePagination(page, totalPages) {
+    const container = document.querySelector('.px-4.py-3.border-t.border-slate-200 .flex.gap-1');
+    if (!container) return;
+    let html = `<button onclick="changePage(${page - 1})" class="px-3 py-1.5 rounded-lg text-sm ${page <= 1 ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}" ${page <= 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left text-xs"></i></button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<button onclick="changePage(${i})" class="px-3 py-1.5 rounded-lg text-sm font-medium ${i === page ? 'bg-brand-dark text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}">${i}</button>`;
+    }
+    html += `<button onclick="changePage(${page + 1})" class="px-3 py-1.5 rounded-lg text-sm ${page >= totalPages ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}" ${page >= totalPages ? 'disabled' : ''}><i class="fa-solid fa-chevron-right text-xs"></i></button>`;
+    container.innerHTML = html;
+}
+
+function updateShowingText(page, limit, total) {
+    const startEl = document.querySelector('.px-4.py-3.border-t.border-slate-200 p.text-xs span:nth-child(1)');
+    const endEl = document.querySelector('.px-4.py-3.border-t.border-slate-200 p.text-xs span:nth-child(2)');
+    const totalEl = document.querySelector('.px-4.py-3.border-t.border-slate-200 p.text-xs span:nth-child(3)');
+    const offset = (page - 1) * limit;
+    if (startEl) startEl.textContent = total === 0 ? 0 : offset + 1;
+    if (endEl) endEl.textContent = Math.min(offset + limit, total);
+    if (totalEl) totalEl.textContent = total;
+}
+
+
 </script>
 
 <?php include_once '../../includes/footer.php'; ?>

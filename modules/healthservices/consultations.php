@@ -163,7 +163,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             <p class="text-sm text-slate-500 mt-0.5">View and manage all patient consultations and medical notes</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="openModal('addConsultationModal')"
+            <button onclick="ModalSystem.open('addConsultationModal')"
                     class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-plus text-xs"></i> New Consultation
             </button>
@@ -329,7 +329,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
                 </div>
                 <h3 class="text-lg font-bold text-slate-800">No consultations recorded yet</h3>
                 <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">Click "New Consultation" above to create your first patient consultation record.</p>
-                <button onclick="openModal('addConsultationModal')" class="mt-4 px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium text-sm font-semibold inline-flex items-center gap-2">
+                <button onclick="ModalSystem.open('addConsultationModal')" class="mt-4 px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium text-sm font-semibold inline-flex items-center gap-2">
                     <i class="fa-solid fa-plus text-xs"></i> New Consultation
                 </button>
             </div>
@@ -466,7 +466,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             <h3 class="font-bold text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-notes-medical text-brand-medium"></i> Consultation Details
             </h3>
-            <button onclick="closeModal('viewConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('viewConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -487,7 +487,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             <h3 class="font-bold text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-stethoscope text-brand-medium"></i> New Consultation Record
             </h3>
-            <button onclick="closeModal('addConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('addConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -608,7 +608,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             </div>
 
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="closeModal('addConsultationModal')"
+                <button type="button" onclick="ModalSystem.close('addConsultationModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -630,7 +630,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             <h3 class="font-bold text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-pen-to-square text-brand-medium"></i> Edit Consultation
             </h3>
-            <button onclick="closeModal('editConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('editConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -747,7 +747,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             </div>
 
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="closeModal('editConsultationModal')"
+                <button type="button" onclick="ModalSystem.close('editConsultationModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -760,11 +760,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
     </div>
 </div>
 
-<!-- Toast notification -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 transition-all duration-300">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMessage"></span>
-</div>
+
 
 <!-- ============================================================ -->
 <!-- 3. CSS STYLES                                                -->
@@ -788,50 +784,10 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
 <script>
     const CONSULTATIONS_DATA = <?php echo json_encode(array_column($consultations, null, 'id'), JSON_UNESCAPED_UNICODE); ?>;
     let activeDateFilter = 'all';
-
-    // Modal Control
-    function openModal(id) {
-        document.getElementById(id).classList.remove('hidden');
-        document.getElementById(id).classList.add('flex');
-        document.body.classList.add('overflow-hidden');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-        document.getElementById(id).classList.remove('flex');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    document.querySelectorAll('.fixed.inset-0').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-                this.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            }
-        });
-    });
-
-    // Toast Notice
-    let toastTimer = null;
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const colors = {
-            success: 'bg-brand-dark',
-            danger: 'bg-rose-600',
-            warning: 'bg-amber-600'
-        };
-        toast.className = 'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 ' + (colors[type] || colors.success);
-        document.getElementById('toastMessage').textContent = message;
-        toast.classList.remove('hidden');
-
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.add('hidden'), 3500);
-    }
-
+   
     // View Details Modal
     function viewConsultation(id) {
-        openModal('viewConsultationModal');
+        ModalSystem.open('viewConsultationModal');
         const c = CONSULTATIONS_DATA[id];
         const content = document.getElementById('consultationDetailsContent');
 
@@ -920,7 +876,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
                     <a href="patients.php?patient=${c.patient_id}&id=${c.patient_id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5">
                         <i class="fa-solid fa-user"></i> View Patient Profile
                     </a>
-                    <button onclick="closeModal('viewConsultationModal'); editConsultation(${c.id});" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5">
+                    <button onclick="ModalSystem.close('viewConsultationModal'); editConsultation(${c.id});" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5">
                         <i class="fa-solid fa-pen"></i> Edit Record
                     </button>
                 </div>
@@ -969,14 +925,14 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             const data = await res.json();
 
             if (res.ok && data.success) {
-                showToast('Consultation created successfully!', 'success');
-                closeModal('addConsultationModal');
+                ModalSystem.toast.success('Consultation created successfully!');
+                ModalSystem.close('addConsultationModal');
                 setTimeout(() => window.location.reload(), 1000);
             } else {
-                showToast(data.message || 'Failed to save consultation', 'danger');
+                ModalSystem.toast.error(data.message || 'Failed to save consultation');
             }
         } catch (err) {
-            showToast('Error saving consultation record', 'danger');
+            ModalSystem.toast.error('Error saving consultation record');
             console.error(err);
         } finally {
             submitBtn.disabled = false;
@@ -988,7 +944,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
     function editConsultation(id) {
         const c = CONSULTATIONS_DATA[id];
         if (!c) {
-            showToast('Consultation not found', 'danger');
+            ModalSystem.toast.error('Consultation not found');
             return;
         }
 
@@ -1018,7 +974,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             document.getElementById('edit_weight').value = '';
         }
 
-        openModal('editConsultationModal');
+        ModalSystem.open('editConsultationModal');
     }
 
     async function saveEditedConsultation(event) {
@@ -1062,14 +1018,14 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             const data = await res.json();
 
             if (res.ok && data.success) {
-                showToast('Consultation updated successfully!', 'success');
-                closeModal('editConsultationModal');
+                ModalSystem.toast.success('Consultation updated successfully!');
+                ModalSystem.close('editConsultationModal');
                 setTimeout(() => window.location.reload(), 1000);
             } else {
-                showToast(data.message || 'Failed to update consultation', 'danger');
+                ModalSystem.toast.error(data.message || 'Failed to update consultation');
             }
         } catch (err) {
-            showToast('Error updating consultation record', 'danger');
+            ModalSystem.toast.error('Error updating consultation record');
             console.error(err);
         } finally {
             submitBtn.disabled = false;
@@ -1077,27 +1033,30 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         }
     }
 
-    // Delete Consultation
     async function deleteConsultation(id) {
-        if (!confirm('Are you sure you want to delete this consultation record?')) return;
+    ModalSystem.confirm(
+        'This consultation record will be permanently removed.',
+        async () => {
+            try {
+                const res = await fetch('/api/consultations.php?id=' + id, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
 
-        try {
-            const res = await fetch('/api/consultations.php?id=' + id, {
-                method: 'DELETE'
-            });
-            const data = await res.json();
-
-            if (res.ok && data.success) {
-                showToast('Consultation deleted successfully!', 'success');
-                setTimeout(() => window.location.reload(), 800);
-            } else {
-                showToast(data.message || 'Failed to delete consultation', 'danger');
+                if (res.ok && data.success) {
+                    ModalSystem.toast.success('Consultation deleted successfully!');
+                    setTimeout(() => window.location.reload(), 800);
+                } else {
+                    ModalSystem.toast.error(data.message || 'Failed to delete consultation');
+                }
+            } catch (err) {
+                ModalSystem.toast.error('Error deleting consultation');
+                console.error(err);
             }
-        } catch (err) {
-            showToast('Error deleting consultation', 'danger');
-            console.error(err);
-        }
-    }
+        },
+        { title: 'Delete Consultation', confirmText: 'Delete', type: 'danger' }
+    );
+}
 
     // Filtering & Searching
     document.getElementById('searchConsultation').addEventListener('input', filterConsultations);
@@ -1214,16 +1173,6 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         window.location.href = '?page=' + page;
     }
 
-    // Keyboard navigation (ESC)
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            });
-        }
-    });
 </script>
 
 <?php include_once '../../includes/footer.php'; ?>

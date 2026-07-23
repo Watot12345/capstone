@@ -59,6 +59,7 @@ $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF'
   <!-- Your custom styles -->
   <link rel="stylesheet" href="<?= $assetBasePath; ?>assets/css/dashb-style.css">
 </head>
+<?php include_once __DIR__ . '/data-mask.php'; ?>
 <body class="bg-white font-sans antialiased text-slate-800 min-h-screen flex flex-col">
 
   <header class="bg-white border-b border-slate-200 h-20 px-6 flex items-center justify-between sticky top-0 z-40 shadow-xs shrink-0">
@@ -85,7 +86,11 @@ $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF'
         <i class="fa-solid fa-bell text-lg"></i>
         <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
       </button>
-      
+      <button id="dataMaskToggle" onclick="toggleDataMask()"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition cursor-pointer">
+    <i class="fa-solid fa-eye-slash text-sm"></i>
+    <span class="hidden sm:inline">Hidden</span>
+</button>
       <div class="h-6 w-px bg-slate-200"></div>
 
       <div class="flex items-center space-x-2 p-1.5 rounded-lg text-left select-none">

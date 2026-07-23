@@ -748,7 +748,8 @@
         <span class="text-sm font-medium" id="toastMessage">Report generated successfully!</span>
         <button onclick="hideToast()" class="ml-2 text-white/60 hover:text-white transition"><i class="fa-regular fa-xmark"></i></button>
     </div>
-
+   <!-- bypass datamask for non data masking -->
+<p class="kpi-number text-xl font-black text-slate-900 mt-1 leading-none"></p>
 </main>
 
 <?php include '../includes/footer.php'; ?>

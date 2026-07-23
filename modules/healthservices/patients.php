@@ -112,16 +112,16 @@ $title = 'Patient Management';
         </div>
         <div class="flex gap-3">
             <div class="flex rounded-lg border border-slate-200 overflow-hidden">
-                <button onclick="openModal('importModal')"
+                <button onclick="ModalSystem.open('importModal')"
                         class="px-4 py-2 bg-white text-slate-700 hover:bg-slate-50 transition-colors text-sm font-semibold flex items-center gap-2 border-r border-slate-200">
                     <i class="fa-solid fa-file-import text-xs"></i> Import
                 </button>
-                <button onclick="openModal('exportModal'); prepExportModal();"
+                <button onclick="ModalSystem.open('exportModal'); prepExportModal();"
                         class="px-4 py-2 bg-white text-slate-700 hover:bg-slate-50 transition-colors text-sm font-semibold flex items-center gap-2">
                     <i class="fa-solid fa-file-export text-xs"></i> Export
                 </button>
             </div>
-            <button onclick="openModal('addPatientModal'); prepAddPatientModal();"
+            <button onclick="ModalSystem.open('addPatientModal'); prepAddPatientModal();"
                     class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-plus text-xs"></i> Add Patient
             </button>
@@ -443,7 +443,7 @@ $title = 'Patient Management';
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Patient Details</h3>
-            <button onclick="closeModal('viewPatientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('viewPatientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -462,7 +462,7 @@ $title = 'Patient Management';
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
             <h3 class="font-bold text-slate-900">Edit Patient</h3>
-            <button onclick="closeModal('editPatientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('editPatientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -545,7 +545,7 @@ $title = 'Patient Management';
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('editPatientModal')"
+                <button type="button" onclick="ModalSystem.close('editPatientModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -571,7 +571,7 @@ $title = 'Patient Management';
             <p class="text-sm text-slate-500" id="deletePatientName">This action cannot be undone.</p>
         </div>
         <div class="flex gap-2 px-6 pb-6">
-            <button type="button" onclick="closeModal('deletePatientModal')"
+            <button type="button" onclick="ModalSystem.close('deletePatientModal')"
                     class="flex-1 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                 Cancel
             </button>
@@ -583,11 +583,7 @@ $title = 'Patient Management';
     </div>
 </div>
 
-<!-- Toast notification (replaces alert() for save/delete feedback) -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white items-center gap-2">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMessage"></span>
-</div>
+
 
 <!-- ============================================================ -->
 <!-- 4A. ADD PATIENT MODAL                                        -->
@@ -599,7 +595,7 @@ $title = 'Patient Management';
                 <h3 class="font-bold text-slate-900">Add New Patient</h3>
                 <p class="text-xs text-slate-400 mt-0.5">Next ID: <span id="nextPatientIdPreview" class="font-mono font-semibold text-brand-dark"></span></p>
             </div>
-            <button onclick="closeModal('addPatientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('addPatientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -685,7 +681,7 @@ $title = 'Patient Management';
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('addPatientModal')"
+                <button type="button" onclick="ModalSystem.close('addPatientModal')"
                         class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                     Cancel
                 </button>
@@ -705,7 +701,7 @@ $title = 'Patient Management';
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
             <h3 class="font-bold text-slate-900">Import Patients</h3>
-            <button onclick="closeModal('importModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('importModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -751,7 +747,7 @@ $title = 'Patient Management';
         </div>
 
         <div class="flex justify-end gap-2 px-6 pb-6">
-            <button type="button" onclick="closeModal('importModal')"
+            <button type="button" onclick="ModalSystem.close('importModal')"
                     class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                 Cancel
             </button>
@@ -770,7 +766,7 @@ $title = 'Patient Management';
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
             <h3 class="font-bold text-slate-900">Export Patients</h3>
-            <button onclick="closeModal('exportModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
+            <button onclick="ModalSystem.close('exportModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -810,7 +806,7 @@ $title = 'Patient Management';
         </div>
 
         <div class="flex justify-end gap-2 px-6 pb-6">
-            <button type="button" onclick="closeModal('exportModal')"
+            <button type="button" onclick="ModalSystem.close('exportModal')"
                     class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
                 Cancel
             </button>
@@ -990,37 +986,12 @@ $title = 'Patient Management';
     // Real patient data from PHP, keyed by id
     const PATIENTS = <?php echo json_encode(array_column($patients, null, 'id'), JSON_PRETTY_PRINT); ?>;
 
-    // ============================================================
-    // MODAL FUNCTIONS
-    // ============================================================
-    function openModal(id) {
-        document.getElementById(id).classList.remove('hidden');
-        document.getElementById(id).classList.add('flex');
-        document.body.classList.add('overflow-hidden');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-        document.getElementById(id).classList.remove('flex');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    // Close modal on backdrop click
-    document.querySelectorAll('.fixed.inset-0').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-                this.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            }
-        });
-    });
-
+   
     // ============================================================
     // VIEW PATIENT
     // ============================================================
     function viewPatient(id) {
-        openModal('viewPatientModal');
+        ModalSystem.open('viewPatientModal');
         const content = document.getElementById('patientDetailsContent');
         content.innerHTML = `
             <div class="flex items-center justify-center py-10 text-slate-400 text-sm">
@@ -1068,7 +1039,7 @@ $title = 'Patient Management';
                         </div>
                     </div>
                     <div class="flex justify-end gap-2 pt-2">
-                        <button onclick="closeModal('viewPatientModal'); editPatient(${p.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold">
+                        <button onclick="ModalSystem.close('viewPatientModal'); editPatient(${p.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold">
                             <i class="fa-solid fa-pen mr-1.5"></i> Edit Patient
                         </button>
                     </div>
@@ -1102,7 +1073,7 @@ $title = 'Patient Management';
         document.getElementById('edit_allergies').value = p.allergies;
         document.getElementById('edit_conditions').value = p.conditions;
 
-        openModal('editPatientModal');
+        ModalSystem.open('editPatientModal');
     }
 
     function saveEditedPatient(event) {
@@ -1126,8 +1097,8 @@ $title = 'Patient Management';
 
         updateRowUI(p);
         recalculateStats();
-        closeModal('editPatientModal');
-        showToast(p.first_name + ' ' + p.last_name + '\'s record was updated.', 'success');
+        ModalSystem.close('editPatientModal');
+        ModalSystem.toast.success(p.first_name + ' ' + p.last_name + '\'s record was updated.');
     }
 
     function updateRowUI(p) {
@@ -1166,7 +1137,7 @@ $title = 'Patient Management';
         pendingDeleteId = id;
         document.getElementById('deletePatientName').textContent =
             `${p.first_name} ${p.last_name} (${p.patient_id}) will be permanently removed.`;
-        openModal('deletePatientModal');
+        ModalSystem.open('deletePatientModal');
     }
 
     function confirmDeletePatient() {
@@ -1180,8 +1151,8 @@ $title = 'Patient Management';
 
         recalculateStats();
         filterPatients();
-        closeModal('deletePatientModal');
-        showToast(p.first_name + ' ' + p.last_name + ' was deleted.', 'danger');
+        ModalSystem.close('deletePatientModal');
+        ModalSystem.toast.error(p.first_name + ' ' + p.last_name + ' was deleted.');
         pendingDeleteId = null;
     }
 
@@ -1190,33 +1161,6 @@ $title = 'Patient Management';
         document.getElementById('statTotal').textContent = remaining.length;
         document.getElementById('statActive').textContent = remaining.filter(p => p.status === 'active').length;
         document.getElementById('statInactive').textContent = remaining.filter(p => p.status === 'inactive').length;
-    }
-
-    // ============================================================
-    // TOAST NOTIFICATIONS (UPDATED with 'info' and 'warning')
-    // ============================================================
-    let toastTimer = null;
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const colors = {
-            success: 'bg-brand-dark',
-            danger: 'bg-rose-600',
-            info: 'bg-blue-600',
-            warning: 'bg-amber-600'
-        };
-        const icons = {
-            success: 'fa-circle-check',
-            danger: 'fa-circle-check',
-            info: 'fa-circle-info',
-            warning: 'fa-triangle-exclamation'
-        };
-        toast.className = 'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white flex items-center gap-2 ' + (colors[type] || colors.success);
-        toast.querySelector('i').className = 'fa-solid ' + (icons[type] || icons.success);
-        document.getElementById('toastMessage').textContent = message;
-        toast.classList.remove('hidden');
-
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
     }
 
     // ============================================================
@@ -1259,8 +1203,8 @@ $title = 'Patient Management';
         PATIENTS[id] = p;
         insertPatientRow(p, true);
         recalculateStats();
-        closeModal('addPatientModal');
-        showToast(p.first_name + ' ' + p.last_name + ' was added as ' + p.patient_id + '.', 'success');
+        ModalSystem.close('addPatientModal');
+        ModalSystem.toast.success(p.first_name + ' ' + p.last_name + ' was added as ' + p.patient_id + '.');
     }
 
     function insertPatientRow(p, prepend = false) {
@@ -1420,9 +1364,9 @@ $title = 'Patient Management';
         });
 
         recalculateStats();
-        closeModal('importModal');
+        ModalSystem.close('importModal');
         clearImportFile();
-        showToast(imported + ' patient' + (imported === 1 ? '' : 's') + ' imported successfully.', 'success');
+        ModalSystem.toast.success(imported + ' patient' + (imported === 1 ? '' : 's') + ' imported successfully.');
     }
 
     // ============================================================
@@ -1459,10 +1403,10 @@ $title = 'Patient Management';
         if (selectedExportFormat === 'csv') {
             downloadCSV(rows);
         } else {
-            showToast((selectedExportFormat === 'excel' ? 'Excel' : 'PDF') + ' export needs a backend endpoint — exporting CSV instead.', 'success');
+            ModalSystem.toast.success((selectedExportFormat === 'excel' ? 'Excel' : 'PDF') + ' export needs a backend endpoint — exporting CSV instead.');
             downloadCSV(rows);
         }
-        closeModal('exportModal');
+        ModalSystem.close('exportModal');
     }
 
     function downloadCSV(rows) {
@@ -1480,7 +1424,7 @@ $title = 'Patient Management';
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast(rows.length + ' patient' + (rows.length === 1 ? '' : 's') + ' exported.', 'success');
+        ModalSystem.toast.success(rows.length + ' patient' + (rows.length === 1 ? '' : 's') + ' exported.');
     }
 
     // ============================================================
@@ -1611,12 +1555,12 @@ $title = 'Patient Management';
                     }, 300);
                     
                     const patientName = row.querySelector('.cell-name')?.textContent || 'Patient';
-                    showToast('🔍 Viewing: ' + patientName, 'info');
+                    ModalSystem.toast.info('🔍 Viewing: ' + patientName);
                 }
             });
             
             if (!found) {
-                showToast('⚠️ Patient not found in the current list', 'warning');
+                ModalSystem.toast.warning('⚠️ Patient not found in the current list');
             }
         }
     });
@@ -1628,26 +1572,20 @@ $title = 'Patient Management';
         if (page < 1 || page > <?php echo $totalPages; ?>) return;
         window.location.href = '?page=' + page;
     }
-
     // ============================================================
     // KEYBOARD SHORTCUTS
     // ============================================================
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.classList.remove('overflow-hidden');
-            });
-        }
         if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
             e.preventDefault();
-            openModal('addPatientModal');
+            ModalSystem.open('addPatientModal');
+            prepAddPatientModal();
         }
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
             e.preventDefault();
             document.getElementById('searchPatient').focus();
         }
     });
+ 
 </script>
 <?php include_once '../../includes/footer.php'; ?>
