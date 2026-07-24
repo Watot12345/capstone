@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['full_name'] = $user['full_name'];
             $_SESSION['department'] = $user['department'] ?? '';
             $_SESSION['role'] = $user['role'] ?? 'employee';
+            $_SESSION['role_description'] = $user['role_description'] ?? '';
             $_SESSION['logged_in'] = true;
             
             echo json_encode([
@@ -49,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'name' => $user['full_name'],
                     'employee_id' => $user['employee_id'],
                     'department' => $user['department'] ?? '',
-                    'role' => $user['role'] ?? 'employee'
+                    'role' => $user['role'] ?? 'employee',
+                    'role_description' => $user['role_description'] ?? ''
                 ]
             ]);
             exit;

@@ -10,9 +10,14 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
 // Get user data from session
 $fullName = $_SESSION['full_name'] ?? 'Joshua Sierra';
-$role = $_SESSION['role'] ?? 'admin';
+$employeeId = $_SESSION['employee_id'] ?? 'SYS--ADMIN-2011';
+$role = $_SESSION['role'] ?? 'System Admin';
+$roleDescription = $_SESSION['role_description'] ?? 'admin';
 
-// Generate initials from full name
+// FORCE display to show "System Admin"
+$displayRole = 'System Admin';  // Hardcoded to always show System Admin
+
+// Generate initials from full name (e.g., "Joshua Sierra" -> "JS")
 $initials = '';
 $nameParts = explode(' ', $fullName);
 foreach ($nameParts as $part) {
@@ -38,9 +43,6 @@ $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF'
   
   <!-- Font Awesome 6 (Latest) - Loaded in head for priority -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  
-  <!-- Alternative: Use the full Font Awesome package with more icons -->
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
   
   <style type="text/tailwindcss">
     @theme {
@@ -104,11 +106,10 @@ $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF'
         </div>
         <div class="hidden sm:flex flex-col">
           <span class="text-xs font-bold text-slate-700 leading-none"><?php echo htmlspecialchars($fullName); ?></span>
-          <span class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-wider"><?php echo htmlspecialchars($role); ?></span>
+          <span class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-wider"><?php echo htmlspecialchars($displayRole); ?></span>
         </div>
       </div>
     </div>
   </header>
 
   <div class="flex-1 flex relative">
-
