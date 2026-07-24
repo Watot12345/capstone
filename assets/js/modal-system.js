@@ -1,20 +1,29 @@
 /**
  * Modal System - Centralized Modal & UI Utilities
  * 
- * Provides reusable modal controls, confirmation dialogs, and UI helpers
- * used across all modules.
- * 
- * DEPENDENCIES:
- *   - toast.php (via footer.php) for toast notifications
- *   - Font Awesome for icons in dynamic modals
- *   - Data Masking System (data-masking.php) - optional
+ * UPDATED: Added reusable form validation system
  * 
  * USAGE:
- *   ModalSystem.open('modalId');
- *   ModalSystem.close('modalId');
- *   ModalSystem.confirm('Delete this record?', () => { ... });
- *   ModalSystem.toast.success('Saved!');
- *   ModalSystem.toast.error('Failed!');
+ *   // Form validation
+ *   ModalSystem.validateForm('addAppointmentModal', {
+ *       fields: {
+ *           'add_patient_search': { 
+ *               type: 'search', 
+ *               hiddenField: 'add_patient_id', 
+ *               label: 'Patient' 
+ *           },
+ *           'add_doctor_search': { 
+ *               type: 'search', 
+ *               hiddenField: 'add_employee_id', 
+ *               label: 'Doctor' 
+ *           },
+ *           'add_service_type': { label: 'Service Type' },
+ *           'add_appointment_date': { label: 'Date' },
+ *           'add_appointment_time': { label: 'Time' }
+ *       },
+ *       submitButtonId: 'submitAddBtn',
+ *       onSubmit: saveNewAppointment
+ *   });
  */
 
 const ModalSystem = (function() {
@@ -24,55 +33,40 @@ const ModalSystem = (function() {
     // DATA MASKING INTEGRATION
     // ============================================================
     
-    /**
-     * Apply data masking to modal content
-     * Delegate to the main data-mask.php system
-     * @param {string|HTMLElement} modal - Modal ID or element
-     */
     function applyMaskingToModal(modal) {
-    if (typeof modal === 'string') {
-        modal = document.getElementById(modal);
-    }
-    if (!modal) return;
-    
-    // Use the exposed global state from data-mask.php
-    let shouldBeMasked = true;
-    
-    // Check if the global isDataMasked exists (exposed from data-mask.php)
-    if (typeof window.isDataMasked !== 'undefined') {
-        shouldBeMasked = window.isDataMasked();
-        console.log('✅ Using global state from data-mask.php:', shouldBeMasked ? 'HIDDEN' : 'VISIBLE');
-    } else {
-        // Fallback to localStorage
-        const isMasked = localStorage.getItem('data_masking_enabled');
-        shouldBeMasked = isMasked === null ? true : isMasked === 'true';
-        console.log('⚠️ Using localStorage fallback:', shouldBeMasked ? 'HIDDEN' : 'VISIBLE');
-    }
-    
-    // Handle regular maskable elements
-    const maskableElements = modal.querySelectorAll('.maskable');
-    maskableElements.forEach(el => {
-        if (shouldBeMasked) {
-            el.classList.add('masked');
-            if (el.tagName === 'INPUT') {
-                el.classList.add('input-maskable');
-                el.style.color = 'transparent';
-            }
-        } else {
-            el.classList.remove('masked');
-            el.classList.remove('input-maskable');
-            el.style.color = '';
-            if (el.tagName === 'INPUT' && el.dataset.real) {
-                el.value = el.dataset.real;
-            }
+        if (typeof modal === 'string') {
+            modal = document.getElementById(modal);
         }
-    });
-}
+        if (!modal) return;
+        
+        let shouldBeMasked = true;
+        
+        if (typeof window.isDataMasked !== 'undefined') {
+            shouldBeMasked = window.isDataMasked();
+        } else {
+            const isMasked = localStorage.getItem('data_masking_enabled');
+            shouldBeMasked = isMasked === null ? true : isMasked === 'true';
+        }
+        
+        const maskableElements = modal.querySelectorAll('.maskable');
+        maskableElements.forEach(el => {
+            if (shouldBeMasked) {
+                el.classList.add('masked');
+                if (el.tagName === 'INPUT') {
+                    el.classList.add('input-maskable');
+                    el.style.color = 'transparent';
+                }
+            } else {
+                el.classList.remove('masked');
+                el.classList.remove('input-maskable');
+                el.style.color = '';
+                if (el.tagName === 'INPUT' && el.dataset.real) {
+                    el.value = el.dataset.real;
+                }
+            }
+        });
+    }
 
-    /**
-     * Toggle data masking for all elements
-     * Delegate to the main data-mask.php system
-     */
     function toggleMasking() {
         if (typeof window.toggleDataMask !== 'undefined') {
             window.toggleDataMask();
@@ -81,9 +75,6 @@ const ModalSystem = (function() {
         }
     }
 
-    /**
-     * Get current masking state
-     */
     function isMasked() {
         if (typeof window.isDataMasked !== 'undefined') {
             return window.isDataMasked();
@@ -92,10 +83,6 @@ const ModalSystem = (function() {
         return isMasked === null ? true : isMasked === 'true';
     }
 
-    /**
-     * Refresh masking on a specific modal
-     * @param {string} id - Modal ID
-     */
     function refreshMasking(id) {
         const modal = document.getElementById(id);
         if (modal) {
@@ -104,44 +91,333 @@ const ModalSystem = (function() {
     }
 
     // ============================================================
+    // FORM VALIDATION SYSTEM (NEW)
+    // ============================================================
+    
+    const validationInstances = {};
+
+    /**
+     * Initialize form validation for a modal
+     * 
+     * @param {string} modalId - The modal element ID
+     * @param {object} config - Validation configuration
+     * @param {object} config.fields - Field definitions { fieldId: { label, type, hiddenField, required, validator } }
+     * @param {string} config.submitButtonId - ID of the submit button
+     * @param {function} config.onSubmit - Submit callback function
+     * @param {boolean} config.showErrorsOnLoad - Show errors immediately (default: false)
+     */
+    function validateForm(modalId, config) {
+        config = config || {};
+        const fields = config.fields || {};
+        const submitButtonId = config.submitButtonId;
+        const onSubmit = config.onSubmit;
+        const showErrorsOnLoad = config.showErrorsOnLoad || false;
+        
+        const modal = document.getElementById(modalId);
+        if (!modal) {
+            console.warn('ModalSystem.validateForm: Modal #' + modalId + ' not found');
+            return;
+        }
+        
+        const form = modal.querySelector('form');
+        if (!form) {
+            console.warn('ModalSystem.validateForm: No form found in modal #' + modalId);
+            return;
+        }
+        
+        const submitBtn = submitButtonId ? document.getElementById(submitButtonId) : form.querySelector('button[type="submit"]');
+        
+        let formTouched = false;
+        let isSubmitting = false;
+        
+        // Store instance for later reference
+        validationInstances[modalId] = {
+            reset: resetForm,
+            getFieldValue: getFieldValue,
+            isValid: () => validateAllFields(false)
+        };
+        
+        /**
+         * Get field value based on field type
+         */
+        function getFieldValue(fieldId, fieldConfig) {
+            const field = document.getElementById(fieldId);
+            if (!field) return '';
+            
+            // For search fields with hidden input
+            if (fieldConfig.type === 'search' && fieldConfig.hiddenField) {
+                const hiddenField = document.getElementById(fieldConfig.hiddenField);
+                return hiddenField ? hiddenField.value.trim() : '';
+            }
+            
+            return field.value.trim();
+        }
+        
+        /**
+         * Highlight a field as error
+         */
+        function highlightField(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.style.borderColor = '#EF4444';
+                field.style.borderWidth = '2px';
+                field.style.boxShadow = '0 0 0 1px #EF4444';
+            }
+        }
+        
+        /**
+         * Clear error from a field
+         */
+        function clearField(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.style.borderColor = '';
+                field.style.borderWidth = '';
+                field.style.boxShadow = '';
+            }
+        }
+        
+        /**
+         * Clear all field errors
+         */
+        function clearAllFields() {
+            Object.keys(fields).forEach(fieldId => {
+                clearField(fieldId);
+            });
+        }
+        
+        /**
+         * Validate all fields
+         */
+        function validateAllFields(showErrors) {
+            let isValid = true;
+            let firstErrorField = null;
+            const errors = [];
+            
+            for (const [fieldId, fieldConfig] of Object.entries(fields)) {
+                const value = getFieldValue(fieldId, fieldConfig);
+                const label = fieldConfig.label || fieldId;
+                let fieldValid = true;
+                
+                // Check required
+                if (fieldConfig.required !== false && !value) {
+                    fieldValid = false;
+                    errors.push(`Please enter ${label}`);
+                }
+                
+                // Custom validator
+                if (fieldValid && typeof fieldConfig.validator === 'function') {
+                    const validatorResult = fieldConfig.validator(value);
+                    if (validatorResult !== true) {
+                        fieldValid = false;
+                        errors.push(validatorResult || `${label} is invalid`);
+                    }
+                }
+                
+                if (!fieldValid) {
+                    isValid = false;
+                    if (showErrors && formTouched) {
+                        highlightField(fieldId);
+                        if (!firstErrorField) firstErrorField = document.getElementById(fieldId);
+                    }
+                } else if (showErrors && formTouched) {
+                    clearField(fieldId);
+                }
+            }
+            
+            // Update submit button
+            if (submitBtn) {
+                if (!isValid || isSubmitting) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    if (!isSubmitting) {
+                        submitBtn.title = 'Please fill in all required fields';
+                    }
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    submitBtn.title = '';
+                }
+            }
+            
+            return { isValid, errors, firstErrorField };
+        }
+        
+        /**
+         * Mark form as touched and validate
+         */
+        function touchForm() {
+            if (!formTouched) {
+                formTouched = true;
+            }
+            validateAllFields(true);
+        }
+        
+        /**
+         * Reset form state
+         */
+        function resetForm() {
+            formTouched = false;
+            isSubmitting = false;
+            clearAllFields();
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                submitBtn.title = 'Please fill in all required fields';
+            }
+            
+            validateAllFields(false);
+        }
+        
+        /**
+         * Handle form submission
+         */
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Mark as touched
+            formTouched = true;
+            
+            // Validate
+            const { isValid, errors, firstErrorField } = validateAllFields(true);
+            
+            if (!isValid) {
+                // Show first error
+                if (errors.length > 0) {
+                    toastWrapper.error(errors[0], {
+                        title: 'Missing Information',
+                        duration: 4000
+                    });
+                }
+                
+                // Focus first error field
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Add shake animation
+                    firstErrorField.classList.add('shake-error');
+                    setTimeout(() => firstErrorField.classList.remove('shake-error'), 500);
+                }
+                
+                return false;
+            }
+            
+            // All valid - call submit handler
+            if (typeof onSubmit === 'function') {
+                isSubmitting = true;
+                
+                try {
+                    await onSubmit(event, {
+                        getFieldValue: getFieldValue,
+                        fields: fields,
+                        form: form
+                    });
+                } catch (err) {
+                    console.error('Form submit error:', err);
+                } finally {
+                    isSubmitting = false;
+                    
+                    // Re-enable button if form is still visible
+                    if (submitBtn && !modal.classList.contains('hidden')) {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.title = '';
+                    }
+                }
+            }
+        }
+        
+        // ============================================================
+        // ATTACH EVENT LISTENERS
+        // ============================================================
+        
+        // Attach to form submit
+        form.addEventListener('submit', handleSubmit);
+        
+        // Watch each field for changes
+        Object.keys(fields).forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('focus', touchForm);
+                field.addEventListener('input', () => {
+                    touchForm();
+                    validateAllFields(true);
+                });
+                field.addEventListener('change', () => {
+                    touchForm();
+                    validateAllFields(true);
+                });
+            }
+            
+            // Watch hidden fields for search inputs
+            const fieldConfig = fields[fieldId];
+            if (fieldConfig.hiddenField) {
+                const hiddenField = document.getElementById(fieldConfig.hiddenField);
+                if (hiddenField) {
+                    const observer = new MutationObserver(() => {
+                        if (formTouched) {
+                            validateAllFields(true);
+                        }
+                    });
+                    observer.observe(hiddenField, { 
+                        attributes: true, 
+                        attributeFilter: ['value'] 
+                    });
+                }
+            }
+        });
+        
+        // Reset on modal open
+        const modalObserver = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.target.id === modalId) {
+                    if (!mutation.target.classList.contains('hidden')) {
+                        // Modal opened - reset
+                        setTimeout(resetForm, 100);
+                    }
+                }
+            });
+        });
+        
+        modalObserver.observe(modal, { attributes: true, attributeFilter: ['class'] });
+        
+        // Initial state
+        resetForm();
+        
+        // Override close to clean up
+        const originalClose = close;
+        
+        console.log('✅ Form validation initialized for modal:', modalId);
+        
+        return validationInstances[modalId];
+    }
+
+    // ============================================================
     // PUBLIC: Open/Close Modals
     // ============================================================
     
-    /**
-     * Open a modal by element ID
-     * @param {string} id - The modal element's ID
-     * @param {object} options - Optional: { applyMasking: boolean, onOpen: function }
-     */
     function open(id, options) {
-    options = options || {};
-    var modal = document.getElementById(id);
-    if (!modal) {
-        console.warn('ModalSystem.open: Element #' + id + ' not found');
-        return;
+        options = options || {};
+        var modal = document.getElementById(id);
+        if (!modal) {
+            console.warn('ModalSystem.open: Element #' + id + ' not found');
+            return;
+        }
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+        
+        if (options.applyMasking !== false) {
+            setTimeout(function() {
+                applyMaskingToModal(modal);
+            }, 150);
+        }
+        
+        if (typeof options.onOpen === 'function') {
+            options.onOpen(modal);
+        }
     }
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.body.classList.add('overflow-hidden');
-    
-    // Apply masking if requested (default: true)
-    if (options.applyMasking !== false) {
-        setTimeout(function() {
-            applyMaskingToModal(modal);
-            console.log('🔄 Masking applied to modal:', id);
-        }, 150);
-    }
-    
-    // Call onOpen callback
-    if (typeof options.onOpen === 'function') {
-        options.onOpen(modal);
-    }
-}
 
-    /**
-     * Close a modal by element ID
-     * @param {string} id - The modal element's ID
-     * @param {object} options - Optional: { onClose: function }
-     */
     function close(id, options) {
         options = options || {};
         var modal = document.getElementById(id);
@@ -153,16 +429,11 @@ const ModalSystem = (function() {
         modal.classList.remove('flex');
         document.body.classList.remove('overflow-hidden');
         
-        // Call onClose callback
         if (typeof options.onClose === 'function') {
             options.onClose(modal);
         }
     }
 
-    /**
-     * Check if any modal is currently open
-     * @returns {boolean}
-     */
     function isAnyOpen() {
         var modals = document.querySelectorAll('.fixed.inset-0');
         for (var i = 0; i < modals.length; i++) {
@@ -174,15 +445,9 @@ const ModalSystem = (function() {
     }
 
     // ============================================================
-    // PUBLIC: Confirmation Dialog with Masking
+    // PUBLIC: Confirmation Dialog
     // ============================================================
 
-    /**
-     * Show a confirmation dialog
-     * @param {string} message - The confirmation message
-     * @param {function} onConfirm - Callback when confirmed
-     * @param {object} [options] - Optional: { title, confirmText, cancelText, type, applyMasking }
-     */
     function confirm(message, onConfirm, options) {
         options = options || {};
         var title = options.title || 'Confirm Action';
@@ -236,7 +501,6 @@ const ModalSystem = (function() {
 
         document.body.appendChild(overlay);
 
-        // Event handlers
         overlay.addEventListener('click', function() {
             close(modalId, { onClose: cleanup });
         });
@@ -265,15 +529,6 @@ const ModalSystem = (function() {
         return modalId;
     }
 
-    // ============================================================
-    // PUBLIC: Dynamic Modal Creator with Masking
-    // ============================================================
-
-    /**
-     * Create a modal dynamically
-     * @param {object} options - { id, title, icon, size, content, footer, onClose, applyMasking }
-     * @returns {string} The modal element ID
-     */
     function createModal(options) {
         options = options || {};
         var id = options.id || 'modal-system-dynamic-' + Date.now();
@@ -285,7 +540,6 @@ const ModalSystem = (function() {
         var onClose = options.onClose || null;
         var applyMasking = options.applyMasking !== false;
 
-        // Prevent duplicate IDs
         if (document.getElementById(id)) {
             console.warn('ModalSystem.createModal: ID "' + id + '" already exists');
             return id;
@@ -310,7 +564,6 @@ const ModalSystem = (function() {
 
         document.body.appendChild(modal);
 
-        // Close handlers
         var closeBtns = modal.querySelectorAll('.modal-close-btn');
         for (var i = 0; i < closeBtns.length; i++) {
             closeBtns[i].addEventListener('click', function() {
@@ -322,7 +575,6 @@ const ModalSystem = (function() {
             close(id, { onClose: onClose });
         });
 
-        // Apply masking if requested
         if (applyMasking) {
             setTimeout(function() {
                 applyMaskingToModal(modal);
@@ -333,56 +585,40 @@ const ModalSystem = (function() {
     }
 
     // ============================================================
-    // PUBLIC: Toast Wrapper
+    // Toast Wrapper
     // ============================================================
 
     var toastWrapper = {
         success: function(msg, opts) {
-            opts = opts || {};
-            opts.type = 'success';
-            if (typeof toast !== 'undefined' && toast.success) {
-                return toast.success(msg, opts);
-            }
+            opts = opts || {}; opts.type = 'success';
+            if (typeof toast !== 'undefined' && toast.success) return toast.success(msg, opts);
             console.log('[toast:success]', msg);
         },
         error: function(msg, opts) {
-            opts = opts || {};
-            opts.type = 'error';
-            if (typeof toast !== 'undefined' && toast.error) {
-                return toast.error(msg, opts);
-            }
+            opts = opts || {}; opts.type = 'error';
+            if (typeof toast !== 'undefined' && toast.error) return toast.error(msg, opts);
             console.log('[toast:error]', msg);
         },
         info: function(msg, opts) {
-            opts = opts || {};
-            opts.type = 'info';
-            if (typeof toast !== 'undefined' && toast.info) {
-                return toast.info(msg, opts);
-            }
+            opts = opts || {}; opts.type = 'info';
+            if (typeof toast !== 'undefined' && toast.info) return toast.info(msg, opts);
             console.log('[toast:info]', msg);
         },
         warning: function(msg, opts) {
-            opts = opts || {};
-            opts.type = 'warning';
-            if (typeof toast !== 'undefined' && toast.warning) {
-                return toast.warning(msg, opts);
-            }
+            opts = opts || {}; opts.type = 'warning';
+            if (typeof toast !== 'undefined' && toast.warning) return toast.warning(msg, opts);
             console.log('[toast:warning]', msg);
         },
         dismiss: function(id) {
-            if (typeof toast !== 'undefined' && toast.dismiss) {
-                toast.dismiss(id);
-            }
+            if (typeof toast !== 'undefined' && toast.dismiss) toast.dismiss(id);
         },
         dismissAll: function() {
-            if (typeof toast !== 'undefined' && toast.dismissAll) {
-                toast.dismissAll();
-            }
+            if (typeof toast !== 'undefined' && toast.dismissAll) toast.dismissAll();
         }
     };
 
     // ============================================================
-    // INTERNAL: Setup Event Handlers (runs on first call)
+    // Setup
     // ============================================================
 
     var initialized = false;
@@ -391,7 +627,6 @@ const ModalSystem = (function() {
         if (initialized) return;
         initialized = true;
 
-        // ESC key handler - close all open modals
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 var modals = document.querySelectorAll('.fixed.inset-0');
@@ -403,7 +638,6 @@ const ModalSystem = (function() {
             }
         });
 
-        // Backdrop click handler for all modals (delegated)
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0')) {
                 var modals = document.querySelectorAll('.fixed.inset-0');
@@ -415,23 +649,7 @@ const ModalSystem = (function() {
                 }
             }
         });
-
-        // Listen for Ctrl+Shift+M - delegate to data-mask.php
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && e.key === 'M') {
-                e.preventDefault();
-                if (typeof window.toggleDataMask !== 'undefined') {
-                    window.toggleDataMask();
-                } else {
-                    toggleMasking();
-                }
-            }
-        });
     }
-
-    // ============================================================
-    // INTERNAL: Helpers
-    // ============================================================
 
     function escapeHtml(str) {
         if (!str) return '';
@@ -440,10 +658,6 @@ const ModalSystem = (function() {
         return div.innerHTML;
     }
 
-    // ============================================================
-    // INIT
-    // ============================================================
-
     init();
 
     // ============================================================
@@ -451,27 +665,18 @@ const ModalSystem = (function() {
     // ============================================================
 
     return {
-        // Core modal functions
         open: open,
         close: close,
         isAnyOpen: isAnyOpen,
         confirm: confirm,
         createModal: createModal,
-        
-        // Data masking functions
+        validateForm: validateForm,  // NEW!
         toggleMasking: toggleMasking,
         isMasked: isMasked,
         refreshMasking: refreshMasking,
         applyMaskingToModal: applyMaskingToModal,
-        
-        // Toast wrapper
         toast: toastWrapper
     };
 })();
 
-// ============================================================
-// GLOBAL KEYBOARD SHORTCUT: Ctrl+Shift+M
-// ============================================================
-
-console.log('✅ ModalSystem loaded with data masking support.');
-console.log('📌 Press Ctrl+Shift+M to toggle data masking.');
+console.log('✅ ModalSystem loaded with validation support.');

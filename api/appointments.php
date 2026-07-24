@@ -20,10 +20,11 @@ header('Content-Type: application/json');
 try {
     $controller = new AppointmentController();
     $method = $_SERVER['REQUEST_METHOD'];
+    
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $parts = explode('/', trim($path, '/'));
 
-    // Get appointment ID from URL if exists (e.g. /api/appointments.php/123)
+    // Get appointment ID from URL if exists
     $appointmentId = null;
     if (count($parts) >= 3 && is_numeric($parts[2])) {
         $appointmentId = $parts[2];
@@ -34,7 +35,8 @@ try {
         $appointmentId = $_GET['id'];
     }
 
-    $isStatusUpdate = isset($_GET['action']) && $_GET['action'] === 'status';
+    $action = $_GET['action'] ?? '';
+    $isStatusUpdate = ($action === 'status');
 
     switch ($method) {
         case 'GET':
@@ -48,7 +50,16 @@ try {
             break;
 
         case 'POST':
-            $controller->store();
+            // FIXED: Check action parameter for update/delete operations
+            if ($action === 'status' && $appointmentId) {
+                $controller->updateStatus($appointmentId);
+            } elseif ($action === 'update' && $appointmentId) {
+                $controller->update($appointmentId);
+            } elseif ($action === 'delete' && $appointmentId) {
+                $controller->destroy($appointmentId);
+            } else {
+                $controller->store();
+            }
             break;
 
         case 'PUT':

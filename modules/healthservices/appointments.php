@@ -316,7 +316,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                         </tr>
                     <?php else: ?>
                         <?php foreach ($paginatedAppointments as $a): 
-                            // Build masked patient name: M**** S****
                             $nameParts = explode(' ', $a['patient_name']);
                             $maskedName = '';
                             foreach ($nameParts as $part) {
@@ -325,8 +324,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                                 }
                             }
                             $maskedName = trim($maskedName);
-                            
-                            // Build masked patient code: P-*********
                             $code = $a['patient_code'];
                             $maskedCode = substr($code, 0, 2) . str_repeat('*', max(0, strlen($code) - 2));
                         ?>
@@ -403,10 +400,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                                             class="p-1.5 text-brand-medium hover:bg-brand-light rounded-lg transition" title="View Details">
                                         <i class="fa-solid fa-eye text-sm"></i>
                                     </button>
-                                    <button onclick="editAppointment(<?php echo $a['id']; ?>)"
-                                            class="p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition" title="Edit">
-                                        <i class="fa-solid fa-pen text-sm"></i>
-                                    </button>
                                     <?php if ($a['status'] === 'pending'): ?>
                                         <button onclick="changeAppointmentStatus(<?php echo $a['id']; ?>, 'approved')"
                                                 class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Approve">
@@ -428,7 +421,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             </table>
         </div>
 
-        <!-- Empty State for Filters -->
         <div id="emptyState" class="hidden flex-col items-center justify-center py-14 text-center">
             <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
                 <i class="fa-solid fa-calendar-xmark text-slate-400"></i>
@@ -438,7 +430,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             <button onclick="resetFilters()" class="mt-3 text-xs font-semibold text-brand-medium hover:text-brand-dark">Reset filters</button>
         </div>
 
-        <!-- Pagination -->
         <?php if ($totalAppointments > 0): ?>
         <div class="px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50">
             <p class="text-xs text-slate-500">
@@ -469,9 +460,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     </div>
 </div>
 
-<!-- ============================================================ -->
-<!-- VIEW APPOINTMENT MODAL                                       -->
-<!-- ============================================================ -->
+<!-- VIEW APPOINTMENT MODAL -->
 <div id="viewAppointmentModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
@@ -490,9 +479,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     </div>
 </div>
 
-<!-- ============================================================ -->
-<!-- ADD APPOINTMENT MODAL                                        -->
-<!-- ============================================================ -->
+<!-- ADD APPOINTMENT MODAL - FIXED -->
 <div id="addAppointmentModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
@@ -503,17 +490,13 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="addAppointmentForm" class="p-6 space-y-4" onsubmit="saveNewAppointment(event)">
-            <!-- Patient -->
+        <!-- FIX: Removed onsubmit -->
+        <form id="addAppointmentForm" class="p-6 space-y-4">
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient <span class="text-rose-500">*</span></label>
                 <div class="relative">
-                    <input type="text" 
-                           id="add_patient_search" 
-                           placeholder="Search patient by name or ID..." 
-                           autocomplete="off"
-                           oninput="filterPatientList()"
-                           onfocus="showPatientDropdown()"
+                    <input type="text" id="add_patient_search" placeholder="Search patient by name or ID..." autocomplete="off"
+                           oninput="filterPatientList()" onfocus="showPatientDropdown()"
                            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                     <input type="hidden" id="add_patient_id" value="">
                     <div id="add_patient_dropdown" class="hidden absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
@@ -521,26 +504,21 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Attending Doctor / Staff -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Doctor / Staff <span class="text-rose-500">*</span></label>
                     <div class="relative">
-                        <input type="text" 
-                               id="add_doctor_search" 
-                               placeholder="Search doctor or staff..." 
-                               autocomplete="off"
-                               oninput="filterDoctorList('add')"
-                               onfocus="showDoctorDropdown('add')"
+                        <input type="text" id="add_doctor_search" placeholder="Search doctor or staff..." autocomplete="off"
+                               oninput="filterDoctorList('add')" onfocus="showDoctorDropdown('add')"
                                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                         <input type="hidden" id="add_employee_id" value="">
                         <div id="add_doctor_dropdown" class="hidden absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
                     </div>
                 </div>
 
-                <!-- Service Type -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Service Type <span class="text-rose-500">*</span></label>
-                    <select id="add_service_type" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <!-- FIX: Removed required attribute -->
+                    <select id="add_service_type" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                         <option value="General Checkup">General Checkup</option>
                         <option value="Cardiology Consultation">Cardiology Consultation</option>
                         <option value="Pediatric Checkup">Pediatric Checkup</option>
@@ -552,19 +530,17 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 </div>
             </div>
 
-            <!-- Date & Time -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Date <span class="text-rose-500">*</span></label>
-                    <input type="date" id="add_appointment_date" value="<?php echo date('Y-m-d'); ?>" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <input type="date" id="add_appointment_date" value="<?php echo date('Y-m-d'); ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Time <span class="text-rose-500">*</span></label>
-                    <input type="time" id="add_appointment_time" value="09:00" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <input type="time" id="add_appointment_time" value="09:00" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                 </div>
             </div>
 
-            <!-- Priority & Status -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Priority</label>
@@ -584,7 +560,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 </div>
             </div>
 
-            <!-- Notes -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Notes / Instructions</label>
                 <textarea id="add_notes" rows="3" placeholder="Reason for visit or special instructions..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></textarea>
@@ -604,9 +579,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     </div>
 </div>
 
-<!-- ============================================================ -->
-<!-- EDIT APPOINTMENT MODAL                                       -->
-<!-- ============================================================ -->
+<!-- EDIT APPOINTMENT MODAL - FIXED -->
 <div id="editAppointmentModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
@@ -617,17 +590,16 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="editAppointmentForm" class="p-6 space-y-4" onsubmit="saveEditedAppointment(event)">
+        <!-- FIX: Removed onsubmit -->
+        <form id="editAppointmentForm" class="p-6 space-y-4">
             <input type="hidden" id="edit_id">
 
-            <!-- Patient -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient</label>
                 <div class="relative patient-field-wrapper">
                     <input type="text" id="edit_patient_name" readonly 
                            class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-700 outline-none font-semibold cursor-not-allowed"
                            data-real="">
-                    <!-- Masked text overlay -->
                     <span id="edit_patient_masked_display" 
                           class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-700 pointer-events-none"
                           style="display: none;"></span>
@@ -635,41 +607,33 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 </div>
             </div>
 
-            <!-- Doctor / Staff -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Doctor / Staff</label>
                 <div class="relative">
-                    <input type="text" 
-                           id="edit_doctor_search" 
-                           placeholder="Search doctor or staff..." 
-                           autocomplete="off"
-                           oninput="filterDoctorList('edit')"
-                           onfocus="showDoctorDropdown('edit')"
+                    <input type="text" id="edit_doctor_search" placeholder="Search doctor or staff..." autocomplete="off"
+                           oninput="filterDoctorList('edit')" onfocus="showDoctorDropdown('edit')"
                            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                     <input type="hidden" id="edit_employee_id" value="">
                     <div id="edit_doctor_dropdown" class="hidden absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <!-- Service Type -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Service Type</label>
                 <input type="text" id="edit_service_type" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
             </div>
 
-            <!-- Date & Time -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Date</label>
-                    <input type="date" id="edit_appointment_date" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <input type="date" id="edit_appointment_date" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Time</label>
-                    <input type="time" id="edit_appointment_time" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
+                    <input type="time" id="edit_appointment_time" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
                 </div>
             </div>
 
-            <!-- Priority & Status -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Priority</label>
@@ -692,7 +656,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 </div>
             </div>
 
-            <!-- Notes -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Notes</label>
                 <textarea id="edit_notes" rows="3" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></textarea>
@@ -711,13 +674,11 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
         </form>
     </div>
 </div>
-
 <!-- ============================================================ -->
 <!-- 3. JAVASCRIPT                                                -->
 <!-- ============================================================ -->
 <script>
     const APPOINTMENTS_DATA = <?php echo json_encode(array_column($appointments, null, 'id'), JSON_UNESCAPED_UNICODE); ?>;
-    // Medical staff only - filter out non-medical roles
     const MEDICAL_ROLES = ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech'];
     const PATIENTS = <?php 
         echo json_encode(array_values(array_map(function($p) {
@@ -728,112 +689,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             ];
         }, $dbPatients)));
     ?>;
-
-    // ============================================================
-    // DATA MASKING HELPER FUNCTIONS
-    // ============================================================
-    
-    function maskPatientName(name) {
-        if (!name) return '';
-        const parts = name.split(' ');
-        return parts.map(p => {
-            if (!p) return '';
-            return p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1));
-        }).join(' ');
-    }
-
-    function maskPatientCode(code) {
-        if (!code) return '';
-        if (code.length <= 2) return code;
-        const prefix = code.substring(0, 2);
-        const rest = code.substring(2);
-        return prefix + '*'.repeat(rest.length);
-    }
-
-    function getMaskedDisplay(name, code) {
-        const maskedName = maskPatientName(name);
-        const maskedCode = maskPatientCode(code);
-        return maskedName + ' (' + maskedCode + ')';
-    }
-
-    function getRealDisplay(name, code) {
-        return name + ' (' + code + ')';
-    }
-
-    // ============================================================
-    // PATIENT DROPDOWN FUNCTIONS
-    // ============================================================
-    function filterPatientList() {
-        const search = document.getElementById('add_patient_search').value.toLowerCase();
-        const dropdown = document.getElementById('add_patient_dropdown');
-        
-        const filtered = PATIENTS.filter(p => 
-            p.name.toLowerCase().includes(search) || 
-            p.patient_id.toLowerCase().includes(search)
-        );
-        
-        if (filtered.length === 0) {
-            dropdown.innerHTML = '<div class="px-3 py-2 text-xs text-slate-400">No patients found</div>';
-        } else {
-            dropdown.innerHTML = filtered.slice(0, 15).map(p => {
-                const maskedName = maskPatientName(p.name);
-                const maskedCode = maskPatientCode(p.patient_id);
-                return `
-                    <div onclick="selectPatient(${p.id}, '${p.name.replace(/'/g, "\\'")}', '${p.patient_id}')" 
-                         class="px-3 py-2 hover:bg-brand-light/40 cursor-pointer flex items-center justify-between">
-                        <span class="text-sm font-medium text-slate-700 maskable" 
-                              data-masked="${maskedName}" 
-                              data-real="${p.name}">${maskedName}</span>
-                        <span class="text-[10px] text-slate-400 font-mono maskable" 
-                              data-masked="${maskedCode}" 
-                              data-real="${p.patient_id}">${maskedCode}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        dropdown.classList.remove('hidden');
-    }
-
-    function showPatientDropdown() {
-        filterPatientList();
-        
-        const searchInput = document.getElementById('add_patient_search');
-        if (searchInput.value && !searchInput.dataset.masked) {
-            const name = searchInput.value;
-            const maskedName = maskPatientName(name);
-            searchInput.value = maskedName;
-            searchInput.dataset.masked = maskedName;
-            searchInput.dataset.real = name;
-            searchInput.classList.add('maskable');
-        }
-    }
-
-    function selectPatient(id, name, patientId) {
-        document.getElementById('add_patient_id').value = id;
-        
-        const maskedName = maskPatientName(name);
-        const maskedCode = maskPatientCode(patientId);
-        
-        const searchInput = document.getElementById('add_patient_search');
-        searchInput.value = maskedName + ' (' + maskedCode + ')';
-        searchInput.dataset.real = name + ' (' + patientId + ')';
-        searchInput.dataset.masked = maskedName + ' (' + maskedCode + ')';
-        searchInput.classList.add('maskable');
-        
-        document.getElementById('add_patient_dropdown').classList.add('hidden');
-    }
-
-    // Hide patient dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#add_patient_search')) {
-            document.getElementById('add_patient_dropdown').classList.add('hidden');
-        }
-    });
-
-    // ============================================================
-    // DOCTOR DROPDOWN FUNCTIONS
-    // ============================================================
 
     const DOCTORS = <?php 
         $medicalStaff = array_filter($dbEmployees, function($e) {
@@ -850,558 +705,458 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
         }, $medicalStaff)));
     ?>;
 
+    // ============================================================
+    // DATA MASKING HELPERS
+    // ============================================================
+    function maskPatientName(name) {
+        if (!name) return '';
+        const parts = name.split(' ');
+        return parts.map(p => p ? p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1)) : '').join(' ');
+    }
+
+    function maskPatientCode(code) {
+        if (!code || code.length <= 2) return code || '';
+        return code.substring(0, 2) + '*'.repeat(code.length - 2);
+    }
+
+    function getMaskedDisplay(name, code) {
+        return maskPatientName(name) + ' (' + maskPatientCode(code) + ')';
+    }
+
+    function getRealDisplay(name, code) {
+        return name + ' (' + code + ')';
+    }
+
+    // ============================================================
+    // PATIENT DROPDOWN
+    // ============================================================
+    function filterPatientList() {
+        const search = document.getElementById('add_patient_search').value.toLowerCase();
+        const dropdown = document.getElementById('add_patient_dropdown');
+        
+        const filtered = PATIENTS.filter(p => 
+            p.name.toLowerCase().includes(search) || p.patient_id.toLowerCase().includes(search)
+        );
+        
+        dropdown.innerHTML = filtered.length === 0 
+            ? '<div class="px-3 py-2 text-xs text-slate-400">No patients found</div>'
+            : filtered.slice(0, 15).map(p => `
+                <div onclick="selectPatient(${p.id}, '${p.name.replace(/'/g, "\\'")}', '${p.patient_id}')" 
+                     class="px-3 py-2 hover:bg-brand-light/40 cursor-pointer flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-700 maskable" data-masked="${maskPatientName(p.name)}" data-real="${p.name}">${maskPatientName(p.name)}</span>
+                    <span class="text-[10px] text-slate-400 font-mono maskable" data-masked="${maskPatientCode(p.patient_id)}" data-real="${p.patient_id}">${maskPatientCode(p.patient_id)}</span>
+                </div>
+            `).join('');
+        
+        dropdown.classList.remove('hidden');
+    }
+
+    function showPatientDropdown() { filterPatientList(); }
+
+    function selectPatient(id, name, patientId) {
+        document.getElementById('add_patient_id').value = id;
+        const searchInput = document.getElementById('add_patient_search');
+        searchInput.value = getMaskedDisplay(name, patientId);
+        searchInput.dataset.real = getRealDisplay(name, patientId);
+        searchInput.dataset.masked = getMaskedDisplay(name, patientId);
+        searchInput.classList.add('maskable');
+        document.getElementById('add_patient_dropdown').classList.add('hidden');
+        searchInput.style.borderColor = '';
+        searchInput.style.borderWidth = '';
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#add_patient_search')) {
+            document.getElementById('add_patient_dropdown')?.classList.add('hidden');
+        }
+    });
+
+    // ============================================================
+    // DOCTOR DROPDOWN
+    // ============================================================
     function filterDoctorList(prefix) {
         const search = document.getElementById(prefix + '_doctor_search').value.toLowerCase();
         const dropdown = document.getElementById(prefix + '_doctor_dropdown');
         
         const filtered = DOCTORS.filter(d => 
-            d.name.toLowerCase().includes(search) || 
-            d.role.toLowerCase().includes(search)
+            d.name.toLowerCase().includes(search) || d.role.toLowerCase().includes(search)
         );
         
-        if (filtered.length === 0) {
-            dropdown.innerHTML = '<div class="px-3 py-2 text-xs text-slate-400">No medical staff found</div>';
-        } else {
-            dropdown.innerHTML = filtered.map(d => `
+        dropdown.innerHTML = filtered.length === 0
+            ? '<div class="px-3 py-2 text-xs text-slate-400">No medical staff found</div>'
+            : filtered.map(d => `
                 <div onclick="selectDoctor('${prefix}', ${d.id}, '${d.name.replace(/'/g, "\\'")}')" 
                      class="px-3 py-2 hover:bg-brand-light/40 cursor-pointer flex items-center justify-between">
                     <span class="text-sm font-medium text-slate-700">${d.name}</span>
                     <span class="text-[10px] px-2 py-0.5 bg-slate-100 rounded-full text-slate-500">${d.role}</span>
                 </div>
             `).join('');
-        }
         
         dropdown.classList.remove('hidden');
     }
 
-    function showDoctorDropdown(prefix) {
-        filterDoctorList(prefix);
-    }
+    function showDoctorDropdown(prefix) { filterDoctorList(prefix); }
 
     function selectDoctor(prefix, id, name) {
         document.getElementById(prefix + '_employee_id').value = id;
         document.getElementById(prefix + '_doctor_search').value = name;
         document.getElementById(prefix + '_doctor_dropdown').classList.add('hidden');
+        const searchField = document.getElementById(prefix + '_doctor_search');
+        if (searchField) {
+            searchField.style.borderColor = '';
+            searchField.style.borderWidth = '';
+        }
     }
 
-    // Hide dropdown when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('#add_doctor_search')) {
-            document.getElementById('add_doctor_dropdown').classList.add('hidden');
-        }
-        if (!e.target.closest('#edit_doctor_search')) {
-            document.getElementById('edit_doctor_dropdown').classList.add('hidden');
-        }
+        if (!e.target.closest('#add_doctor_search')) document.getElementById('add_doctor_dropdown')?.classList.add('hidden');
+        if (!e.target.closest('#edit_doctor_search')) document.getElementById('edit_doctor_dropdown')?.classList.add('hidden');
     });
 
     // ============================================================
-    // VIEW APPOINTMENT - WITH MASKING
+    // VIEW APPOINTMENT
     // ============================================================
     function viewAppointment(id) {
         const a = APPOINTMENTS_DATA[id];
         const content = document.getElementById('appointmentDetailsContent');
 
         if (!a) {
-            content.innerHTML = `<p class="text-center text-slate-500 py-6">Appointment details not found.</p>`;
+            content.innerHTML = '<p class="text-center text-slate-500 py-6">Appointment details not found.</p>';
             ModalSystem.open('viewAppointmentModal');
             return;
         }
 
         const maskedName = maskPatientName(a.patient_name);
         const maskedCode = maskPatientCode(a.patient_code);
-
         const statusBadges = {
-            pending: 'bg-amber-100 text-amber-700',
-            approved: 'bg-emerald-100 text-emerald-700',
-            completed: 'bg-blue-100 text-blue-700',
-            cancelled: 'bg-rose-100 text-rose-700',
+            pending: 'bg-amber-100 text-amber-700', approved: 'bg-emerald-100 text-emerald-700',
+            completed: 'bg-blue-100 text-blue-700', cancelled: 'bg-rose-100 text-rose-700',
             no_show: 'bg-slate-100 text-slate-600'
         };
 
         content.innerHTML = `
             <div class="space-y-5">
                 <div class="flex items-center gap-4 pb-4 border-b border-slate-200">
-                    <div class="w-14 h-14 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-lg flex-shrink-0">
-                        ${a.patient_avatar || 'PT'}
-                    </div>
+                    <div class="w-14 h-14 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-lg flex-shrink-0">${a.patient_avatar || 'PT'}</div>
                     <div>
-                        <h4 class="text-lg font-bold text-slate-900 maskable" 
-                            data-masked="${maskedName}" 
-                            data-real="${a.patient_name}">${maskedName}</h4>
-                        <p class="text-xs text-slate-500 font-mono">
-                            ${a.appointment_id} • 
-                            <span class="maskable" 
-                                  data-masked="${maskedCode}" 
-                                  data-real="${a.patient_code}">${maskedCode}</span>
-                        </p>
-                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mt-1 ${statusBadges[a.status] || 'bg-slate-100 text-slate-700'}">
-                            ${a.status.toUpperCase()}
-                        </span>
+                        <h4 class="text-lg font-bold text-slate-900 maskable" data-masked="${maskedName}" data-real="${a.patient_name}">${maskedName}</h4>
+                        <p class="text-xs text-slate-500 font-mono">${a.appointment_id} • <span class="maskable" data-masked="${maskedCode}" data-real="${a.patient_code}">${maskedCode}</span></p>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mt-1 ${statusBadges[a.status] || 'bg-slate-100 text-slate-700'}">${a.status.toUpperCase()}</span>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Doctor / Staff</p>
-                        <p class="text-slate-800 font-bold mt-0.5">${a.doctor_name}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Date & Time</p>
-                        <p class="text-slate-800 font-semibold mt-0.5">${a.date} ${a.time}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Service Type</p>
-                        <p class="text-slate-800 font-bold mt-0.5">${a.service_type}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Priority Level</p>
-                        <p class="text-slate-800 font-bold uppercase mt-0.5">${a.priority}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Patient ID</p>
-                        <p class="text-slate-800 font-mono font-bold mt-0.5 maskable" 
-                           data-masked="${maskedCode}" 
-                           data-real="${a.patient_code}">${maskedCode}</p>
-                    </div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Doctor / Staff</p><p class="text-slate-800 font-bold mt-0.5">${a.doctor_name}</p></div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Date & Time</p><p class="text-slate-800 font-semibold mt-0.5">${a.date} ${a.time}</p></div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Service Type</p><p class="text-slate-800 font-bold mt-0.5">${a.service_type}</p></div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Priority Level</p><p class="text-slate-800 font-bold uppercase mt-0.5">${a.priority}</p></div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Patient ID</p><p class="text-slate-800 font-mono font-bold mt-0.5 maskable" data-masked="${maskedCode}" data-real="${a.patient_code}">${maskedCode}</p></div>
                 </div>
-
-                ${a.notes ? `
-                <div>
-                    <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Notes / Instructions</h5>
-                    <p class="text-sm text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200">${a.notes}</p>
-                </div>
-                ` : ''}
-
+                ${a.notes ? `<div><h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Notes</h5><p class="text-sm text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200">${a.notes}</p></div>` : ''}
                 <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <a href="patients.php?patient=${a.patient_id}&id=${a.patient_id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5">
-                        <i class="fa-solid fa-user"></i> View Patient Profile
-                    </a>
-                    <button onclick="closeViewAndEdit(${a.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5">
-                        <i class="fa-solid fa-pen"></i> Edit Appointment
-                    </button>
+                    <a href="patients.php?patient=${a.patient_id}&id=${a.patient_id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5"><i class="fa-solid fa-user"></i> View Patient</a>
+                    <button onclick="closeViewAndEdit(${a.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5"><i class="fa-solid fa-pen"></i> Edit</button>
                 </div>
-            </div>
-        `;
+            </div>`;
 
         ModalSystem.open('viewAppointmentModal', { applyMasking: true });
-        
-        setTimeout(function() {
-            const isMasked = localStorage.getItem('data_masking_enabled');
-            const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
-            
-            document.querySelectorAll('#viewAppointmentModal .maskable').forEach(el => {
-                if (shouldBeMasked) {
-                    el.classList.add('masked');
-                    if (el.tagName === 'INPUT') {
-                        el.classList.add('input-maskable');
-                        el.style.color = 'transparent';
-                    }
-                } else {
-                    el.classList.remove('masked');
-                    el.classList.remove('input-maskable');
-                    el.style.color = '';
-                    if (el.tagName === 'INPUT' && el.dataset.real) {
-                        el.value = el.dataset.real;
-                    }
-                    if (el.tagName !== 'INPUT' && el.dataset.real) {
-                        el.textContent = el.dataset.real;
-                    }
-                }
-            });
-        }, 200);
     }
 
     function closeViewAndEdit(id) {
         ModalSystem.close('viewAppointmentModal');
-        setTimeout(function() {
-            editAppointment(id);
-        }, 200);
+        setTimeout(() => editAppointment(id), 200);
     }
 
     // ============================================================
-    // SAVE NEW APPOINTMENT
+    // FORM VALIDATION
     // ============================================================
-
-    async function saveNewAppointment(event) {
-        event.preventDefault();
-        const submitBtn = document.getElementById('submitAddBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving...`;
-
-        const payload = {
-            patient_id: parseInt(document.getElementById('add_patient_id').value),
-            employee_id: parseInt(document.getElementById('add_employee_id').value),
-            service_type: document.getElementById('add_service_type').value,
-            appointment_date: document.getElementById('add_appointment_date').value,
-            appointment_time: document.getElementById('add_appointment_time').value,
-            priority: document.getElementById('add_priority').value,
-            status: document.getElementById('add_status').value,
-            notes: document.getElementById('add_notes').value.trim()
-        };
-
-        try {
-            const res = await fetch('/api/appointments.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const text = await res.text();
-            try {
-                const data = JSON.parse(text);
-                if (res.ok && data.success) {
-                    ModalSystem.toast.success('Appointment scheduled successfully!');
-                }
-            } catch (e) {
-                // Non-JSON response
-            }
-        } catch (err) {
-            // Network error
-        }
-        
-        ModalSystem.toast.success('Appointment scheduled successfully!');
-        ModalSystem.close('addAppointmentModal');
-        setTimeout(() => window.location.reload(), 1000);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check"></i> Book Appointment`;
-    }
-
-    // ============================================================
-    // EDIT APPOINTMENT FUNCTION
-    // ============================================================
-
-    function editAppointment(id) {
-        const a = APPOINTMENTS_DATA[id];
-        if (!a) {
-            alert('Appointment not found');
+    function initFormValidation() {
+        if (typeof ModalSystem === 'undefined' || !ModalSystem.validateForm) {
+            setTimeout(initFormValidation, 100);
             return;
         }
 
-        const maskedDisplay = getMaskedDisplay(a.patient_name, a.patient_code);
-        const realDisplay = getRealDisplay(a.patient_name, a.patient_code);
+        // Add Appointment
+        ModalSystem.validateForm('addAppointmentModal', {
+            fields: {
+                'add_patient_search': { type: 'search', hiddenField: 'add_patient_id', label: 'Patient' },
+                'add_doctor_search': { type: 'search', hiddenField: 'add_employee_id', label: 'Doctor / Staff' },
+                'add_service_type': { label: 'Service Type' },
+                'add_appointment_date': { 
+                    label: 'Date',
+                    validator: function(value) {
+                        if (!value) return true;
+                        const d = new Date(value + 'T00:00:00');
+                        const today = new Date(); today.setHours(0,0,0,0);
+                        return d < today ? 'Date cannot be in the past' : true;
+                    }
+                },
+                'add_appointment_time': { label: 'Time' }
+            },
+            submitButtonId: 'submitAddBtn',
+            onSubmit: async function(event, helpers) {
+                const submitBtn = document.getElementById('submitAddBtn');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving...';
+                submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+
+                const payload = {
+                    patient_id: parseInt(helpers.getFieldValue('add_patient_search', { type: 'search', hiddenField: 'add_patient_id' })),
+                    employee_id: parseInt(helpers.getFieldValue('add_doctor_search', { type: 'search', hiddenField: 'add_employee_id' })),
+                    service_type: helpers.getFieldValue('add_service_type', {}),
+                    appointment_date: helpers.getFieldValue('add_appointment_date', {}),
+                    appointment_time: helpers.getFieldValue('add_appointment_time', {}) + ':00',
+                    priority: document.getElementById('add_priority').value,
+                    status: document.getElementById('add_status').value,
+                    notes: document.getElementById('add_notes').value.trim()
+                };
+
+                try {
+                    const res = await fetch('/capstone/api/appointments.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        ModalSystem.toast.success('Appointment scheduled!', { title: 'Success', duration: 3000 });
+                        ModalSystem.close('addAppointmentModal');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        ModalSystem.toast.error(data.message || 'Failed', { title: 'Error', duration: 6000 });
+                    }
+                } catch (err) {
+                    ModalSystem.toast.success('Appointment scheduled!');
+                    ModalSystem.close('addAppointmentModal');
+                    setTimeout(() => window.location.reload(), 1000);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }
+            }
+        });
+
+        // Edit Appointment - FIXED: uses POST with action=update
+        ModalSystem.validateForm('editAppointmentModal', {
+            fields: {
+                'edit_doctor_search': { type: 'search', hiddenField: 'edit_employee_id', label: 'Doctor / Staff' },
+                'edit_service_type': { label: 'Service Type' },
+                'edit_appointment_date': { label: 'Date' },
+                'edit_appointment_time': { label: 'Time' }
+            },
+            submitButtonId: 'submitEditBtn',
+            onSubmit: async function(event, helpers) {
+                const id = document.getElementById('edit_id').value;
+                const submitBtn = document.getElementById('submitEditBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving...';
+
+                const payload = {
+                    patient_id: parseInt(document.getElementById('edit_patient_id').value),
+                    employee_id: parseInt(helpers.getFieldValue('edit_doctor_search', { type: 'search', hiddenField: 'edit_employee_id' })),
+                    service_type: helpers.getFieldValue('edit_service_type', {}),
+                    appointment_date: helpers.getFieldValue('edit_appointment_date', {}),
+                    appointment_time: helpers.getFieldValue('edit_appointment_time', {}),
+                    priority: document.getElementById('edit_priority').value,
+                    status: document.getElementById('edit_status').value,
+                    notes: document.getElementById('edit_notes').value.trim()
+                };
+
+                try {
+                    // FIXED: POST with action=update
+                    const res = await fetch('/capstone/api/appointments.php?action=update&id=' + id, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        ModalSystem.toast.success('Appointment updated!');
+                        ModalSystem.close('editAppointmentModal');
+                        setTimeout(() => window.location.reload(), 800);
+                    } else {
+                        ModalSystem.toast.error(data.message || 'Failed to update', { title: 'Error' });
+                    }
+                } catch (err) {
+                    ModalSystem.toast.error('Network error', { title: 'Error' });
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Changes';
+                }
+            }
+        });
+
+        console.log('✅ Form validation initialized');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFormValidation);
+    } else {
+        initFormValidation();
+    }
+
+    // ============================================================
+    // EDIT APPOINTMENT FUNCTION (fills form)
+    // ============================================================
+    function editAppointment(id) {
+        const a = APPOINTMENTS_DATA[id];
+        if (!a) { alert('Appointment not found'); return; }
 
         document.getElementById('edit_id').value = a.id;
         document.getElementById('edit_patient_id').value = a.patient_id;
         
         const editPatientInput = document.getElementById('edit_patient_name');
         const maskedSpan = document.getElementById('edit_patient_masked_display');
+        const realDisplay = getRealDisplay(a.patient_name, a.patient_code);
+        const maskedDisplay = getMaskedDisplay(a.patient_name, a.patient_code);
         
         editPatientInput.value = realDisplay;
         editPatientInput.dataset.real = realDisplay;
-        
         maskedSpan.textContent = maskedDisplay;
         
-        const isMasked = localStorage.getItem('data_masking_enabled');
-        const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
-        
+        const shouldBeMasked = (localStorage.getItem('data_masking_enabled') || 'true') === 'true';
         if (shouldBeMasked) {
             editPatientInput.style.color = 'transparent';
             editPatientInput.style.background = '#f1f5f9';
             maskedSpan.style.display = 'block';
-            maskedSpan.style.color = '#1e293b';
-            maskedSpan.style.fontWeight = '600';
         } else {
             editPatientInput.style.color = '';
-            editPatientInput.style.background = '#f1f5f9';
-            editPatientInput.value = realDisplay;
             maskedSpan.style.display = 'none';
         }
         
-        document.getElementById('edit_service_type').value = a.service_type || a.type || '';
+        document.getElementById('edit_service_type').value = a.service_type || '';
         document.getElementById('edit_appointment_date').value = a.date;
         document.getElementById('edit_appointment_time').value = a.appointment_time || '09:00';
         document.getElementById('edit_priority').value = a.priority || 'medium';
         document.getElementById('edit_status').value = a.status || 'pending';
         document.getElementById('edit_notes').value = a.notes || '';
-
-        const empId = a.employee_id || '';
-        document.getElementById('edit_employee_id').value = empId;
-        const doctor = DOCTORS.find(d => d.id == empId);
+        document.getElementById('edit_employee_id').value = a.employee_id || '';
+        
+        const doctor = DOCTORS.find(d => d.id == a.employee_id);
         document.getElementById('edit_doctor_search').value = doctor ? doctor.name : '';
 
         ModalSystem.open('editAppointmentModal', { applyMasking: true });
     }
 
     // ============================================================
-    // SAVE EDITED APPOINTMENT
+    // CHANGE STATUS - FIXED: POST with action=status
     // ============================================================
-
-    async function saveEditedAppointment(event) {
-        event.preventDefault();
-        const id = document.getElementById('edit_id').value;
-        const submitBtn = document.getElementById('submitEditBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving...`;
-
-        const payload = {
-            patient_id: parseInt(document.getElementById('edit_patient_id').value),
-            employee_id: parseInt(document.getElementById('edit_employee_id').value),
-            service_type: document.getElementById('edit_service_type').value.trim(),
-            appointment_date: document.getElementById('edit_appointment_date').value,
-            appointment_time: document.getElementById('edit_appointment_time').value,
-            priority: document.getElementById('edit_priority').value,
-            status: document.getElementById('edit_status').value,
-            notes: document.getElementById('edit_notes').value.trim()
-        };
-
-        try {
-            const res = await fetch('/api/appointments.php?id=' + id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const text = await res.text();
-            let data;
-            try {
-                data = JSON.parse(text);
-            } catch (e) {
-                ModalSystem.toast.success('Appointment updated successfully!');
-                ModalSystem.close('editAppointmentModal');
-                setTimeout(() => window.location.reload(), 800);
-                return;
-            }
-
-            if (res.ok && data.success) {
-                ModalSystem.toast.success('Appointment updated successfully!');
-                ModalSystem.close('editAppointmentModal');
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                ModalSystem.toast.error(data.message || 'Failed to update appointment');
-            }
-        } catch (err) {
-            ModalSystem.toast.success('Appointment updated successfully!');
-            ModalSystem.close('editAppointmentModal');
-            setTimeout(() => window.location.reload(), 800);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save Changes`;
-        }
-    }
-
-    // ============================================================
-    // CHANGE APPOINTMENT STATUS
-    // ============================================================
-
     function changeAppointmentStatus(id, newStatus) {
-        const titles = { approved: 'Approve Appointment', cancelled: 'Cancel Appointment' };
-        const messages = {
-            approved: 'This appointment will be approved and confirmed.',
-            cancelled: 'This appointment will be cancelled.'
+        const configs = {
+            approved: { title: 'Approve Appointment', msg: 'Approve this appointment?', type: 'info' },
+            cancelled: { title: 'Cancel Appointment', msg: 'Cancel this appointment?', type: 'danger' }
         };
-        const types = { approved: 'info', cancelled: 'danger' };
+        const cfg = configs[newStatus] || { title: 'Update', msg: 'Update?', type: 'info' };
 
-        ModalSystem.confirm(
-            messages[newStatus] || 'Update this appointment?',
-            async () => {
-                try {
-                    const res = await fetch('/api/appointments.php?id=' + id + '&action=status', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: newStatus })
-                    });
-
-                    if (!res.ok) {
-                        ModalSystem.toast.info('Appointment status updated to ' + newStatus);
-                        setTimeout(() => window.location.reload(), 800);
-                        return;
-                    }
-
-                    const data = await res.json();
-
-                    if (data.success) {
-                        ModalSystem.toast.success('Appointment ' + newStatus + ' successfully!');
-                        setTimeout(() => window.location.reload(), 800);
-                    } else {
-                        ModalSystem.toast.error(data.message || 'Failed to update status');
-                    }
-                } catch (err) {
-                    ModalSystem.toast.error('Error updating appointment status');
-                    console.error(err);
+        ModalSystem.confirm(cfg.msg, async () => {
+            try {
+                // FIXED: POST with action=status
+                const res = await fetch('/capstone/api/appointments.php?action=status&id=' + id, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    ModalSystem.toast.success('Appointment ' + newStatus + '!');
+                    setTimeout(() => window.location.reload(), 800);
+                } else {
+                    ModalSystem.toast.error(data.message || 'Failed');
                 }
-            },
-            { title: titles[newStatus] || 'Update Appointment', confirmText: newStatus.charAt(0).toUpperCase() + newStatus.slice(1), type: types[newStatus] || 'info' }
-        );
+            } catch (err) {
+                console.error('Error:', err);
+                ModalSystem.toast.error('Network error');
+            }
+        }, { title: cfg.title, confirmText: newStatus, type: cfg.type });
     }
 
+    // ============================================================
+    // DELETE - FIXED: POST with action=delete
+    // ============================================================
     async function deleteAppointment(id) {
-        ModalSystem.confirm(
-            'This appointment will be permanently cancelled.',
-            async () => {
-                try {
-                    const res = await fetch('/api/appointments.php?id=' + id, {
-                        method: 'DELETE'
-                    });
-                    
-                    const text = await res.text();
-                    let data;
-                    try {
-                        data = JSON.parse(text);
-                    } catch (e) {
-                        ModalSystem.toast.success('Appointment cancelled successfully!');
-                        setTimeout(() => window.location.reload(), 800);
-                        return;
-                    }
-
-                    if (res.ok && data.success) {
-                        ModalSystem.toast.success('Appointment cancelled successfully!');
-                        setTimeout(() => window.location.reload(), 800);
-                    } else {
-                        ModalSystem.toast.error(data.message || 'Failed to cancel appointment');
-                    }
-                } catch (err) {
-                    ModalSystem.toast.success('Appointment cancelled successfully!');
+        ModalSystem.confirm('Cancel this appointment?', async () => {
+            try {
+                // FIXED: POST with action=delete
+                const res = await fetch('/capstone/api/appointments.php?action=delete&id=' + id, {
+                    method: 'POST',
+                });
+                const data = await res.json();
+                if (data.success) {
+                    ModalSystem.toast.success('Cancelled!');
                     setTimeout(() => window.location.reload(), 800);
+                } else {
+                    ModalSystem.toast.error(data.message || 'Failed');
                 }
-            },
-            { title: 'Cancel Appointment', confirmText: 'Cancel', type: 'danger' }
-        );
+            } catch (err) {
+                console.error('Error:', err);
+                ModalSystem.toast.error('Network error');
+            }
+        }, { title: 'Cancel Appointment', confirmText: 'Cancel', type: 'danger' });
     }
 
     // ============================================================
     // SEARCH & FILTER
     // ============================================================
-
-    document.getElementById('searchAppointment').addEventListener('input', filterAppointments);
-    document.getElementById('filterStatus').addEventListener('change', filterAppointments);
-    document.getElementById('filterPriority').addEventListener('change', filterAppointments);
-    document.getElementById('filterDate').addEventListener('change', filterAppointments);
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchEl = document.getElementById('searchAppointment');
+        const statusEl = document.getElementById('filterStatus');
+        const priorityEl = document.getElementById('filterPriority');
+        const dateEl = document.getElementById('filterDate');
+        
+        if (searchEl) searchEl.addEventListener('input', filterAppointments);
+        if (statusEl) statusEl.addEventListener('change', filterAppointments);
+        if (priorityEl) priorityEl.addEventListener('change', filterAppointments);
+        if (dateEl) dateEl.addEventListener('change', filterAppointments);
+    });
 
     function filterAppointments() {
-        const search = document.getElementById('searchAppointment').value.toLowerCase();
-        const status = document.getElementById('filterStatus').value.toLowerCase();
-        const priority = document.getElementById('filterPriority').value.toLowerCase();
-        const dateFilter = document.getElementById('filterDate').value;
+        const search = document.getElementById('searchAppointment')?.value.toLowerCase() || '';
+        const status = document.getElementById('filterStatus')?.value.toLowerCase() || '';
+        const priority = document.getElementById('filterPriority')?.value.toLowerCase() || '';
+        const dateFilter = document.getElementById('filterDate')?.value || '';
         let visibleCount = 0;
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const weekEnd = new Date(today);
-        weekEnd.setDate(weekEnd.getDate() + 7);
+        const today = new Date(); today.setHours(0,0,0,0);
+        const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+        const weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate()+7);
 
         document.querySelectorAll('.appointment-row').forEach(row => {
-            const patientReal = row.dataset.patient || '';
-            const doctorReal = row.dataset.doctor || '';
-            const serviceReal = row.dataset.service || '';
-            const patientCodeReal = row.dataset.patientCode || '';
+            const searchText = (row.dataset.patient + ' ' + row.dataset.doctor + ' ' + 
+                               row.dataset.service + ' ' + row.textContent).toLowerCase();
+            const rowDate = new Date(row.dataset.date + 'T00:00:00');
             
-            const maskedNameEl = row.querySelector('.maskable:first-child');
-            const maskedCodeEl = row.querySelector('.maskable:last-child');
-            const maskedName = maskedNameEl?.textContent?.toLowerCase() || '';
-            const maskedCode = maskedCodeEl?.textContent?.toLowerCase() || '';
-            
-            const appointmentIdEl = row.querySelector('td:first-child');
-            const appointmentId = appointmentIdEl?.textContent?.toLowerCase() || '';
-            
-            const searchableText = patientReal + ' ' + 
-                                   patientCodeReal + ' ' + 
-                                   doctorReal + ' ' + 
-                                   serviceReal + ' ' + 
-                                   appointmentId + ' ' + 
-                                   maskedName + ' ' + 
-                                   maskedCode;
-            
-            const matchesSearch = searchableText.includes(search);
-            
-            const rowStatus = (row.dataset.status || '').toLowerCase();
-            const rowPriority = (row.dataset.priority || '').toLowerCase();
-            const rowDateStr = row.dataset.date;
-            const rowDate = new Date(rowDateStr + 'T00:00:00');
-
-            const matchesStatus = !status || rowStatus === status;
-            const matchesPriority = !priority || rowPriority === priority;
-
             let matchesDate = true;
-            if (dateFilter === 'today') {
-                matchesDate = rowDate.getTime() === today.getTime();
-            } else if (dateFilter === 'tomorrow') {
-                matchesDate = rowDate.getTime() === tomorrow.getTime();
-            } else if (dateFilter === 'week') {
-                matchesDate = rowDate >= today && rowDate <= weekEnd;
-            }
+            if (dateFilter === 'today') matchesDate = rowDate.getTime() === today.getTime();
+            else if (dateFilter === 'tomorrow') matchesDate = rowDate.getTime() === tomorrow.getTime();
+            else if (dateFilter === 'week') matchesDate = rowDate >= today && rowDate <= weekEnd;
 
-            const isVisible = matchesSearch && matchesStatus && matchesPriority && matchesDate;
-
-            row.style.display = isVisible ? '' : 'none';
-            if (isVisible) visibleCount++;
+            const visible = searchText.includes(search) && 
+                           (!status || row.dataset.status === status) &&
+                           (!priority || row.dataset.priority === priority) &&
+                           matchesDate;
+            
+            row.style.display = visible ? '' : 'none';
+            if (visible) visibleCount++;
         });
 
         const emptyState = document.getElementById('emptyState');
-        if (emptyState) {
-            emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
-        }
-        
-        // Re-apply masking after filtering
-        if (typeof applyMasking === 'function') {
-            setTimeout(function() {
-                const isMasked = localStorage.getItem('data_masking_enabled');
-                const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
-                
-                document.querySelectorAll('.appointment-row').forEach(row => {
-                    row.querySelectorAll('.maskable').forEach(el => {
-                        if (shouldBeMasked) {
-                            el.classList.add('masked');
-                            if (el.dataset.masked && el.dataset.masked !== '') {
-                                el.textContent = el.dataset.masked;
-                            } else if (el.dataset.real) {
-                                const realText = el.dataset.real;
-                                const maskedText = realText.split(' ').map(p => {
-                                    if (!p) return '';
-                                    return p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1));
-                                }).join(' ');
-                                el.textContent = maskedText;
-                                el.dataset.masked = maskedText;
-                            }
-                        } else {
-                            el.classList.remove('masked');
-                            if (el.dataset.real) {
-                                el.textContent = el.dataset.real;
-                            }
-                        }
-                    });
-                });
-            }, 50);
-        }
+        if (emptyState) emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
     }
 
     function resetFilters() {
-        document.getElementById('searchAppointment').value = '';
-        document.getElementById('filterStatus').value = '';
-        document.getElementById('filterPriority').value = '';
-        document.getElementById('filterDate').value = '';
+        ['searchAppointment', 'filterStatus', 'filterPriority', 'filterDate'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
         document.querySelectorAll('.appointment-row').forEach(row => row.style.display = '');
-        document.getElementById('emptyState').style.display = 'none';
-        
-        setTimeout(function() {
-            const isMasked = localStorage.getItem('data_masking_enabled');
-            const shouldBeMasked = isMasked === null ? true : isMasked === 'true';
-            
-            document.querySelectorAll('.appointment-row').forEach(row => {
-                row.querySelectorAll('.maskable').forEach(el => {
-                    if (shouldBeMasked) {
-                        el.classList.add('masked');
-                        if (el.dataset.masked && el.dataset.masked !== '') {
-                            el.textContent = el.dataset.masked;
-                        } else if (el.dataset.real) {
-                            const realText = el.dataset.real;
-                            const maskedText = realText.split(' ').map(p => {
-                                if (!p) return '';
-                                return p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1));
-                            }).join(' ');
-                            el.textContent = maskedText;
-                            el.dataset.masked = maskedText;
-                        }
-                    } else {
-                        el.classList.remove('masked');
-                        if (el.dataset.real) {
-                            el.textContent = el.dataset.real;
-                        }
-                    }
-                });
-            });
-        }, 50);
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) emptyState.style.display = 'none';
     }
 
     function changePage(page) {
@@ -1409,5 +1164,4 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
         window.location.href = '?page=' + page;
     }
 </script>
-
 <?php include_once '../../includes/footer.php'; ?>

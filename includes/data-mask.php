@@ -474,16 +474,6 @@ td .maskable.masked::after {
         }
     };
 
-    // ============================================================
-    // KEYBOARD SHORTCUT: Ctrl+Shift+M
-    // ============================================================
-
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.shiftKey && e.key === 'M') {
-            e.preventDefault();
-            window.toggleDataMask();
-        }
-    });
 
     // ============================================================
     // AUTO-APPLY ON PAGE LOAD
