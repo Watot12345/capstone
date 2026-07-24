@@ -29,23 +29,29 @@ try {
 // Fetch Employees/Doctors
 $employeeModel = new Employee();
 $dbEmployees = [];
+$medicalStaff = []; // NEW: For filter dropdown
 try {
     $rawEmployees = $employeeModel->all();
-    // Ensure each employee has a full_name
     foreach ($rawEmployees as $e) {
         $displayName = $e['full_name'] ?? '';
         if (empty($displayName)) {
             $displayName = $e['name'] ?? $e['username'] ?? "Employee #{$e['id']}";
         }
         $e['full_name'] = $displayName;
-        // Also set first_name and last_name for compatibility
         $e['first_name'] = $displayName;
         $e['last_name'] = '';
         $dbEmployees[] = $e;
+        
+        // NEW: Filter only medical staff for doctor dropdown
+        $role = strtolower($e['role_description'] ?? $e['role'] ?? '');
+        if (in_array($role, ['doctor', 'medical practitioner', 'nurse', 'dentist', 'midwives', 'nutritionist', 'immunization coordinator', 'lab tech', 'health center director'])) {
+            $medicalStaff[] = $e;
+        }
     }
 } catch (Throwable $e) {
     error_log('Error loading employees: ' . $e->getMessage());
     $dbEmployees = [];
+    $medicalStaff = [];
 }
 
 // Fetch real consultations from database
@@ -274,8 +280,16 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
                     <input type="text" id="searchConsultation" placeholder="Search by patient name, consultation ID, diagnosis, or ICD code..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm transition">
                 </div>
                 <div class="flex gap-2 flex-wrap">
-                    <select id="filterStatus" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white"><option value="">All Status</option><option value="completed">Completed</option><option value="referred">Referred</option></select>
-                    <select id="filterDoctor" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white"><option value="">All Doctors</option><option value="Dr. Elena Santos">Dr. Elena Santos</option><option value="Dr. Miguel Reyes">Dr. Miguel Reyes</option><option value="Dr. Ana Cruz">Dr. Ana Cruz</option></select>
+                    <select id="filterStatus" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white"><option value="">All Status</option><option value="in_progress">in progress</option><option value="completed">Completed</option><option value="referred">Referred</option></select>
+                    <select id="filterDoctor" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white">
+    <option value="">All Doctors</option>
+    <?php foreach ($medicalStaff as $doc): 
+        $docName = $doc['full_name'] ?? trim(($doc['first_name'] ?? '') . ' ' . ($doc['last_name'] ?? ''));
+        if (empty($docName)) $docName = $doc['name'] ?? $doc['username'] ?? "Employee #{$doc['id']}";
+    ?>
+        <option value="<?php echo htmlspecialchars(strtolower($docName)); ?>"><?php echo htmlspecialchars($docName); ?></option>
+    <?php endforeach; ?>
+</select>
                     <button onclick="resetFilters()" title="Reset filters" class="px-3 py-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 hover:text-slate-700 transition-colors text-sm"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
             </div>
@@ -303,7 +317,7 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         <?php else: ?>
             <?php foreach ($paginatedConsultations as $c): ?>
             <div class="consultation-card bg-white rounded-xl shadow-xs border border-slate-200 p-4 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
-                 data-patient="<?php echo htmlspecialchars(strtolower($c['patient_name'])); ?>"
+                 data-patient="<?php echo htmlspecialchars(strtolower($c['patient_code'])); ?>"
                  data-doctor="<?php echo htmlspecialchars(strtolower($c['doctor_name'])); ?>"
                  data-diagnosis="<?php echo htmlspecialchars(strtolower($c['diagnosis'])); ?>"
                  data-icd="<?php echo htmlspecialchars(strtolower($c['icd_code'])); ?>"
@@ -658,8 +672,45 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
 
     function matchesDateFilter(d,r){if(!r||r==='all')return true;if(!d)return false;const dt=new Date(d+'T00:00:00'),td=new Date();td.setHours(0,0,0,0);const sw=new Date(td);sw.setDate(sw.getDate()-sw.getDay()+(sw.getDay()===0?-6:1));sw.setHours(0,0,0,0);const sm=new Date(td.getFullYear(),td.getMonth(),1),sy=new Date(td.getFullYear(),0,1);switch(r){case'today':return dt.getTime()===td.getTime();case'week':return dt>=sw&&dt<=td;case'month':return dt>=sm&&dt<=td;case'year':return dt>=sy&&dt<=td;default:return true;}}
 
-    function filterConsultations(){const s=document.getElementById('searchConsultation').value.toLowerCase(),st=document.getElementById('filterStatus').value.toLowerCase(),dr=document.getElementById('filterDoctor').value.toLowerCase();let c=0;document.querySelectorAll('.consultation-card').forEach(card=>{const p=card.dataset.patient||'',dg=card.dataset.diagnosis||'',ic=card.dataset.icd||'',cs=(card.dataset.status||'').toLowerCase(),cd=(card.dataset.doctor||'').toLowerCase(),cdt=card.dataset.date;const v=(p.includes(s)||dg.includes(s)||ic.includes(s))&&(!st||cs===st)&&(!dr||cd.includes(dr))&&matchesDateFilter(cdt,activeDateFilter);card.style.display=v?'':'none';if(v)c++;});document.getElementById('emptyState').style.display=c===0?'flex':'none';}
-    function resetFilters(){document.getElementById('searchConsultation').value='';document.getElementById('filterStatus').value='';document.getElementById('filterDoctor').value='';setDateFilter('all');document.querySelectorAll('.consultation-card').forEach(card=>card.style.display='');document.getElementById('emptyState').style.display='none';}
+ function filterConsultations() {
+    const search = document.getElementById('searchConsultation').value.toLowerCase();
+    const status = document.getElementById('filterStatus').value.toLowerCase();
+    const doctor = document.getElementById('filterDoctor').value.toLowerCase();
+    const dateRange = activeDateFilter;
+    let visibleCount = 0;
+
+    document.querySelectorAll('.consultation-card').forEach(card => {
+        // Get BOTH real data (dataset) AND visible text
+        const patientReal = card.dataset.patient || '';
+        const patientCode = card.dataset.patientCode || '';
+        const diagnosis = card.dataset.diagnosis || '';
+        const icd = card.dataset.icd || '';
+        
+        // Get visible text from the card (masked version)
+        const patientVisible = (card.querySelector('.maskable[data-real]')?.textContent || '').toLowerCase();
+        const doctorVisible = (card.querySelector('span.maskable[data-real]')?.textContent || '').toLowerCase();
+        const consultationId = (card.querySelector('.font-mono')?.textContent || '').toLowerCase();
+        
+        // Search against BOTH real and masked text
+        const matchesSearch = 
+            patientReal.includes(search) ||        // Real name from dataset
+            patientVisible.includes(search) ||     // Masked name like "j**** g****"
+            patientCode.includes(search) ||        // Patient code P-2024-001
+            diagnosis.includes(search) || 
+            icd.includes(search) ||
+            consultationId.includes(search);       // CONS-0001
+            
+        const matchesStatus = !status || (card.dataset.status || '').toLowerCase() === status;
+        const matchesDoctor = !doctor || (card.dataset.doctor || '').toLowerCase().includes(doctor);
+        const matchesDate = matchesDateFilter(card.dataset.date, dateRange);
+
+        const isVisible = matchesSearch && matchesStatus && matchesDoctor && matchesDate;
+        card.style.display = isVisible ? '' : 'none';
+        if (isVisible) visibleCount++;
+    });
+
+    document.getElementById('emptyState').style.display = visibleCount === 0 ? 'flex' : 'none';
+}
     function changePage(page){if(page<1||page><?php echo $totalPages; ?>)return;window.location.href='?page='+page;}
 
     // ============================================================
