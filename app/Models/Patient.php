@@ -20,29 +20,29 @@ class Patient
 
     public function find(string $id): ?array
     {
-        $result = $this->db->select($this->table, ['id' => $id]);
+        $result = $this->db->select($this->table, ['id' => 'eq.' . $id]);
         return !empty($result) ? $result[0] : null;
     }
 
     public function findByPatientId(string $patientId): ?array
     {
-        $result = $this->db->select($this->table, ['patient_id' => $patientId]);
+        $result = $this->db->select($this->table, ['patient_id' => 'eq.' . $patientId]);
         return !empty($result) ? $result[0] : null;
     }
 
     public function create(array $data): array
     {
-        return $this->db->insert($this->table, $data);
+        return $this->db->insert($this->table, $data, true);
     }
 
     public function updateById(string $id, array $data): array
     {
-        return $this->db->update($this->table, $data, ['id' => $id]);
+        return $this->db->update($this->table, $data, ['id' => 'eq.' . $id], true);
     }
 
     public function deleteById(string $id): bool
     {
-        $this->db->delete($this->table, ['id' => $id]);
+        $this->db->delete($this->table, ['id' => 'eq.' . $id], true);
         return true;
     }
 

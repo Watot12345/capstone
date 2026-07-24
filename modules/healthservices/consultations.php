@@ -26,13 +26,26 @@ try {
 } catch (Throwable $e) {
     error_log('Error loading patients: ' . $e->getMessage());
 }
-
+// Fetch Employees/Doctors
 $employeeModel = new Employee();
 $dbEmployees = [];
 try {
-    $dbEmployees = $employeeModel->all();
+    $rawEmployees = $employeeModel->all();
+    // Ensure each employee has a full_name
+    foreach ($rawEmployees as $e) {
+        $displayName = $e['full_name'] ?? '';
+        if (empty($displayName)) {
+            $displayName = $e['name'] ?? $e['username'] ?? "Employee #{$e['id']}";
+        }
+        $e['full_name'] = $displayName;
+        // Also set first_name and last_name for compatibility
+        $e['first_name'] = $displayName;
+        $e['last_name'] = '';
+        $dbEmployees[] = $e;
+    }
 } catch (Throwable $e) {
     error_log('Error loading employees: ' . $e->getMessage());
+    $dbEmployees = [];
 }
 
 // Fetch real consultations from database
@@ -153,7 +166,6 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
 <!-- ============================================================ -->
 <!-- 2. HTML + PHP EMBEDDED + Tailwind CSS                       -->
 <!-- ============================================================ -->
-
 <div class="flex-1 px-6 pt-[26px] pb-20 mb-10 flex flex-col min-h-0 overflow-y-auto">
 
     <!-- Page Header -->
@@ -256,66 +268,25 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
     <!-- Search & Filters -->
     <div class="bg-white rounded-xl shadow-xs p-4 border border-slate-200 mb-6">
         <div class="flex flex-col gap-3">
-            <!-- Row 1: Search + Status + Doctor -->
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="flex-1 relative">
                     <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text"
-                           id="searchConsultation"
-                           placeholder="Search by patient name, consultation ID, diagnosis, or ICD code..."
-                           class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm transition">
+                    <input type="text" id="searchConsultation" placeholder="Search by patient name, consultation ID, diagnosis, or ICD code..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm transition">
                 </div>
                 <div class="flex gap-2 flex-wrap">
-                    <select id="filterStatus" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white">
-                        <option value="">All Status</option>
-                        <option value="completed">Completed</option>
-                        <option value="referred">Referred</option>
-                    </select>
-                    <select id="filterDoctor" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white">
-                        <option value="">All Doctors</option>
-                        <option value="Dr. Elena Santos">Dr. Elena Santos</option>
-                        <option value="Dr. Miguel Reyes">Dr. Miguel Reyes</option>
-                        <option value="Dr. Ana Cruz">Dr. Ana Cruz</option>
-                    </select>
-                    <button onclick="resetFilters()" title="Reset filters"
-                            class="px-3 py-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 hover:text-slate-700 transition-colors text-sm">
-                        <i class="fa-solid fa-rotate-right"></i>
-                    </button>
+                    <select id="filterStatus" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white"><option value="">All Status</option><option value="completed">Completed</option><option value="referred">Referred</option></select>
+                    <select id="filterDoctor" class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none text-sm bg-white"><option value="">All Doctors</option><option value="Dr. Elena Santos">Dr. Elena Santos</option><option value="Dr. Miguel Reyes">Dr. Miguel Reyes</option><option value="Dr. Ana Cruz">Dr. Ana Cruz</option></select>
+                    <button onclick="resetFilters()" title="Reset filters" class="px-3 py-2 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 hover:text-slate-700 transition-colors text-sm"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
             </div>
-
-            <!-- Row 2: Date Range Filters -->
             <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide mr-1">Consultation Date:</span>
-                
-                <button onclick="setDateFilter('today')" 
-                        class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all">
-                    <i class="fa-solid fa-calendar-day mr-1"></i> Today
-                </button>
-                
-                <button onclick="setDateFilter('week')" 
-                        class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all">
-                    <i class="fa-solid fa-calendar-week mr-1"></i> This Week
-                </button>
-                
-                <button onclick="setDateFilter('month')" 
-                        class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all">
-                    <i class="fa-solid fa-calendar mr-1"></i> This Month
-                </button>
-                
-                <button onclick="setDateFilter('year')" 
-                        class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all">
-                    <i class="fa-solid fa-calendar-year mr-1"></i> This Year
-                </button>
-                
-                <button onclick="setDateFilter('all')" 
-                        class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 transition-all">
-                    <i class="fa-solid fa-times mr-1"></i> All
-                </button>
-                
-                <span id="activeDateFilter" class="text-xs text-brand-medium font-semibold hidden">
-                    <i class="fa-solid fa-filter mr-1"></i> <span id="activeDateFilterLabel">Today</span>
-                </span>
+                <button onclick="setDateFilter('today')" class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all"><i class="fa-solid fa-calendar-day mr-1"></i> Today</button>
+                <button onclick="setDateFilter('week')" class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all"><i class="fa-solid fa-calendar-week mr-1"></i> This Week</button>
+                <button onclick="setDateFilter('month')" class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all"><i class="fa-solid fa-calendar mr-1"></i> This Month</button>
+                <button onclick="setDateFilter('year')" class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-brand-light/40 hover:border-brand-medium transition-all"><i class="fa-solid fa-calendar-year mr-1"></i> This Year</button>
+                <button onclick="setDateFilter('all')" class="date-filter-btn px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 transition-all"><i class="fa-solid fa-times mr-1"></i> All</button>
+                <span id="activeDateFilter" class="text-xs text-brand-medium font-semibold hidden"><i class="fa-solid fa-filter mr-1"></i> <span id="activeDateFilterLabel">Today</span></span>
             </div>
         </div>
     </div>
@@ -324,14 +295,10 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="consultationGrid">
         <?php if (empty($paginatedConsultations)): ?>
             <div class="col-span-full bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-xs">
-                <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4 text-brand-medium text-2xl">
-                    <i class="fa-solid fa-stethoscope"></i>
-                </div>
+                <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4 text-brand-medium text-2xl"><i class="fa-solid fa-stethoscope"></i></div>
                 <h3 class="text-lg font-bold text-slate-800">No consultations recorded yet</h3>
                 <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">Click "New Consultation" above to create your first patient consultation record.</p>
-                <button onclick="ModalSystem.open('addConsultationModal')" class="mt-4 px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium text-sm font-semibold inline-flex items-center gap-2">
-                    <i class="fa-solid fa-plus text-xs"></i> New Consultation
-                </button>
+                <button onclick="ModalSystem.open('addConsultationModal')" class="mt-4 px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium text-sm font-semibold inline-flex items-center gap-2"><i class="fa-solid fa-plus text-xs"></i> New Consultation</button>
             </div>
         <?php else: ?>
             <?php foreach ($paginatedConsultations as $c): ?>
@@ -342,74 +309,36 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
                  data-icd="<?php echo htmlspecialchars(strtolower($c['icd_code'])); ?>"
                  data-status="<?php echo htmlspecialchars($c['status']); ?>"
                  data-date="<?php echo htmlspecialchars($c['date']); ?>">
-                
                 <div>
-                    <!-- Header -->
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2.5">
-                            <div class="w-9 h-9 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-xs flex-shrink-0">
-                                <?php echo htmlspecialchars($c['patient_avatar']); ?>
-                            </div>
+                            <div class="w-9 h-9 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-xs flex-shrink-0"><?php echo htmlspecialchars($c['patient_avatar']); ?></div>
                             <div>
-                                <p class="font-semibold text-slate-800 text-sm line-clamp-1"><?php echo htmlspecialchars($c['patient_name']); ?></p>
+                                <!-- FIXED: Added maskable class -->
+                                <p class="font-semibold text-slate-800 text-sm line-clamp-1 maskable" data-real="<?php echo htmlspecialchars($c['patient_name']); ?>" data-masked="<?php echo htmlspecialchars(maskName($c['patient_name'])); ?>"><?php echo htmlspecialchars(maskName($c['patient_name'])); ?></p>
                                 <p class="text-xs text-slate-400 font-mono"><?php echo htmlspecialchars($c['consultation_id']); ?></p>
                             </div>
                         </div>
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold <?php 
-                            echo strtolower($c['status']) === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'; 
-                        ?>">
-                            <?php echo htmlspecialchars(ucfirst($c['status'])); ?>
-                        </span>
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold <?php echo strtolower($c['status']) === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'; ?>"><?php echo htmlspecialchars(ucfirst($c['status'])); ?></span>
                     </div>
-                    
-                    <!-- Details -->
                     <div class="space-y-1.5 text-xs">
                         <div class="flex justify-between">
                             <span class="text-slate-500">Doctor / Staff</span>
-                            <span class="text-slate-800 font-medium"><?php echo htmlspecialchars($c['doctor_name']); ?></span>
+                            <!-- FIXED: Added maskable class -->
+                            <span class="text-slate-800 font-medium maskable" data-real="<?php echo htmlspecialchars($c['doctor_name']); ?>" data-masked="<?php echo htmlspecialchars(maskName($c['doctor_name'])); ?>"><?php echo htmlspecialchars(maskName($c['doctor_name'])); ?></span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Date & Time</span>
-                            <span class="text-slate-800"><?php echo date('M d, Y', strtotime($c['date'])) . ' ' . date('h:i A', strtotime($c['time'])); ?></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">ICD-10 Code</span>
-                            <span class="text-slate-800 font-mono font-bold"><?php echo htmlspecialchars($c['icd_code']); ?></span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-slate-500">Date & Time</span><span class="text-slate-800"><?php echo date('M d, Y', strtotime($c['date'])) . ' ' . date('h:i A', strtotime($c['time'])); ?></span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">ICD-10 Code</span><span class="text-slate-800 font-mono font-bold"><?php echo htmlspecialchars($c['icd_code']); ?></span></div>
                     </div>
-                    
-                    <!-- Diagnosis -->
-                    <div class="mt-3 pt-2.5 border-t border-slate-100">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Diagnosis</p>
-                        <p class="text-xs text-slate-800 font-semibold line-clamp-1 mt-0.5"><?php echo htmlspecialchars($c['diagnosis']); ?></p>
-                    </div>
-                    
-                    <!-- Treatment -->
-                    <div class="mt-2">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Treatment Plan</p>
-                        <p class="text-xs text-slate-600 line-clamp-2 mt-0.5"><?php echo htmlspecialchars($c['treatment_plan'] ?: 'None recorded'); ?></p>
-                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-slate-100"><p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Diagnosis</p><p class="text-xs text-slate-800 font-semibold line-clamp-1 mt-0.5"><?php echo htmlspecialchars($c['diagnosis']); ?></p></div>
+                    <div class="mt-2"><p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Treatment Plan</p><p class="text-xs text-slate-600 line-clamp-2 mt-0.5"><?php echo htmlspecialchars($c['treatment_plan'] ?: 'None recorded'); ?></p></div>
                 </div>
-
-                <!-- Actions -->
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <a href="patients.php?patient=<?php echo $c['patient_id']; ?>&id=<?php echo $c['patient_id']; ?>" 
-                       class="px-2.5 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="View Patient Profile">
-                        <i class="fa-solid fa-user mr-1"></i> Patient
-                    </a>
+                    <a href="patients.php?patient=<?php echo $c['patient_id']; ?>&id=<?php echo $c['patient_id']; ?>" class="px-2.5 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="View Patient Profile"><i class="fa-solid fa-user mr-1"></i> Patient</a>
                     <div class="flex gap-1">
-                        <button onclick="viewConsultation(<?php echo $c['id']; ?>)"
-                                class="px-2.5 py-1 text-xs font-semibold text-brand-medium hover:bg-brand-light rounded-lg transition">
-                            <i class="fa-solid fa-eye mr-1"></i> View
-                        </button>
-                        <button onclick="editConsultation(<?php echo $c['id']; ?>)"
-                                class="px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition">
-                            <i class="fa-solid fa-pen mr-1"></i> Edit
-                        </button>
-                        <button onclick="deleteConsultation(<?php echo $c['id']; ?>)"
-                                class="px-2.5 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-50 rounded-lg transition">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        <button onclick="viewConsultation(<?php echo $c['id']; ?>)" class="px-2.5 py-1 text-xs font-semibold text-brand-medium hover:bg-brand-light rounded-lg transition"><i class="fa-solid fa-eye mr-1"></i> View</button>
+                        <button onclick="editConsultation(<?php echo $c['id']; ?>)" class="px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
+                        <button onclick="deleteConsultation(<?php echo $c['id']; ?>)" class="px-2.5 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-50 rounded-lg transition"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
             </div>
@@ -417,351 +346,48 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         <?php endif; ?>
     </div>
 
-    <!-- Empty state for search/filter -->
-    <div id="emptyState" class="hidden flex-col items-center justify-center py-14 text-center">
-        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-            <i class="fa-solid fa-stethoscope text-slate-400"></i>
-        </div>
-        <p class="text-sm font-semibold text-slate-600">No consultations match your search or filter</p>
-        <p class="text-xs text-slate-400 mt-1">Try clearing or adjusting your search criteria</p>
-        <button onclick="resetFilters()" class="mt-3 text-xs font-semibold text-brand-medium hover:text-brand-dark">Clear filters</button>
-    </div>
+    <div id="emptyState" class="hidden flex-col items-center justify-center py-14 text-center"><div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3"><i class="fa-solid fa-stethoscope text-slate-400"></i></div><p class="text-sm font-semibold text-slate-600">No consultations match your search or filter</p><p class="text-xs text-slate-400 mt-1">Try clearing or adjusting your search criteria</p><button onclick="resetFilters()" class="mt-3 text-xs font-semibold text-brand-medium hover:text-brand-dark">Clear filters</button></div>
 
-    <!-- Pagination -->
     <?php if ($totalConsultations > 0): ?>
-    <div class="mt-6 px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 bg-white rounded-xl shadow-xs border border-slate-200">
-        <p class="text-xs text-slate-500">
-            Showing <span class="font-semibold text-slate-700"><?php echo min($offset + 1, $totalConsultations); ?></span> to
-            <span class="font-semibold text-slate-700"><?php echo min($offset + $limit, $totalConsultations); ?></span> of
-            <span class="font-semibold text-slate-700"><?php echo $totalConsultations; ?></span> consultations
-        </p>
-        <div class="flex gap-1">
-            <button onclick="changePage(<?php echo $page - 1; ?>)"
-                    class="px-3 py-1.5 rounded-lg text-sm <?php echo $page <= 1 ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'; ?>"
-                    <?php echo $page <= 1 ? 'disabled' : ''; ?>>
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-            </button>
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <button onclick="changePage(<?php echo $i; ?>)"
-                        class="px-3 py-1.5 rounded-lg text-sm font-medium <?php echo $i === $page ? 'bg-brand-dark text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'; ?>">
-                    <?php echo $i; ?>
-                </button>
-            <?php endfor; ?>
-            <button onclick="changePage(<?php echo $page + 1; ?>)"
-                    class="px-3 py-1.5 rounded-lg text-sm <?php echo $page >= $totalPages ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'; ?>"
-                    <?php echo $page >= $totalPages ? 'disabled' : ''; ?>>
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-            </button>
-        </div>
-    </div>
+    <div class="mt-6 px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 bg-white rounded-xl shadow-xs border border-slate-200"><p class="text-xs text-slate-500">Showing <span class="font-semibold text-slate-700"><?php echo min($offset + 1, $totalConsultations); ?></span> to <span class="font-semibold text-slate-700"><?php echo min($offset + $limit, $totalConsultations); ?></span> of <span class="font-semibold text-slate-700"><?php echo $totalConsultations; ?></span> consultations</p><div class="flex gap-1"><button onclick="changePage(<?php echo $page - 1; ?>)" class="px-3 py-1.5 rounded-lg text-sm <?php echo $page <= 1 ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'; ?>" <?php echo $page <= 1 ? 'disabled' : ''; ?>><i class="fa-solid fa-chevron-left text-xs"></i></button><?php for ($i = 1; $i <= $totalPages; $i++): ?><button onclick="changePage(<?php echo $i; ?>)" class="px-3 py-1.5 rounded-lg text-sm font-medium <?php echo $i === $page ? 'bg-brand-dark text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'; ?>"><?php echo $i; ?></button><?php endfor; ?><button onclick="changePage(<?php echo $page + 1; ?>)" class="px-3 py-1.5 rounded-lg text-sm <?php echo $page >= $totalPages ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'; ?>" <?php echo $page >= $totalPages ? 'disabled' : ''; ?>><i class="fa-solid fa-chevron-right text-xs"></i></button></div></div>
     <?php endif; ?>
 </div>
 
-<!-- ============================================================ -->
-<!-- VIEW CONSULTATION MODAL                                      -->
-<!-- ============================================================ -->
-<div id="viewConsultationModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
-            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-notes-medical text-brand-medium"></i> Consultation Details
-            </h3>
-            <button onclick="ModalSystem.close('viewConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div id="consultationDetailsContent" class="p-6">
-            <div class="flex items-center justify-center py-10 text-slate-400 text-sm">
-                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading consultation details...
-            </div>
-        </div>
-    </div>
+<!-- VIEW CONSULTATION MODAL -->
+<div id="viewConsultationModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"><div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10"><h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-notes-medical text-brand-medium"></i> Consultation Details</h3><button onclick="ModalSystem.close('viewConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"><i class="fa-solid fa-xmark"></i></button></div><div id="consultationDetailsContent" class="p-6"><div class="flex items-center justify-center py-10 text-slate-400 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading consultation details...</div></div></div></div>
+
+<!-- ADD CONSULTATION MODAL -->
+<div id="addConsultationModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"><div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10"><h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-stethoscope text-brand-medium"></i> New Consultation Record</h3><button onclick="ModalSystem.close('addConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"><i class="fa-solid fa-xmark"></i></button></div>
+<!-- FIXED: Removed onsubmit -->
+<form id="addConsultationForm" class="p-6 space-y-4">
+<input type="hidden" id="add_appointment_id" value="">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient <span class="text-rose-500">*</span></label><select id="add_patient_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"><option value="">Select Patient</option><?php foreach ($dbPatients as $p): ?><option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['first_name'] . ' ' . $p['last_name']); ?> (<?php echo htmlspecialchars($p['patient_id'] ?? "P-{$p['id']}"); ?>)</option><?php endforeach; ?></select></div>
+<div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Attending Doctor / Staff <span class="text-rose-500">*</span></label><select id="add_employee_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"><option value="">Select Doctor / Staff</option><?php if (!empty($dbEmployees)): ?><?php foreach ($dbEmployees as $e): $displayName = $e['full_name'] ?? ''; if (empty($displayName)) { $displayName = $e['name'] ?? $e['username'] ?? "Employee #{$e['id']}"; } ?><option value="<?php echo $e['id']; ?>"><?php echo htmlspecialchars($displayName); ?></option><?php endforeach; ?><?php else: ?><option value="1">Dr. Elena Santos</option><option value="2">Dr. Miguel Reyes</option><option value="3">Dr. Ana Cruz</option><?php endif; ?></select></div>
 </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Date <span class="text-rose-500">*</span></label><input type="date" id="add_date" value="<?php echo date('Y-m-d'); ?>" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Time <span class="text-rose-500">*</span></label><input type="time" id="add_time" value="<?php echo date('H:i'); ?>" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Chief Complaints / Symptoms</label><input type="text" id="add_symptoms" placeholder="e.g., Fever, persistent cough, headache" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Diagnosis <span class="text-rose-500">*</span></label><input type="text" id="add_diagnosis" required placeholder="Primary diagnosis" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">ICD-10 Code</label><input type="text" id="add_icd_code" placeholder="e.g., J06.9, I10" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none font-mono uppercase"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</label><select id="add_status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="referred">Referred</option><option value="follow_up">Follow-up Needed</option></select></div></div>
+<div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50"><label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1.5"><i class="fa-solid fa-heart-pulse text-rose-500"></i> Vital Signs (Optional)</label><div class="grid grid-cols-2 sm:grid-cols-4 gap-3"><div><span class="text-[10px] text-slate-500">BP (mmHg)</span><input type="text" id="add_bp" placeholder="120/80" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div><div><span class="text-[10px] text-slate-500">Heart Rate (bpm)</span><input type="text" id="add_hr" placeholder="72" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div><div><span class="text-[10px] text-slate-500">Temp (°C)</span><input type="text" id="add_temp" placeholder="36.5" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div><div><span class="text-[10px] text-slate-500">Weight (kg)</span><input type="text" id="add_weight" placeholder="65" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div></div></div>
+<div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Treatment Plan & Prescriptions</label><textarea id="add_treatment_plan" rows="2" placeholder="Medications prescribed, rest, lab tests ordered..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></textarea></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Follow-up Date</label><input type="date" id="add_follow_up_date" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Clinical Notes</label><input type="text" id="add_notes" placeholder="Additional observations" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div></div>
+<div class="flex justify-end gap-2 pt-3 border-t border-slate-100"><button type="button" onclick="ModalSystem.close('addConsultationModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Cancel</button><button type="submit" id="submitAddBtn" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold flex items-center gap-1.5"><i class="fa-solid fa-check"></i> Save Consultation</button></div>
+</form></div></div>
 
-<!-- ============================================================ -->
-<!-- ADD CONSULTATION MODAL                                       -->
-<!-- ============================================================ -->
-<div id="addConsultationModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
-            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-stethoscope text-brand-medium"></i> New Consultation Record
-            </h3>
-            <button onclick="ModalSystem.close('addConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <form id="addConsultationForm" class="p-6 space-y-4" onsubmit="saveNewConsultation(event)">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Patient -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient <span class="text-rose-500">*</span></label>
-                    <select id="add_patient_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                        <option value="">Select Patient</option>
-                        <?php foreach ($dbPatients as $p): ?>
-                            <option value="<?php echo $p['id']; ?>">
-                                <?php echo htmlspecialchars($p['first_name'] . ' ' . $p['last_name']); ?> (<?php echo htmlspecialchars($p['patient_id'] ?? "P-{$p['id']}"); ?>)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <!-- Attending Employee / Doctor -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Attending Doctor / Staff <span class="text-rose-500">*</span></label>
-                    <select id="add_employee_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                        <?php if (!empty($dbEmployees)): ?>
-                            <?php foreach ($dbEmployees as $e): ?>
-                                <option value="<?php echo $e['id']; ?>">
-                                    <?php echo htmlspecialchars(trim(($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? '')) ?: ($e['name'] ?? "Employee #{$e['id']}")); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <option value="1">Dr. Elena Santos (General Medicine)</option>
-                            <option value="2">Dr. Miguel Reyes (Cardiology)</option>
-                            <option value="3">Dr. Ana Cruz (Pediatrics)</option>
-                        <?php endif; ?>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Date & Time -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Date <span class="text-rose-500">*</span></label>
-                    <input type="date" id="add_date" value="<?php echo date('Y-m-d'); ?>" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Time <span class="text-rose-500">*</span></label>
-                    <input type="time" id="add_time" value="<?php echo date('H:i'); ?>" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-            </div>
-
-            <!-- Symptoms & Diagnosis -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Chief Complaints / Symptoms</label>
-                    <input type="text" id="add_symptoms" placeholder="e.g., Fever, persistent cough, headache" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Diagnosis <span class="text-rose-500">*</span></label>
-                    <input type="text" id="add_diagnosis" required placeholder="Primary diagnosis" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-            </div>
-
-            <!-- ICD Code & Status -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">ICD-10 Code</label>
-                    <input type="text" id="add_icd_code" placeholder="e.g., J06.9, I10" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none font-mono uppercase">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</label>
-                    <select id="add_status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                        <option value="completed">Completed</option>
-                        <option value="referred">Referred</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Vital Signs Section -->
-            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-heart-pulse text-rose-500"></i> Vital Signs (Optional)
-                </label>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div>
-                        <span class="text-[10px] text-slate-500">BP (mmHg)</span>
-                        <input type="text" id="add_bp" placeholder="120/80" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-500">Heart Rate (bpm)</span>
-                        <input type="text" id="add_hr" placeholder="72" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-500">Temp (°C)</span>
-                        <input type="text" id="add_temp" placeholder="36.5" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-500">Weight (kg)</span>
-                        <input type="text" id="add_weight" placeholder="65" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Treatment Plan -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Treatment Plan & Prescriptions</label>
-                <textarea id="add_treatment_plan" rows="2" placeholder="Medications prescribed, rest, lab tests ordered..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></textarea>
-            </div>
-
-            <!-- Notes & Follow-up Date -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Follow-up Date</label>
-                    <input type="date" id="add_follow_up_date" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Clinical Notes</label>
-                    <input type="text" id="add_notes" placeholder="Additional observations" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="ModalSystem.close('addConsultationModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
-                    Cancel
-                </button>
-                <button type="submit" id="submitAddBtn"
-                        class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold flex items-center gap-1.5">
-                    <i class="fa-solid fa-check"></i> Save Consultation
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- EDIT CONSULTATION MODAL                                      -->
-<!-- ============================================================ -->
-<div id="editConsultationModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
-            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-pen-to-square text-brand-medium"></i> Edit Consultation
-            </h3>
-            <button onclick="ModalSystem.close('editConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <form id="editConsultationForm" class="p-6 space-y-4" onsubmit="saveEditedConsultation(event)">
-            <input type="hidden" id="edit_id">
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Patient (Read only display) -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient</label>
-                    <input type="text" id="edit_patient_name" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-700 outline-none font-semibold cursor-not-allowed">
-                    <input type="hidden" id="edit_patient_id">
-                </div>
-
-                <!-- Attending Doctor / Staff -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Attending Doctor / Staff</label>
-                    <select id="edit_employee_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                        <?php if (!empty($dbEmployees)): ?>
-                            <?php foreach ($dbEmployees as $e): ?>
-                                <option value="<?php echo $e['id']; ?>">
-                                    <?php echo htmlspecialchars(trim(($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? '')) ?: ($e['name'] ?? "Employee #{$e['id']}")); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <option value="1">Dr. Elena Santos (General Medicine)</option>
-                            <option value="2">Dr. Miguel Reyes (Cardiology)</option>
-                            <option value="3">Dr. Ana Cruz (Pediatrics)</option>
-                        <?php endif; ?>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Date & Time -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Date</label>
-                    <input type="date" id="edit_date" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Time</label>
-                    <input type="time" id="edit_time" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-            </div>
-
-            <!-- Symptoms & Diagnosis -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Symptoms</label>
-                    <input type="text" id="edit_symptoms" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Diagnosis</label>
-                    <input type="text" id="edit_diagnosis" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-            </div>
-
-            <!-- ICD Code & Status -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">ICD-10 Code</label>
-                    <input type="text" id="edit_icd_code" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none font-mono uppercase">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</label>
-                    <select id="edit_status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                        <option value="completed">Completed</option>
-                        <option value="referred">Referred</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Vital Signs Section -->
-            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-heart-pulse text-rose-500"></i> Vital Signs
-                </label>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div>
-                        <span class="text-[10px] text-slate-500">BP (mmHg)</span>
-                        <input type="text" id="edit_bp" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-500">Heart Rate</span>
-                        <input type="text" id="edit_hr" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-500">Temp (°C)</span>
-                        <input type="text" id="edit_temp" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-500">Weight (kg)</span>
-                        <input type="text" id="edit_weight" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Treatment Plan -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Treatment Plan</label>
-                <textarea id="edit_treatment_plan" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></textarea>
-            </div>
-
-            <!-- Notes & Follow-up Date -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Follow-up Date</label>
-                    <input type="date" id="edit_follow_up_date" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Clinical Notes</label>
-                    <input type="text" id="edit_notes" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="ModalSystem.close('editConsultationModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">
-                    Cancel
-                </button>
-                <button type="submit" id="submitEditBtn"
-                        class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold flex items-center gap-1.5">
-                    <i class="fa-solid fa-check"></i> Save Changes
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-
+<!-- EDIT CONSULTATION MODAL -->
+<div id="editConsultationModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"><div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10"><h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-brand-medium"></i> Edit Consultation</h3><button onclick="ModalSystem.close('editConsultationModal')" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"><i class="fa-solid fa-xmark"></i></button></div>
+<!-- FIXED: Removed onsubmit -->
+<form id="editConsultationForm" class="p-6 space-y-4">
+<input type="hidden" id="edit_id"><input type="hidden" id="edit_appointment_id" value="">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Patient</label><input type="text" id="edit_patient_name" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-700 outline-none font-semibold cursor-not-allowed"><input type="hidden" id="edit_patient_id"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Attending Doctor / Staff</label><select id="edit_employee_id" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"><option value="">Select Doctor / Staff</option><?php if (!empty($dbEmployees)): ?><?php foreach ($dbEmployees as $e): $fullName = trim(($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? '')); $fullName = !empty($fullName) ? $fullName : ($e['name'] ?? ''); $displayText = !empty($fullName) ? $fullName : "Employee #{$e['id']}"; ?><option value="<?php echo $e['id']; ?>"><?php echo htmlspecialchars($displayText); ?></option><?php endforeach; ?><?php else: ?><option value="1">Dr. Elena Santos</option><option value="2">Dr. Miguel Reyes</option><option value="3">Dr. Ana Cruz</option><?php endif; ?></select></div></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Date</label><input type="date" id="edit_date" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Time</label><input type="time" id="edit_time" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Symptoms</label><input type="text" id="edit_symptoms" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Diagnosis</label><input type="text" id="edit_diagnosis" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">ICD-10 Code</label><input type="text" id="edit_icd_code" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none font-mono uppercase"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status</label><select id="edit_status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="referred">Referred</option><option value="follow_up">Follow-up Needed</option></select></div></div>
+<div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50"><label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1.5"><i class="fa-solid fa-heart-pulse text-rose-500"></i> Vital Signs</label><div class="grid grid-cols-2 sm:grid-cols-4 gap-3"><div><span class="text-[10px] text-slate-500">BP (mmHg)</span><input type="text" id="edit_bp" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div><div><span class="text-[10px] text-slate-500">Heart Rate (bpm)</span><input type="text" id="edit_hr" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div><div><span class="text-[10px] text-slate-500">Temp (°C)</span><input type="text" id="edit_temp" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div><div><span class="text-[10px] text-slate-500">Weight (kg)</span><input type="text" id="edit_weight" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"></div></div></div>
+<div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Treatment Plan</label><textarea id="edit_treatment_plan" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></textarea></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Follow-up Date</label><input type="date" id="edit_follow_up_date" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div><div><label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Clinical Notes</label><input type="text" id="edit_notes" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-medium/40 focus:border-brand-medium outline-none"></div></div>
+<div class="flex justify-end gap-2 pt-3 border-t border-slate-100"><button type="button" onclick="ModalSystem.close('editConsultationModal')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Cancel</button><button type="submit" id="submitEditBtn" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-sm font-semibold flex items-center gap-1.5"><i class="fa-solid fa-check"></i> Save Changes</button></div>
+</form></div></div>
 <!-- ============================================================ -->
 <!-- 3. CSS STYLES                                                -->
 <!-- ============================================================ -->
@@ -785,6 +411,20 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
     const CONSULTATIONS_DATA = <?php echo json_encode(array_column($consultations, null, 'id'), JSON_UNESCAPED_UNICODE); ?>;
     let activeDateFilter = 'all';
    
+    // ============================================================
+    // MASKING HELPERS
+    // ============================================================
+    function maskPatientName(name) {
+        if (!name) return '';
+        const parts = name.split(' ');
+        return parts.map(p => p ? p.charAt(0).toUpperCase() + '*'.repeat(Math.max(0, p.length - 1)) : '').join(' ');
+    }
+
+    function maskPatientCode(code) {
+        if (!code || code.length <= 2) return code || '';
+        return code.substring(0, 2) + '*'.repeat(code.length - 2);
+    }
+
     // View Details Modal
     function viewConsultation(id) {
         ModalSystem.open('viewConsultationModal');
@@ -813,78 +453,36 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         content.innerHTML = `
             <div class="space-y-5">
                 <div class="flex items-center gap-4 pb-4 border-b border-slate-200">
-                    <div class="w-14 h-14 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-lg flex-shrink-0">
-                        ${c.patient_avatar || 'PT'}
-                    </div>
+                    <div class="w-14 h-14 rounded-full bg-brand-light border border-brand-border flex items-center justify-center text-brand-dark font-bold text-lg flex-shrink-0">${c.patient_avatar || 'PT'}</div>
                     <div>
-                        <h4 class="text-lg font-bold text-slate-900">${c.patient_name}</h4>
-                        <p class="text-xs text-slate-500 font-mono">${c.consultation_id} • ${c.patient_code}</p>
-                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mt-1 ${c.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
-                            ${c.status ? c.status.toUpperCase() : 'COMPLETED'}
-                        </span>
+                        <h4 class="text-lg font-bold text-slate-900 maskable" data-real="${c.patient_name}" data-masked="${maskPatientName(c.patient_name)}">${maskPatientName(c.patient_name)}</h4>
+                        <p class="text-xs text-slate-500 font-mono maskable" data-real="${c.patient_code}" data-masked="${maskPatientCode(c.patient_code)}">${c.consultation_id} • ${maskPatientCode(c.patient_code)}</p>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mt-1 ${c.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${c.status ? c.status.toUpperCase() : 'COMPLETED'}</span>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Attending Doctor / Staff</p>
-                        <p class="text-slate-800 font-bold mt-0.5">${c.doctor_name}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Date & Time</p>
-                        <p class="text-slate-800 font-semibold mt-0.5">${c.date} ${c.time}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">ICD-10 Code</p>
-                        <p class="text-slate-800 font-mono font-bold mt-0.5">${c.icd_code || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 font-semibold uppercase">Follow-up Date</p>
-                        <p class="text-slate-800 font-semibold mt-0.5">${c.follow_up_date || c.follow_up || 'None scheduled'}</p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-slate-400 font-semibold uppercase">Vital Signs</p>
-                        <p class="text-slate-800 mt-0.5">${vitalsHtml}</p>
-                    </div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Attending Doctor / Staff</p><p class="text-slate-800 font-bold mt-0.5 maskable" data-real="${c.doctor_name}" data-masked="${maskPatientName(c.doctor_name)}">${maskPatientName(c.doctor_name)}</p></div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Date & Time</p><p class="text-slate-800 font-semibold mt-0.5">${c.date} ${c.time}</p></div>
+                    <div><p class="text-slate-400 font-semibold uppercase">ICD-10 Code</p><p class="text-slate-800 font-mono font-bold mt-0.5">${c.icd_code || 'N/A'}</p></div>
+                    <div><p class="text-slate-400 font-semibold uppercase">Follow-up Date</p><p class="text-slate-800 font-semibold mt-0.5">${c.follow_up_date || c.follow_up || 'None scheduled'}</p></div>
+                    <div class="col-span-2"><p class="text-slate-400 font-semibold uppercase">Vital Signs</p><p class="text-slate-800 mt-0.5">${vitalsHtml}</p></div>
                 </div>
-
-                ${c.symptoms ? `
-                <div>
-                    <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Chief Complaints / Symptoms</h5>
-                    <p class="text-sm text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200">${c.symptoms}</p>
-                </div>
-                ` : ''}
-
-                <div>
-                    <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Diagnosis</h5>
-                    <p class="text-sm font-semibold text-slate-900 bg-emerald-50/60 p-3 rounded-lg border border-emerald-100">${c.diagnosis}</p>
-                </div>
-
-                <div>
-                    <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Treatment Plan</h5>
-                    <p class="text-sm text-slate-800 bg-brand-light/30 p-3 rounded-lg border border-brand-border">${c.treatment_plan || c.treatment || 'No treatment plan recorded.'}</p>
-                </div>
-
-                ${c.notes ? `
-                <div>
-                    <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Clinical Notes</h5>
-                    <p class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-200">${c.notes}</p>
-                </div>
-                ` : ''}
-
+                ${c.symptoms ? `<div><h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Chief Complaints / Symptoms</h5><p class="text-sm text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200">${c.symptoms}</p></div>` : ''}
+                <div><h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Diagnosis</h5><p class="text-sm font-semibold text-slate-900 bg-emerald-50/60 p-3 rounded-lg border border-emerald-100">${c.diagnosis}</p></div>
+                <div><h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Treatment Plan</h5><p class="text-sm text-slate-800 bg-brand-light/30 p-3 rounded-lg border border-brand-border">${c.treatment_plan || c.treatment || 'No treatment plan recorded.'}</p></div>
+                ${c.notes ? `<div><h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Clinical Notes</h5><p class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-200">${c.notes}</p></div>` : ''}
                 <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <a href="patients.php?patient=${c.patient_id}&id=${c.patient_id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5">
-                        <i class="fa-solid fa-user"></i> View Patient Profile
-                    </a>
-                    <button onclick="ModalSystem.close('viewConsultationModal'); editConsultation(${c.id});" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5">
-                        <i class="fa-solid fa-pen"></i> Edit Record
-                    </button>
+                    <a href="patients.php?patient=${c.patient_id}&id=${c.patient_id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5"><i class="fa-solid fa-user"></i> View Patient Profile</a>
+                    <button onclick="ModalSystem.close('viewConsultationModal'); editConsultation(${c.id});" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5"><i class="fa-solid fa-pen"></i> Edit Record</button>
                 </div>
-            </div>
-        `;
+            </div>`;
+        
+        setTimeout(() => { if (typeof ModalSystem !== 'undefined' && ModalSystem.refreshMasking) ModalSystem.refreshMasking('viewConsultationModal'); }, 100);
     }
 
-    // Add Consultation
+    // ============================================================
+    // ADD CONSULTATION
+    // ============================================================
     async function saveNewConsultation(event) {
         event.preventDefault();
         const submitBtn = document.getElementById('submitAddBtn');
@@ -897,9 +495,9 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         const weight = document.getElementById('add_weight').value.trim();
 
         let vitalSigns = null;
-        if (bp || hr || temp || weight) {
-            vitalSigns = { bp, hr, temp, weight };
-        }
+        if (bp || hr || temp || weight) { vitalSigns = { bp, hr, temp, weight }; }
+
+        const appointmentId = document.getElementById('add_appointment_id')?.value || null;
 
         const payload = {
             patient_id: parseInt(document.getElementById('add_patient_id').value),
@@ -913,45 +511,46 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             vital_signs: vitalSigns,
             treatment_plan: document.getElementById('add_treatment_plan').value.trim(),
             notes: document.getElementById('add_notes').value.trim(),
-            follow_up_date: document.getElementById('add_follow_up_date').value || null
+            follow_up_date: document.getElementById('add_follow_up_date').value || null,
+            appointment_id: appointmentId
         };
 
         try {
-            const res = await fetch('/api/consultations.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const res = await fetch('/capstone/api/consultations.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
             const data = await res.json();
-
-            if (res.ok && data.success) {
-                ModalSystem.toast.success('Consultation created successfully!');
-                ModalSystem.close('addConsultationModal');
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                ModalSystem.toast.error(data.message || 'Failed to save consultation');
-            }
-        } catch (err) {
-            ModalSystem.toast.error('Error saving consultation record');
-            console.error(err);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save Consultation`;
-        }
+            if (data.success) { ModalSystem.toast.success('Consultation created!'); ModalSystem.close('addConsultationModal'); setTimeout(() => window.location.reload(), 1000); }
+            else { ModalSystem.toast.error(data.message || 'Failed'); }
+        } catch (err) { ModalSystem.toast.error('Network error'); console.error(err); }
+        finally { submitBtn.disabled = false; submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save Consultation`; }
     }
 
-    // Edit Consultation
+    // ============================================================
+    // EDIT CONSULTATION
+    // ============================================================
     function editConsultation(id) {
         const c = CONSULTATIONS_DATA[id];
-        if (!c) {
-            ModalSystem.toast.error('Consultation not found');
-            return;
-        }
+        if (!c) { ModalSystem.toast.error('Consultation not found'); return; }
 
         document.getElementById('edit_id').value = c.id;
         document.getElementById('edit_patient_id').value = c.patient_id;
         document.getElementById('edit_patient_name').value = c.patient_name + ' (' + c.patient_code + ')';
-        document.getElementById('edit_employee_id').value = c.employee_id || 1;
+        document.getElementById('edit_appointment_id').value = c.appointment_id || '';
+        
+        const employeeSelect = document.getElementById('edit_employee_id');
+        if (employeeSelect && c.employee_id) {
+            const targetId = String(c.employee_id);
+            let found = false;
+            for (let i = 0; i < employeeSelect.options.length; i++) {
+                if (String(employeeSelect.options[i].value) === targetId) { employeeSelect.selectedIndex = i; found = true; break; }
+            }
+            if (!found) {
+                const doctorName = c.doctor_name || '';
+                for (let i = 0; i < employeeSelect.options.length; i++) {
+                    if (employeeSelect.options[i].text.toLowerCase().includes(doctorName.toLowerCase())) { employeeSelect.selectedIndex = i; break; }
+                }
+            }
+        }
+        
         document.getElementById('edit_date').value = c.date;
         document.getElementById('edit_time').value = c.time;
         document.getElementById('edit_symptoms').value = c.symptoms || '';
@@ -977,6 +576,9 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         ModalSystem.open('editConsultationModal');
     }
 
+    // ============================================================
+    // SAVE EDITED CONSULTATION
+    // ============================================================
     async function saveEditedConsultation(event) {
         event.preventDefault();
         const id = document.getElementById('edit_id').value;
@@ -988,11 +590,8 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
         const hr = document.getElementById('edit_hr').value.trim();
         const temp = document.getElementById('edit_temp').value.trim();
         const weight = document.getElementById('edit_weight').value.trim();
-
         let vitalSigns = null;
-        if (bp || hr || temp || weight) {
-            vitalSigns = { bp, hr, temp, weight };
-        }
+        if (bp || hr || temp || weight) { vitalSigns = { bp, hr, temp, weight }; }
 
         const payload = {
             patient_id: parseInt(document.getElementById('edit_patient_id').value),
@@ -1006,173 +605,94 @@ $todayCount = count(array_filter($consultations, fn($c) => $c['date'] === date('
             vital_signs: vitalSigns,
             treatment_plan: document.getElementById('edit_treatment_plan').value.trim(),
             notes: document.getElementById('edit_notes').value.trim(),
-            follow_up_date: document.getElementById('edit_follow_up_date').value || null
+            follow_up_date: document.getElementById('edit_follow_up_date').value || null,
+            appointment_id: document.getElementById('edit_appointment_id')?.value || null
         };
 
         try {
-            const res = await fetch('/api/consultations.php?id=' + id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const res = await fetch('/capstone/api/consultations.php?action=update&id=' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
             const data = await res.json();
-
-            if (res.ok && data.success) {
-                ModalSystem.toast.success('Consultation updated successfully!');
-                ModalSystem.close('editConsultationModal');
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                ModalSystem.toast.error(data.message || 'Failed to update consultation');
-            }
-        } catch (err) {
-            ModalSystem.toast.error('Error updating consultation record');
-            console.error(err);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save Changes`;
-        }
+            if (data.success) { ModalSystem.toast.success('Consultation updated!'); ModalSystem.close('editConsultationModal'); setTimeout(() => window.location.reload(), 1000); }
+            else { ModalSystem.toast.error(data.message || 'Failed'); }
+        } catch (err) { ModalSystem.toast.error('Network error'); }
+        finally { submitBtn.disabled = false; submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save Changes`; }
     }
 
+    // ============================================================
+    // DELETE CONSULTATION
+    // ============================================================
     async function deleteConsultation(id) {
-    ModalSystem.confirm(
-        'This consultation record will be permanently removed.',
-        async () => {
+        ModalSystem.confirm('This consultation record will be permanently removed.', async () => {
             try {
-                const res = await fetch('/api/consultations.php?id=' + id, {
-                    method: 'DELETE'
-                });
+                const res = await fetch('/capstone/api/consultations.php?action=delete&id=' + id, { method:'POST' });
                 const data = await res.json();
+                if (data.success) { ModalSystem.toast.success('Consultation deleted!'); setTimeout(() => window.location.reload(), 800); }
+                else { ModalSystem.toast.error(data.message || 'Failed'); }
+            } catch (err) { ModalSystem.toast.error('Error deleting consultation'); }
+        }, { title:'Delete Consultation', confirmText:'Delete', type:'danger' });
+    }
 
-                if (res.ok && data.success) {
-                    ModalSystem.toast.success('Consultation deleted successfully!');
-                    setTimeout(() => window.location.reload(), 800);
-                } else {
-                    ModalSystem.toast.error(data.message || 'Failed to delete consultation');
-                }
-            } catch (err) {
-                ModalSystem.toast.error('Error deleting consultation');
-                console.error(err);
-            }
-        },
-        { title: 'Delete Consultation', confirmText: 'Delete', type: 'danger' }
-    );
-}
-
-    // Filtering & Searching
+    // ============================================================
+    // FILTERING & SEARCHING
+    // ============================================================
     document.getElementById('searchConsultation').addEventListener('input', filterConsultations);
     document.getElementById('filterStatus').addEventListener('change', filterConsultations);
     document.getElementById('filterDoctor').addEventListener('change', filterConsultations);
 
     function setDateFilter(range) {
         activeDateFilter = range;
-        
-        document.querySelectorAll('.date-filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
+        document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
         const indicator = document.getElementById('activeDateFilter');
         const label = document.getElementById('activeDateFilterLabel');
-        
-        if (range === 'all') {
-            indicator.classList.add('hidden');
-        } else {
+        if (range === 'all') { indicator.classList.add('hidden'); }
+        else {
             document.querySelectorAll('.date-filter-btn').forEach(btn => {
-                const btnText = btn.textContent.trim().toLowerCase();
-                if ((range === 'today' && btnText.includes('today')) ||
-                    (range === 'week' && btnText.includes('week')) ||
-                    (range === 'month' && btnText.includes('month')) ||
-                    (range === 'year' && btnText.includes('year'))) {
-                    btn.classList.add('active');
-                }
+                const t = btn.textContent.trim().toLowerCase();
+                if ((range==='today'&&t.includes('today'))||(range==='week'&&t.includes('week'))||(range==='month'&&t.includes('month'))||(range==='year'&&t.includes('year'))) btn.classList.add('active');
             });
-            
-            const labels = {
-                'today': 'Today',
-                'week': 'This Week',
-                'month': 'This Month',
-                'year': 'This Year'
-            };
-            label.textContent = labels[range] || range;
+            label.textContent = {today:'Today',week:'This Week',month:'This Month',year:'This Year'}[range]||range;
             indicator.classList.remove('hidden');
         }
-        
         filterConsultations();
     }
 
-    function matchesDateFilter(consultationDate, range) {
-        if (!range || range === 'all') return true;
-        if (!consultationDate) return false;
+    function matchesDateFilter(d,r){if(!r||r==='all')return true;if(!d)return false;const dt=new Date(d+'T00:00:00'),td=new Date();td.setHours(0,0,0,0);const sw=new Date(td);sw.setDate(sw.getDate()-sw.getDay()+(sw.getDay()===0?-6:1));sw.setHours(0,0,0,0);const sm=new Date(td.getFullYear(),td.getMonth(),1),sy=new Date(td.getFullYear(),0,1);switch(r){case'today':return dt.getTime()===td.getTime();case'week':return dt>=sw&&dt<=td;case'month':return dt>=sm&&dt<=td;case'year':return dt>=sy&&dt<=td;default:return true;}}
 
-        const date = new Date(consultationDate + 'T00:00:00');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const startOfWeek = new Date(today);
-        const day = startOfWeek.getDay();
-        const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
-        startOfWeek.setDate(diff);
-        startOfWeek.setHours(0, 0, 0, 0);
-        
-        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const startOfYear = new Date(today.getFullYear(), 0, 1);
+    function filterConsultations(){const s=document.getElementById('searchConsultation').value.toLowerCase(),st=document.getElementById('filterStatus').value.toLowerCase(),dr=document.getElementById('filterDoctor').value.toLowerCase();let c=0;document.querySelectorAll('.consultation-card').forEach(card=>{const p=card.dataset.patient||'',dg=card.dataset.diagnosis||'',ic=card.dataset.icd||'',cs=(card.dataset.status||'').toLowerCase(),cd=(card.dataset.doctor||'').toLowerCase(),cdt=card.dataset.date;const v=(p.includes(s)||dg.includes(s)||ic.includes(s))&&(!st||cs===st)&&(!dr||cd.includes(dr))&&matchesDateFilter(cdt,activeDateFilter);card.style.display=v?'':'none';if(v)c++;});document.getElementById('emptyState').style.display=c===0?'flex':'none';}
+    function resetFilters(){document.getElementById('searchConsultation').value='';document.getElementById('filterStatus').value='';document.getElementById('filterDoctor').value='';setDateFilter('all');document.querySelectorAll('.consultation-card').forEach(card=>card.style.display='');document.getElementById('emptyState').style.display='none';}
+    function changePage(page){if(page<1||page><?php echo $totalPages; ?>)return;window.location.href='?page='+page;}
 
-        switch(range) {
-            case 'today':
-                return date.getTime() === today.getTime();
-            case 'week':
-                return date >= startOfWeek && date <= today;
-            case 'month':
-                return date >= startOfMonth && date <= today;
-            case 'year':
-                return date >= startOfYear && date <= today;
-            default:
-                return true;
+    // ============================================================
+    // APPOINTMENT PRE-FILL
+    // ============================================================
+    document.addEventListener('DOMContentLoaded',function(){
+        const p=new URLSearchParams(window.location.search);
+        if(p.get('from_appointment')==='true'){
+            const pid=p.get('patient_id'),aid=p.get('appointment_id'),eid=p.get('employee_id'),dt=p.get('date'),tm=p.get('time'),dn=p.get('doctor_name');
+            setTimeout(()=>{
+                ModalSystem.open('addConsultationModal');
+                const ps=document.getElementById('add_patient_id');if(ps&&pid){for(let o of ps.options){if(String(o.value)===String(pid)){o.selected=true;break;}}}
+                const es=document.getElementById('add_employee_id');if(es&&eid){const t=String(eid);let f=false;for(let i=0;i<es.options.length;i++){if(String(es.options[i].value)===t){es.selectedIndex=i;f=true;break;}}if(!f&&dn){for(let i=0;i<es.options.length;i++){if(es.options[i].text.toLowerCase().includes(dn.toLowerCase())){es.selectedIndex=i;break;}}}}
+                const di=document.getElementById('add_date');if(di&&dt)di.value=dt;
+                const ti=document.getElementById('add_time');if(ti&&tm){const m=tm.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);if(m){let h=parseInt(m[1]);if(m[3].toUpperCase()==='PM'&&h!==12)h+=12;if(m[3].toUpperCase()==='AM'&&h===12)h=0;ti.value=`${h.toString().padStart(2,'0')}:${m[2]}`;}else if(tm.includes(':'))ti.value=tm.substring(0,5);else ti.value=new Date().toTimeString().slice(0,5);}
+                const ss=document.getElementById('add_status');if(ss)ss.value='completed';
+                const ni=document.getElementById('add_notes');if(ni&&aid)ni.value=`Consultation from appointment #${aid}`;
+                const ai=document.getElementById('add_appointment_id');if(ai&&aid)ai.value=aid;
+                ModalSystem.toast.info('Patient and doctor pre-filled from appointment',{title:'📋 Auto-filled',duration:3000});
+            },500);
+            if(window.history&&window.history.replaceState){const pg=p.get('page')||'1';window.history.replaceState({},document.title,window.location.pathname+'?page='+pg);}
         }
+    });
+
+    // ============================================================
+    // FORM VALIDATION
+    // ============================================================
+    function initConsultationValidation(){
+        if(typeof ModalSystem==='undefined'||!ModalSystem.validateForm){setTimeout(initConsultationValidation,100);return;}
+        ModalSystem.validateForm('addConsultationModal',{fields:{'add_patient_id':{label:'Patient'},'add_employee_id':{label:'Doctor / Staff'},'add_date':{label:'Date'},'add_time':{label:'Time'},'add_diagnosis':{label:'Diagnosis'}},onSubmit:saveNewConsultation});
+        ModalSystem.validateForm('editConsultationModal',{fields:{'edit_employee_id':{label:'Doctor / Staff'},'edit_date':{label:'Date'},'edit_time':{label:'Time'},'edit_diagnosis':{label:'Diagnosis'}},onSubmit:saveEditedConsultation});
+        console.log('✅ Consultation form validation initialized');
     }
-
-    function filterConsultations() {
-        const search = document.getElementById('searchConsultation').value.toLowerCase();
-        const status = document.getElementById('filterStatus').value.toLowerCase();
-        const doctor = document.getElementById('filterDoctor').value.toLowerCase();
-        const dateRange = activeDateFilter;
-        let visibleCount = 0;
-
-        document.querySelectorAll('.consultation-card').forEach(card => {
-            const patient = card.dataset.patient || '';
-            const diagnosis = card.dataset.diagnosis || '';
-            const icd = card.dataset.icd || '';
-            const cardStatus = (card.dataset.status || '').toLowerCase();
-            const cardDoctor = (card.dataset.doctor || '').toLowerCase();
-            const cardDate = card.dataset.date;
-
-            const matchesSearch = patient.includes(search) || diagnosis.includes(search) || icd.includes(search);
-            const matchesStatus = !status || cardStatus === status;
-            const matchesDoctor = !doctor || cardDoctor.includes(doctor);
-            const matchesDate = matchesDateFilter(cardDate, dateRange);
-
-            const isVisible = matchesSearch && matchesStatus && matchesDoctor && matchesDate;
-
-            card.style.display = isVisible ? '' : 'none';
-            if (isVisible) visibleCount++;
-        });
-
-        document.getElementById('emptyState').style.display = visibleCount === 0 ? 'flex' : 'none';
-    }
-
-    function resetFilters() {
-        document.getElementById('searchConsultation').value = '';
-        document.getElementById('filterStatus').value = '';
-        document.getElementById('filterDoctor').value = '';
-        setDateFilter('all');
-        document.querySelectorAll('.consultation-card').forEach(card => card.style.display = '');
-        document.getElementById('emptyState').style.display = 'none';
-    }
-
-    function changePage(page) {
-        if (page < 1 || page > <?php echo $totalPages; ?>) return;
-        window.location.href = '?page=' + page;
-    }
-
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initConsultationValidation);}else{initConsultationValidation();}
 </script>
-
 <?php include_once '../../includes/footer.php'; ?>

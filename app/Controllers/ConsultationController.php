@@ -64,45 +64,43 @@ class ConsultationController extends BaseController
         });
     }
 
-    public function store(): void
-    {
-        $data = $this->input();
+   public function store(): void
+{
+    $data = $this->input();
+    
+    error_log('STORE called with: ' . json_encode($data));
 
-        $this->handle(function() use ($data) {
-            if (empty($data['patient_id'])) {
-                return [
-                    'success' => false,
-                    'message' => 'Patient selection is required',
-                    'code' => 400
-                ];
+    $this->handle(function() use ($data) {
+        if (empty($data['patient_id'])) {
+            return ['success' => false, 'message' => 'Patient selection is required', 'code' => 400];
+        }
+
+        $dbData = $this->prepareDbData($data);
+        
+        error_log('STORE dbData: ' . json_encode($dbData));
+
+        if (empty($dbData['consultation_id'])) {
+            $dbData['consultation_id'] = $this->consultationModel->generateConsultationId();
+        }
+
+        $result = $this->consultationModel->create($dbData);
+        
+        error_log('STORE result: ' . json_encode($result));
+
+        // FIX: UNCOMMENTED - Update appointment status to completed
+        if (!empty($dbData['appointment_id'])) {
+            try {
+                error_log('Updating appointment ' . $dbData['appointment_id'] . ' to completed');
+                $this->appointmentModel->updateStatus($dbData['appointment_id'], 'completed');
+                error_log('Appointment status updated successfully');
+            } catch (Throwable $e) {
+                error_log('Failed to update appointment status: ' . $e->getMessage());
             }
+        }
 
-            $dbData = $this->prepareDbData($data);
-
-            if (empty($dbData['consultation_id'])) {
-                $dbData['consultation_id'] = $this->consultationModel->generateConsultationId();
-            }
-
-            $result = $this->consultationModel->create($dbData);
-
-            // If appointment_id is linked, update appointment status to completed
-            if (!empty($dbData['appointment_id'])) {
-                try {
-                    $this->appointmentModel->updateStatus($dbData['appointment_id'], 'completed');
-                } catch (Throwable $e) {
-                    error_log('Failed to update appointment status: ' . $e->getMessage());
-                }
-            }
-
-            return [
-                'success' => true,
-                'message' => 'Consultation created successfully',
-                'data' => $result,
-                'code' => 201
-            ];
-        });
-    }
-
+        return ['success' => true, 'message' => 'Consultation created successfully', 'data' => $result, 'code' => 201];
+    });
+}
     public function update(string $id): void
     {
         $data = $this->input();
@@ -185,92 +183,46 @@ class ConsultationController extends BaseController
         });
     }
 
-    private function prepareDbData(array $data, bool $isUpdate = false): array
-    {
-        $dbData = [];
+   private function prepareDbData(array $data, bool $isUpdate = false): array
+{
+    $dbData = [];
 
-        if (isset($data['consultation_id'])) {
-            $dbData['consultation_id'] = trim($data['consultation_id']);
-        }
-        if (isset($data['patient_id'])) {
-            $dbData['patient_id'] = (int)$data['patient_id'];
-        }
-        if (isset($data['employee_id'])) {
-            $dbData['employee_id'] = (int)$data['employee_id'];
-        } elseif (!$isUpdate && empty($dbData['employee_id'])) {
-            // Default fallback employee_id if none specified
-            $dbData['employee_id'] = 1;
-        }
+    // Only include fields that have values
+    $allowedFields = [
+        'consultation_id', 'patient_id', 'employee_id', 'appointment_id',
+        'date', 'time', 'diagnosis', 'icd_code', 'symptoms',
+        'vital_signs', 'treatment_plan', 'notes', 'follow_up_date', 'status'
+    ];
 
-        if (isset($data['appointment_id']) && $data['appointment_id'] !== '') {
-            $dbData['appointment_id'] = (int)$data['appointment_id'];
-        } elseif (!$isUpdate) {
-            $dbData['appointment_id'] = null;
+    foreach ($data as $key => $value) {
+        if (in_array($key, $allowedFields) && $value !== null && $value !== '') {
+            $dbData[$key] = $value;
         }
-
-        if (isset($data['date'])) {
-            $dbData['date'] = $data['date'];
-        } elseif (!$isUpdate) {
-            $dbData['date'] = date('Y-m-d');
-        }
-
-        if (isset($data['time'])) {
-            $dbData['time'] = $data['time'];
-        } elseif (!$isUpdate) {
-            $dbData['time'] = date('H:i:s');
-        }
-
-        if (isset($data['diagnosis'])) {
-            $dbData['diagnosis'] = trim($data['diagnosis']);
-        }
-        if (isset($data['icd_code'])) {
-            $dbData['icd_code'] = trim($data['icd_code']);
-        }
-        if (isset($data['symptoms'])) {
-            $dbData['symptoms'] = trim($data['symptoms']);
-        }
-
-        if (isset($data['vital_signs'])) {
-            if (is_array($data['vital_signs'])) {
-                $dbData['vital_signs'] = json_encode($data['vital_signs']);
-            } else {
-                $dbData['vital_signs'] = $data['vital_signs'];
-            }
-        }
-
-        if (isset($data['treatment_plan'])) {
-            $dbData['treatment_plan'] = trim($data['treatment_plan']);
-        } elseif (isset($data['treatment'])) {
-            $dbData['treatment_plan'] = trim($data['treatment']);
-        }
-
-        if (isset($data['notes'])) {
-            $dbData['notes'] = trim($data['notes']);
-        }
-
-        if (isset($data['follow_up_date']) && !empty($data['follow_up_date'])) {
-            $dbData['follow_up_date'] = $data['follow_up_date'];
-        } elseif (array_key_exists('follow_up_date', $data) && empty($data['follow_up_date'])) {
-            $dbData['follow_up_date'] = null;
-        }
-
-        if (isset($data['status'])) {
-            $status = strtolower(trim($data['status']));
-            // Enforce database check constraint: status IN ('completed', 'referred')
-            if (in_array($status, ['completed', 'referred'])) {
-                $dbData['status'] = $status;
-            } else {
-                $dbData['status'] = 'completed';
-            }
-        } elseif (!$isUpdate) {
-            $dbData['status'] = 'completed';
-        }
-
-        $dbData['updated_at'] = date('Y-m-d H:i:sP');
-
-        return $dbData;
     }
 
+    // Set defaults for new records
+    if (!$isUpdate) {
+        if (empty($dbData['date'])) $dbData['date'] = date('Y-m-d');
+        if (empty($dbData['time'])) $dbData['time'] = date('H:i:s');
+        if (empty($dbData['status'])) $dbData['status'] = 'in_progress';
+        if (empty($dbData['employee_id'])) $dbData['employee_id'] = 1;
+    }
+
+    // Convert vital_signs to JSON if array
+    if (isset($dbData['vital_signs']) && is_array($dbData['vital_signs'])) {
+        $dbData['vital_signs'] = json_encode($dbData['vital_signs']);
+    }
+
+    // Handle treatment/treatment_plan mapping
+    if (isset($data['treatment']) && !isset($dbData['treatment_plan'])) {
+        $dbData['treatment_plan'] = trim($data['treatment']);
+    }
+
+    // DO NOT send updated_at - Supabase handles this
+    unset($dbData['updated_at']);
+
+    return $dbData;
+}
     private function getPatientsMap(): array
     {
         try {

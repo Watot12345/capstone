@@ -16,7 +16,18 @@ class EmployeeController extends BaseController
     public function index(): void
     {
         $this->handle(function() {
-            $employees = $this->employeeModel->all(['order' => 'created_at.desc']);
+            $employees = $this->employeeModel->all(['order' => 'id.asc']);
+            
+            // Add full_name if not present
+            foreach ($employees as &$e) {
+                if (empty($e['full_name']) && !empty($e['name'])) {
+                    $e['full_name'] = $e['name'];
+                } elseif (empty($e['full_name']) && !empty($e['username'])) {
+                    $e['full_name'] = $e['username'];
+                } elseif (empty($e['full_name'])) {
+                    $e['full_name'] = "Employee #{$e['id']}";
+                }
+            }
             
             return [
                 'success' => true,
@@ -63,8 +74,7 @@ class EmployeeController extends BaseController
             $query = strtolower($query);
             
             $results = array_values(array_filter($all, function($e) use ($query) {
-                return str_contains(strtolower($e['first_name'] ?? ''), $query) ||
-                       str_contains(strtolower($e['last_name'] ?? ''), $query) ||
+                return str_contains(strtolower($e['full_name'] ?? ''), $query) ||
                        str_contains(strtolower($e['username'] ?? ''), $query) ||
                        str_contains(strtolower($e['email'] ?? ''), $query);
             }));
@@ -77,4 +87,3 @@ class EmployeeController extends BaseController
         });
     }
 }
-?>

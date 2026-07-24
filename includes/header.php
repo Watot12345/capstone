@@ -73,24 +73,29 @@ $assetBasePath = str_repeat('../', substr_count(trim(dirname($_SERVER['PHP_SELF'
     </div>
   </div>
 
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-3">
       
       <div class="hidden md:flex items-center space-x-2 text-slate-500 font-mono text-xs font-semibold">
-    <i class="fa-solid fa-calendar-day text-brand-medium"></i>
-    <span id="headerClock">Loading System Time...</span>
-</div>
+        <i class="fa-solid fa-calendar-day text-brand-medium"></i>
+        <span id="headerClock">Loading System Time...</span>
+      </div>
       
       <div class="hidden md:block h-6 w-px bg-slate-200"></div>
 
+      <!-- Bell Icon -->
       <button class="relative p-2 text-slate-400 hover:text-brand-dark rounded-lg hover:bg-slate-50 transition focus:outline-none cursor-pointer">
         <i class="fa-solid fa-bell text-lg"></i>
         <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
       </button>
+
+      <!-- Data Mask Toggle -->
       <button id="dataMaskToggle" onclick="toggleDataMask()"
-        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition cursor-pointer">
-    <i class="fa-solid fa-eye-slash text-sm"></i>
-    <span class="hidden sm:inline">Hidden</span>
-</button>
+              class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-300 cursor-pointer"
+              title="Click to toggle data masking (Ctrl+Shift+M)">
+        <i id="maskToggleIcon" class="fa-solid fa-eye-slash text-sm transition-all duration-300"></i>
+        <span id="maskToggleLabel" class="hidden sm:inline">Hidden</span>
+      </button>
+
       <div class="h-6 w-px bg-slate-200"></div>
 
       <div class="flex items-center space-x-2 p-1.5 rounded-lg text-left select-none">

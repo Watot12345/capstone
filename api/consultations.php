@@ -5,7 +5,6 @@ require_once __DIR__ . '/../Core/Env.php';
 require_once __DIR__ . '/../Core/Response.php';
 require_once __DIR__ . '/../app/Controllers/ConsultationController.php';
 
-// Handle CORS
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
@@ -17,22 +16,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 header('Content-Type: application/json');
 
+// DEBUG
+$rawInput = file_get_contents('php://input');
+error_log('=== CONSULTATIONS API ===');
+error_log('Method: ' . $_SERVER['REQUEST_METHOD']);
+error_log('Input: ' . $rawInput);
+
 try {
     $controller = new ConsultationController();
     $method = $_SERVER['REQUEST_METHOD'];
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $parts = explode('/', trim($path, '/'));
     
-    // Get consultation ID from URL if exists (e.g. /api/consultations.php/123)
     $consultationId = null;
     if (count($parts) >= 3 && is_numeric($parts[2])) {
         $consultationId = $parts[2];
     }
-    
-    // Also support ?id=...
     if (!$consultationId && isset($_GET['id']) && is_numeric($_GET['id'])) {
         $consultationId = $_GET['id'];
     }
+
+    $action = $_GET['action'] ?? '';
 
     switch ($method) {
         case 'GET':
@@ -46,29 +50,25 @@ try {
             break;
 
         case 'POST':
-            $controller->store();
-            break;
-
-        case 'PUT':
-            if ($consultationId) {
+            if ($action === 'update' && $consultationId) {
                 $controller->update($consultationId);
-            } else {
-                Response::error('Consultation ID is required for update', 400);
-            }
-            break;
-
-        case 'DELETE':
-            if ($consultationId) {
+            } elseif ($action === 'delete' && $consultationId) {
                 $controller->destroy($consultationId);
             } else {
-                Response::error('Consultation ID is required for deletion', 400);
+                $controller->store();
             }
             break;
 
         default:
             Response::error('Method not allowed', 405);
     }
-} catch (Exception $e) {
-    error_log('API Error in consultations.php: ' . $e->getMessage());
-    Response::error('Internal server error: ' . $e->getMessage(), 500);
+} catch (Throwable $e) {
+    error_log('API ERROR: ' . $e->getMessage());
+    error_log('TRACE: ' . $e->getTraceAsString());
+    
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Server error: ' . $e->getMessage()
+    ]);
 }

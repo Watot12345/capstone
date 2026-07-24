@@ -1,3 +1,4 @@
+
 <?php
 // ============================================================
 // COLOR PALETTE USED ON THIS PAGE
@@ -18,6 +19,7 @@ include_once __DIR__ . '/../../includes/data-mask.php';
 require_once __DIR__ . '/../../app/Models/Patient.php';
 require_once __DIR__ . '/../../app/Models/Employee.php';
 require_once __DIR__ . '/../../app/Models/Appointment.php';
+require_once __DIR__ . '/../../app/Models/Consultation.php'; // ADD THIS - Include Consultation Model
 require_once __DIR__ . '/../../app/Controllers/AppointmentController.php';
 
 // Fetch Patients
@@ -33,9 +35,21 @@ try {
 $employeeModel = new Employee();
 $dbEmployees = [];
 try {
-    $dbEmployees = $employeeModel->all();
+    $rawEmployees = $employeeModel->all();
+    // Ensure each employee has a full_name
+    foreach ($rawEmployees as $e) {
+        $displayName = $e['full_name'] ?? '';
+        if (empty($displayName)) {
+            $displayName = $e['name'] ?? $e['username'] ?? "Employee #{$e['id']}";
+        }
+        $e['full_name'] = $displayName;
+        $e['first_name'] = $displayName;
+        $e['last_name'] = '';
+        $dbEmployees[] = $e;
+    }
 } catch (Throwable $e) {
     error_log('Error loading employees: ' . $e->getMessage());
+    $dbEmployees = [];
 }
 
 // Fetch Appointments
@@ -52,7 +66,7 @@ try {
         }
     }
 
-       $medicalRoles = ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech'];
+    $medicalRoles = ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech'];
 
     $employeesMap = [];
     foreach ($dbEmployees as $e) {
@@ -81,7 +95,7 @@ try {
             $avatar = "PT";
         }
             
-                $employeeId = $a['employee_id'] ?? null;
+        $employeeId = $a['employee_id'] ?? null;
         $employee = $employeesMap[$employeeId] ?? null;
         if ($employee) {
             $role = $employee['role_description'] ?? '';
@@ -123,6 +137,26 @@ try {
     error_log("Error building appointments list: " . $e->getMessage());
 }
 
+// ============================================================
+// FETCH CONSULTATIONS FOR APPOINTMENT LINKING - ADD THIS SECTION
+// ============================================================
+$consultationModel = new Consultation();
+$consultations = [];
+$consultationMap = [];
+
+try {
+    $rawConsultations = $consultationModel->all(['order' => 'date.desc']);
+    
+    // Build a map of appointment_id -> consultation
+    foreach ($rawConsultations as $c) {
+        if (!empty($c['appointment_id'])) {
+            $consultationMap[$c['appointment_id']] = $c['id'];
+        }
+    }
+} catch (Throwable $e) {
+    error_log('Error loading consultations: ' . $e->getMessage());
+}
+
 // Doctor list for UI filters and dropdowns
 $doctorsList = !empty($dbEmployees) ? $dbEmployees : [
     ['id' => 1, 'name' => 'Dr. Elena Santos', 'specialty' => 'General Medicine'],
@@ -147,7 +181,6 @@ $totalPending  = count(array_filter($appointments, fn($a) => $a['status'] === 'p
 $totalCompleted = count(array_filter($appointments, fn($a) => $a['status'] === 'completed'));
 $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === date('Y-m-d')));
 ?>
-
 <!-- ============================================================ -->
 <!-- 2. HTML + PHP EMBEDDED + Tailwind CSS                       -->
 <!-- ============================================================ -->
@@ -412,6 +445,13 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                                             <i class="fa-solid fa-ban text-sm"></i>
                                         </button>
                                     <?php endif; ?>
+                                    <!-- In appointments.php, in the actions column -->
+<?php if ($a['status'] === 'approved' || $a['status'] === 'confirmed'): ?>
+    <button onclick="startConsultationFromAppointment(<?php echo $a['id']; ?>)"
+            class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Start Consultation">
+        <i class="fa-solid fa-stethoscope text-sm"></i>
+    </button>
+<?php endif; ?>
                                 </div>
                             </td>
                         </tr>
@@ -679,6 +719,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
 <!-- ============================================================ -->
 <script>
     const APPOINTMENTS_DATA = <?php echo json_encode(array_column($appointments, null, 'id'), JSON_UNESCAPED_UNICODE); ?>;
+    const CONSULTATION_MAP = <?php echo json_encode($consultationMap); ?>;
     const MEDICAL_ROLES = ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech'];
     const PATIENTS = <?php 
         echo json_encode(array_values(array_map(function($p) {
@@ -691,20 +732,19 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     ?>;
 
     const DOCTORS = <?php 
-        $medicalStaff = array_filter($dbEmployees, function($e) {
-            $role = $e['role_description'] ?? '';
-            return in_array($role, ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech']);
-        });
-        echo json_encode(array_values(array_map(function($e) {
-            return [
-                'id' => $e['id'],
-                'name' => $e['full_name'] ?? trim(($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? '')),
-                'role' => $e['role_description'] ?? '',
-                'department' => $e['department'] ?? ''
-            ];
-        }, $medicalStaff)));
-    ?>;
-
+    $medicalStaff = array_filter($dbEmployees, function($e) {
+        $role = $e['role_description'] ?? '';
+        return in_array($role, ['Health Center Director', 'Doctor', 'Nurse', 'Dentist', 'midwives', 'Nutritionist', 'Immunization Coordinator', 'Lab tech']);
+    });
+    echo json_encode(array_values(array_map(function($e) {
+        return [
+            'id' => $e['id'],
+            'name' => $e['full_name'] ?? $e['name'] ?? $e['username'] ?? "Employee #{$e['id']}",
+            'role' => $e['role_description'] ?? '',
+            'department' => $e['department'] ?? ''
+        ];
+    }, $medicalStaff)));
+?>;
     // ============================================================
     // DATA MASKING HELPERS
     // ============================================================
@@ -834,6 +874,12 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             no_show: 'bg-slate-100 text-slate-600'
         };
 
+        const patientId = a.patient_id || 0;
+        const patientIdForLink = patientId > 0 ? patientId : '';
+
+        // Check if consultation exists using CONSULTATION_MAP
+        const consultationId = CONSULTATION_MAP && CONSULTATION_MAP[a.id] ? CONSULTATION_MAP[a.id] : null;
+
         content.innerHTML = `
             <div class="space-y-5">
                 <div class="flex items-center gap-4 pb-4 border-b border-slate-200">
@@ -852,9 +898,32 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                     <div><p class="text-slate-400 font-semibold uppercase">Patient ID</p><p class="text-slate-800 font-mono font-bold mt-0.5 maskable" data-masked="${maskedCode}" data-real="${a.patient_code}">${maskedCode}</p></div>
                 </div>
                 ${a.notes ? `<div><h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Notes</h5><p class="text-sm text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200">${a.notes}</p></div>` : ''}
-                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <a href="patients.php?patient=${a.patient_id}&id=${a.patient_id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5"><i class="fa-solid fa-user"></i> View Patient</a>
-                    <button onclick="closeViewAndEdit(${a.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5"><i class="fa-solid fa-pen"></i> Edit</button>
+                <div class="flex flex-wrap justify-end gap-2 pt-3 border-t border-slate-100">
+                    ${patientIdForLink ? `
+                        <a href="patients.php?patient=${patientIdForLink}&id=${patientIdForLink}" 
+                           class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs font-semibold inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-user"></i> View Patient Profile
+                        </a>
+                    ` : `
+                        <span class="px-4 py-2 bg-slate-200 text-slate-400 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-not-allowed">
+                            <i class="fa-solid fa-user"></i> Patient ID Missing
+                        </span>
+                    `}
+                    ${(a.status === 'approved' || a.status === 'confirmed') && !consultationId ? `
+                        <button onclick="startConsultationFromAppointment(${a.id})" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-xs font-semibold inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-stethoscope"></i> Start Consultation
+                        </button>
+                    ` : ''}
+                    ${consultationId ? `
+                        <a href="consultations.php" 
+                           class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-xs font-semibold inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-notes-medical"></i> View Consultation
+                        </a>
+                    ` : ''}
+                    <button onclick="closeViewAndEdit(${a.id})" class="px-4 py-2 bg-brand-dark text-white rounded-lg hover:bg-brand-medium transition text-xs font-semibold inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </button>
                 </div>
             </div>`;
 
@@ -864,6 +933,139 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     function closeViewAndEdit(id) {
         ModalSystem.close('viewAppointmentModal');
         setTimeout(() => editAppointment(id), 200);
+    }
+
+    // ============================================================
+    // OPEN CONSULTATION WITH APPOINTMENT DATA - FIXED
+    // ============================================================
+    function openConsultationWithAppointmentData(a) {
+        // Open the consultation modal
+        ModalSystem.open('addConsultationModal');
+        
+        // Wait for modal to render
+        setTimeout(() => {
+            // Set patient
+            const patientSelect = document.getElementById('add_patient_id');
+            if (patientSelect && a.patient_id) {
+                for (let option of patientSelect.options) {
+                    if (String(option.value) === String(a.patient_id)) {
+                        option.selected = true;
+                        console.log('✅ Patient selected:', option.text);
+                        break;
+                    }
+                }
+            }
+            
+            // Set employee (doctor)
+            const employeeSelect = document.getElementById('add_employee_id');
+            if (employeeSelect && a.employee_id) {
+                const targetId = String(a.employee_id);
+                let found = false;
+                for (let i = 0; i < employeeSelect.options.length; i++) {
+                    if (String(employeeSelect.options[i].value) === targetId) {
+                        employeeSelect.selectedIndex = i;
+                        found = true;
+                        console.log('✅ Doctor selected:', employeeSelect.options[i].text);
+                        break;
+                    }
+                }
+                if (!found) {
+                    console.warn('⚠️ Doctor ID not found in dropdown:', a.employee_id);
+                    // Try to find by name as fallback
+                    const doctorName = a.doctor_name || '';
+                    for (let i = 0; i < employeeSelect.options.length; i++) {
+                        if (employeeSelect.options[i].text.toLowerCase().includes(doctorName.toLowerCase())) {
+                            employeeSelect.selectedIndex = i;
+                            console.log('✅ Doctor found by name:', employeeSelect.options[i].text);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Set date
+            const dateInput = document.getElementById('add_date');
+            if (dateInput && a.date) {
+                dateInput.value = a.date;
+            }
+            
+            // Set time
+            const timeInput = document.getElementById('add_time');
+            if (timeInput && a.time) {
+                const timeStr = a.time;
+                const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                if (match) {
+                    let hours = parseInt(match[1]);
+                    const minutes = match[2];
+                    const meridian = match[3].toUpperCase();
+                    if (meridian === 'PM' && hours !== 12) hours += 12;
+                    if (meridian === 'AM' && hours === 12) hours = 0;
+                    timeInput.value = `${hours.toString().padStart(2, '0')}:${minutes}`;
+                } else if (timeStr.includes(':')) {
+                    timeInput.value = timeStr.substring(0, 5);
+                } else {
+                    timeInput.value = new Date().toTimeString().slice(0, 5);
+                }
+            }
+            
+            // Set status
+            const statusSelect = document.getElementById('add_status');
+            if (statusSelect) {
+                statusSelect.value = 'in_progress';
+            }
+            
+            // Add note
+            const notesInput = document.getElementById('add_notes');
+            if (notesInput && a.id) {
+                notesInput.value = `Consultation from appointment #${a.appointment_id || a.id}`;
+            }
+            
+            // Set hidden appointment_id
+            const appointmentInput = document.getElementById('add_appointment_id');
+            if (appointmentInput && a.id) {
+                appointmentInput.value = a.id;
+            }
+            
+            // Show confirmation
+            ModalSystem.toast.info('Patient and doctor pre-filled from appointment', {
+                title: '📋 Auto-filled',
+                duration: 3000
+            });
+        }, 500);
+    }
+
+    // ============================================================
+    // START CONSULTATION FROM APPOINTMENT - FIXED
+    // ============================================================
+    function startConsultationFromAppointment(appointmentId) {
+        const a = APPOINTMENTS_DATA[appointmentId];
+        if (!a) {
+            ModalSystem.toast.error('Appointment not found');
+            return;
+        }
+        
+        // Check if consultation already exists using CONSULTATION_MAP
+        if (CONSULTATION_MAP && CONSULTATION_MAP[appointmentId]) {
+            ModalSystem.toast.info('Consultation already exists for this appointment', {
+                title: 'Info',
+                duration: 3000
+            });
+            window.location.href = 'consultations.php';
+            return;
+        }
+        
+        // Redirect with all parameters including doctor_name
+        const params = new URLSearchParams({
+            patient_id: a.patient_id,
+            appointment_id: a.id,
+            employee_id: a.employee_id,
+            date: a.date,
+            time: a.time,
+            doctor_name: a.doctor_name,
+            from_appointment: 'true'
+        });
+        
+        window.location.href = `consultations.php?${params.toString()}`;
     }
 
     // ============================================================
@@ -938,7 +1140,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
             }
         });
 
-        // Edit Appointment - FIXED: uses POST with action=update
+        // Edit Appointment
         ModalSystem.validateForm('editAppointmentModal', {
             fields: {
                 'edit_doctor_search': { type: 'search', hiddenField: 'edit_employee_id', label: 'Doctor / Staff' },
@@ -965,7 +1167,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
                 };
 
                 try {
-                    // FIXED: POST with action=update
                     const res = await fetch('/capstone/api/appointments.php?action=update&id=' + id, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1043,7 +1244,7 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     }
 
     // ============================================================
-    // CHANGE STATUS - FIXED: POST with action=status
+    // CHANGE STATUS
     // ============================================================
     function changeAppointmentStatus(id, newStatus) {
         const configs = {
@@ -1054,7 +1255,6 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
 
         ModalSystem.confirm(cfg.msg, async () => {
             try {
-                // FIXED: POST with action=status
                 const res = await fetch('/capstone/api/appointments.php?action=status&id=' + id, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1077,12 +1277,11 @@ $todayAppointments = count(array_filter($appointments, fn($a) => $a['date'] === 
     }
 
     // ============================================================
-    // DELETE - FIXED: POST with action=delete
+    // DELETE
     // ============================================================
     async function deleteAppointment(id) {
         ModalSystem.confirm('Cancel this appointment?', async () => {
             try {
-                // FIXED: POST with action=delete
                 const res = await fetch('/capstone/api/appointments.php?action=delete&id=' + id, {
                     method: 'POST',
                 });

@@ -23,13 +23,15 @@ class Appointment
 
     public function find(string|int $id): ?array
     {
-        $result = $this->db->select($this->table, ['id' => $id]);
+        // FIXED: Use eq. format for Supabase
+        $result = $this->db->select($this->table, ['id' => 'eq.' . $id]);
         return !empty($result) ? $result[0] : null;
     }
 
     public function findByAppointmentId(string $appointmentId): ?array
     {
-        $result = $this->db->select($this->table, ['appointment_id' => $appointmentId]);
+        // FIXED: Use eq. format for Supabase
+        $result = $this->db->select($this->table, ['appointment_id' => 'eq.' . $appointmentId]);
         return !empty($result) ? $result[0] : null;
     }
 
@@ -38,29 +40,33 @@ class Appointment
         if (empty($data['appointment_id'])) {
             $data['appointment_id'] = $this->generateAppointmentId();
         }
-        return $this->db->insert($this->table, $data);
+        // FIXED: Use service key
+        return $this->db->insert($this->table, $data, true);
     }
 
     public function updateById(string|int $id, array $data): array
     {
-        return $this->db->update($this->table, $data, ['id' => $id]);
+        // FIXED: Use eq. format + service key
+        return $this->db->update($this->table, $data, ['id' => 'eq.' . $id], true);
     }
 
     public function updateStatus(string|int $id, string $status): array
     {
-        return $this->db->update($this->table, ['status' => $status], ['id' => $id]);
+        // FIXED: Use eq. format + service key
+        return $this->db->update($this->table, ['status' => $status], ['id' => 'eq.' . $id], true);
     }
 
     public function deleteById(string|int $id): bool
     {
-        $this->db->delete($this->table, ['id' => $id]);
+        // FIXED: Use eq. format + service key
+        $this->db->delete($this->table, ['id' => 'eq.' . $id], true);
         return true;
     }
 
     public function generateAppointmentId(): string
     {
         try {
-            $all = $this->all(['limit' => 1000]);
+            $all = $this->all();
             $maxNum = 0;
             foreach ($all as $a) {
                 if (!empty($a['appointment_id']) && preg_match('/APT-(\d+)/i', $a['appointment_id'], $matches)) {
